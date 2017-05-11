@@ -1,0 +1,136 @@
+#set($list = $jsonObject)
+<div class="box span12 hflist" id='$list.id'  module="$module" page="$page" param="$!list.param" component="$list.component" style="$!style;overflow:inherit">
+    <span  class="ruler" style="display: none;">$!list.ruler</span>
+    <span  class="helper" style="display: none;">$!list.helper</span>
+    <div class="box-header">
+        <h2><i class="$list.icon"></i><span class="break"></span>$list.title</h2>
+        <div class="box-icon">
+            <a href="#" class="btn-setting"><i class="icon-wrench"></i></a>
+            <a href="#" class="btn-minimize"><i class="icon-chevron-up"></i></a>
+            <a href="#" class="btn-close"><i class="icon-remove"></i></a>
+        </div>
+    </div>
+##    #if($list.helperData.size() > 0)
+    <h2 class="span12 hflist-tools"  style="line-height:1.6;margin-right: 5px;;float: left;display: #if($list.helperData.size() > 0) #else none #end">
+    ##                <div class="hflist-tools-button badge badge-info " style="position: relative;cursor:pointer"><i class="icon-plus-sign"></i> ID</div>
+##                <div class="hflist-tools-button badge badge-info " style="position: relative;cursor:pointer"><i class="icon-plus-sign"></i> 名称</div>
+##                <div class="hflist-tools-button badge badge-info " style="position: relative;cursor:pointer"><i class="icon-plus-sign"></i> 描述</div>
+##                <div class="hflist-tools-button badge badge-info " style="position: relative;cursor:pointer"><i class="icon-plus-sign"></i> 生效时间</div>
+##                <div class="hflist-tools-button badge badge-info " style="position: relative;cursor:pointer"><i class="icon-plus-sign"></i> 失效时间</div>
+##                <div class="hflist-tools-button badge badge-info " style="position: relative;cursor:pointer"><i class="icon-plus-sign"></i> 商户ID</div>
+    </h2>
+##    #end
+    <div    class="box-content">
+
+        <table class="">
+            <tbody class='hflist-fast-data' style="display:none ;">
+                #foreach($row in $list.helperData)
+                <tr>
+                    #if($list.BOFR)
+                        <th>$list.BOFR.get(0).component</th>
+                    #end
+                    #set($count=0)
+                    #foreach($item in $row)
+                        #set($value =$item)
+                        #set($column = ${list.columns.get($count)})
+                        #if($column.editType != "hidden")
+                            <td>
+                                #set($elementSize = "mini span12")
+                                #parse("component/element/field.vm")
+                            </td>
+                        #else
+                            #parse("component/element/field.vm")
+                        #end
+                        #set($count=$count+1)
+                    #end
+
+                    #if($list.EOFR)
+                        <td class="center">
+                            <input name="EOFR_EDIT_FLAG" type="hidden" />
+                            #foreach($item in $list.EOFR)
+                                <a class="btn ${item.fillclass} hfhref" href="javascript:void(0)"  params="$!{item.params}" action='${item.action}'>
+                                    $item.component
+                                </a>
+                            #end
+                        </td>
+                    #end
+                </tr>
+                #end
+            </tbody>
+        </table>
+        <form class="form-horizontal" >
+            <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                <tr>
+                    #if($list.BOFR)
+                        <th width="20px">$list.BOFR.get(0).component</th>
+                    #end
+                    #foreach($column in $list.columns)
+                        #if($column.editType != "hidden")
+                            <th width="$column.width">
+                                #if("$!column.tipinfo" != "")
+                                    <a href="#" title="" data-rel="tooltip" data-original-title="$!column.tipinfo">$column.name</a>
+                                #else
+                                    $column.name
+                                #end
+                                #if($!column.notNull)<span style="color:red;">*</span> #end </th>
+                        #end
+                    #end
+                    #if($list.EOFR)
+                        <th width="20%;">操作</th>
+                    #end
+                </tr>
+                </thead>
+                <tbody class='hflist-data'>
+                    #foreach($row in $list.data)
+                    <tr>
+                        #if($list.BOFR)
+                            <th>$list.BOFR.get(0).component</th>
+                        #end
+                        #set($count=0)
+                        #foreach($item in $row)
+                            #set($value =$item)
+                            #set($column = ${list.columns.get($count)})
+                            #if($column.editType != "hidden")
+                                <td>
+                                    #set($elementSize = "mini span12")
+                            #parse("component/element/field.vm")
+                                </td>
+                            #else
+                                #parse("component/element/field.vm")
+                            #end
+                            #set($count=$count+1)
+                        #end
+
+                        #if($list.EOFR)
+                            <td class="center">
+                                <input name="EOFR_EDIT_FLAG" type="hidden" />
+                                #foreach($item in $list.EOFR)
+                                    <a class="btn ${item.fillclass} hfhref" href="javascript:void(0)"  params="$!{item.params}" action='${item.action}'>
+                                        $item.component
+                                    </a>
+                                #end
+                            </td>
+                        #end
+                    </tr>
+                    #end
+                </tbody>
+            </table>
+        </form>
+        <div class="pagination pagination-centered">
+            <ul class='hflist-pager'>
+                #foreach($pageObj in $list.pager)
+                    <li  #if($pageObj.get(2) == "active")   class="active"  #end
+                            ><a href="javascript:void(0)" class='hflist-pager-button' pageNo='$pageObj.get(1)' disabled='$pageObj.get(3)'>$pageObj.get(0)</a></li>
+                #end
+            </ul>
+        </div>
+        #if($list.EOF)
+            <div class="form-actions" align="center">
+                #foreach($item in $list.EOF)
+                    $item.component
+                #end
+            </div>
+        #end
+    </div>
+</div>

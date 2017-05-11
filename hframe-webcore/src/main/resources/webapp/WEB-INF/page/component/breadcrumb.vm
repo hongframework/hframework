@@ -1,0 +1,33 @@
+
+#if("$!breadcrumb" != "")
+<div class="row-fluid collapse in breadcrumb" style="margin-top: -15px;margin-bottom: 0px;margin-left: -20px;padding: 0px;"  id="breadcrumb">
+    <span  class="ruler" style="display: none;">$!breadcrumb.ruler</span>
+    <div class="span12">
+        <form>
+        <div class="">
+            <h2>
+                <i class="icon-home"></i>
+                Home
+
+        #foreach($column in $breadcrumb.columns)
+            #set($href = "")
+            #if(${breadcrumb.ELE.get($column.code)})
+                #set($href = $!{breadcrumb.ELE.get($column.code)})
+            #end
+            &nbsp;>&nbsp;
+            #set($data = $breadcrumb.data)
+            #set($value = $!data.get($column.code))
+##            #set($href.params = 1)
+            #set($elementSize = "medium")
+            #parse("component/element/field.vm")
+            #set($value = "" )
+        #end
+##        #foreach($item in $breadcrumb.EOF)
+##            &nbsp;&nbsp;$item.component
+##        #end
+            </h2>
+        </div>
+        </form>
+    </div>
+</div>
+#end

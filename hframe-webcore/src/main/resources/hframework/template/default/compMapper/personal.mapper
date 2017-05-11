@@ -1,0 +1,12 @@
+<mapper component-id="personal"  data-auth="session">
+    <baseMapper>
+        <mapping id="user" value="${data}">
+            <mapping id="name" value="${NAME_FIELD}"></mapping>
+            <mapping id="avatar" value="${avatar}"></mapping>
+        </mapping>
+        <mapping id="centerUrl" value="/hframe/center.html"></mapping>
+        <mapping id="settingUrl" value="/hframe/setting.html"></mapping>
+        <mapping id="messageUrl" value="/hframe/message.html"></mapping>
+        <mapping id="logoutUrl" value="/logout.html"></mapping>
+    </baseMapper>
+</mapper>

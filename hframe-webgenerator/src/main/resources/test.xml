@@ -1,0 +1,14 @@
+<ruler>
+    <module>hframe</module>
+    <entity>hfmd_entity</entity>
+    <rule>
+        <rule-type>1</rule-type>
+        <source-code>ispk</source-code>
+        <source-value>1</source-value>
+        <target-code>nullable</target-code>
+        <target-value>0</target-value>
+        <editable>false</editable>
+    </rule>
+    <rule>
+    </rule>
+</ruler>

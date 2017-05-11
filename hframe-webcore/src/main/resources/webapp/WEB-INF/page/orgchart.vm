@@ -1,0 +1,407 @@
+#if($isPop)
+    #parse("blank_startpart.vm")
+#else
+    #parse("default_startpart.vm")
+#end
+<link rel="icon" type="image/x-icon" href="$staticResourcePath/plugins/OrgChart/img/logo.ico">
+<link rel="stylesheet" href="$staticResourcePath/plugins/OrgChart/css/font-awesome.min.css">
+<link rel="stylesheet" href="$staticResourcePath/plugins/OrgChart/css/ol.min.css">
+<link rel="stylesheet" href="$staticResourcePath/plugins/OrgChart/css/jquery.orgchart.css">
+<link rel="stylesheet" href="$staticResourcePath/plugins/OrgChart/css/style.css">
+<style type="text/css">
+##    html,body {
+##        width: 100%;
+##        height: 100%;
+##        margin: 0;
+##        padding: 0;
+##    }
+##
+##    body {
+##        font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+##        font-size: 14px;
+##        line-height: 1.428571429;
+##        color: #333333;
+##        background-image: url($staticResourcePath/plugins/OrgChart/img/background.jpg);
+##    }
+
+    #headline {
+        background-color: rgba(0,0,0,0.5);
+        text-align: center;
+    }
+
+    .demo-heading {
+        padding: 40px 10px 0px 10px;
+        margin: 0px;
+        font-size: 3em;
+        color: #fff;
+    }
+
+    .demo-container {
+        position: relative;
+        display: inline-block;
+        top: 10px;
+        left: 10px;
+        height: 420px;
+        width: calc(100% - 24px);
+        border: 2px dashed #36a9e1;
+        background: rgba(0, 0, 0, 0.3);
+        border-radius: 5px;
+        overflow: auto;
+        text-align: center;
+    }
+
+    .orgchart {
+        background: rgba(0, 0, 0, 0.0);
+    }
+
+    .orgchart>.spinner {
+        color: rgba(255, 255, 0, 0.75);
+    }
+
+    .orgchart .node .title {
+        background-color: #fff;
+        color: #000;
+    }
+
+    .orgchart .node .content {
+        border-color: transparent;
+        border-top-color: #333;
+    }
+
+    .orgchart .node>.spinner {
+        color: rgba(184, 0, 54, 0.75);
+    }
+
+    .orgchart .node:hover {
+        background-color: rgba(255, 255, 0, 0.6);
+    }
+
+    .orgchart .node.focused {
+        background-color: rgba(255, 255, 0, 0.6);
+    }
+
+    .orgchart .node .edge {
+        color: rgba(0, 0, 0, 0.6);
+    }
+
+    .orgchart .edge:hover {
+        color: #000;
+    }
+
+    .orgchart td.left, .orgchart td.top, .orgchart td.right {
+        border-color: #fff;
+    }
+
+    .orgchart td>.down {
+        background-color: #fff;
+    }
+
+    .orgchart .second-menu-icon {
+        transition: opacity .5s;
+        opacity: 0;
+        right: -5px;
+        top: -5px;
+        z-index: 2;
+        color: rgba(184, 0, 100, 0.8);
+        font-size: 18px;
+        position: absolute;
+    }
+
+    .orgchart .second-menu-icon:hover {
+        color: #b80064;
+    }
+
+    .orgchart .node:hover .second-menu-icon {
+        opacity: 1;
+    }
+
+    .orgchart .node .second-menu {
+        display: none;
+        position: absolute;
+        top: 0;
+        right: -70px;
+        border-radius: 35px;
+        box-shadow: 0 0 4px 1px #999;
+        background-color: #fff;
+        z-index: 1;
+    }
+
+    .orgchart .node .second-menu .avatar {
+        width: 60px;
+        height: 60px;
+        border-radius: 30px;
+        float: left;
+        margin: 5px;
+    }
+
+    .orgchart~.mask .spinner {
+        color: rgba(255, 255, 0, 0.75);
+    }
+
+    #integrate-map {
+        position:absolute;
+        left: 40px;
+        width: calc(100% - 80px);
+        z-index:100;
+    }
+
+    #integrate-map .orgchart {
+        padding: 0px;
+        min-height: 154px;
+
+    }
+
+    #integrate-map .orgchart>table:first-child {
+        margin: 5px auto;
+    }
+
+    .orgchart.view-state .edge {
+        display: none;
+    }
+
+    #edit-panel {
+        position: relative;
+        /*left: 10px;*/
+        /*width: calc(100% - 40px);*/
+        border-radius: 4px;
+        float: left;
+        margin-top: 10px;
+        padding: 10px;
+        color: #fff;
+        background-color: #36a9e1;
+    }
+
+    #edit-panel .btn-inputs {
+        font-size: 24px;
+    }
+
+    /*#edit-panel.view-state>:not(#chart-state-panel) {*/
+        /*display: none;*/
+    /*}*/
+
+    #edit-panel label {
+        font-weight: bold;
+    }
+
+    #edit-panel.edit-parent-node .selected-node-group{
+        display: none;
+    }
+
+    #chart-state-panel, #selected-node, #btn-remove-input {
+        margin-right: 20px;
+    }
+
+    #edit-panel button, #btn-export-hier {
+        color: #333;
+        background-color: #fff;
+        display: inline-block;
+        padding: 6px 12px;
+        margin-bottom: 0;
+        line-height: 1.42857143;
+        text-align: center;
+        white-space: nowrap;
+        vertical-align: middle;
+        -ms-touch-action: manipulation;
+        touch-action: manipulation;
+        cursor: pointer;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+        background-image: none;
+        border: 1px solid #36a9e1;
+        border-radius: 4px;
+    }
+
+    #edit-panel.edit-parent-node button:not(#btn-add-nodes) {
+        display: none;
+    }
+
+    #edit-panel button:hover,.edit-panel button:focus,.edit-panel button:active {
+        border-color: #eea236;
+        box-shadow:  0 0 10px #eea236;
+    }
+
+    #new-nodelist {
+        display: inline-block;
+        list-style:none;
+        margin-top: -2px;
+        padding: 0;
+        vertical-align: text-top;
+    }
+
+    #new-nodelist>* {
+        padding-bottom: 4px;
+    }
+
+    .btn-inputs {
+        vertical-align: sub;
+    }
+
+    #edit-panel.edit-parent-node .btn-inputs {
+        /*display: none;*/
+    }
+
+    .btn-inputs:hover {
+        text-shadow: 0 0 4px #fff;
+    }
+
+    .radio-panel input[type='radio'] {
+        display: inline-block;
+        height: 24px;
+        width: 24px;
+        vertical-align: top;
+    }
+
+    #edit-panel.view-state .radio-panel input[type='radio']+label {
+        vertical-align: -webkit-baseline-middle;
+    }
+
+    #btn-add-nodes {
+        margin-left: 20px;
+    }
+
+    #btn-export-hier {
+        vertical-align: top;
+        margin-top: 200px;
+        margin-left: 50px;
+    }
+
+    #btn-export-hier+pre {
+        display: inline-block;
+        vertical-align: top;
+        color: #fff;
+        font-size: 18px;
+        font-weight: bold;
+        margin-top: -80px;
+        margin-left: 50px;
+    }
+
+    #color-coded .orgchart {
+        background: transparent;
+    }
+    .orgchart .middle-level .title {
+        background-color: #006699;
+    }
+    .orgchart .product-dept .title {
+        background-color: #009933;
+    }
+    .orgchart .rd-dept .title {
+        background-color: #993366;
+    }
+    .orgchart .pipeline1 .title {
+        background-color: #996633;
+    }
+    .orgchart .frontend1 .title {
+        background-color: #cc0066;
+    }
+
+    .hidden {
+        display: none;
+    }
+
+    .orgchart .drill-icon {
+        transition: opacity .5s;
+        opacity: 0;
+        right: -14px;
+        top: -14px;
+        z-index: 2;
+        color: rgba(184, 0, 100, 0.8);
+        font-size: 24px;
+        position: absolute;
+    }
+
+    .orgchart .drill-icon:hover {
+        color: #b80064;
+    }
+
+    .orgchart .node:hover .drill-icon {
+        opacity: 1;
+    }
+
+</style>
+<pre id="org-chart-data" style="display: none;">
+    $treeChart
+</pre>
+<div class="row-fluid">
+
+
+
+    <div class="span9">
+        <div class="demo-container" id="chart-edit" style="text-align: left;" component="treeChart"></div>
+    </div>
+    <div class="span3">
+        <div class="box span12">
+            <div class="box-header">
+                <h2><i class="icon-info-sign"></i>组织信息</h2>
+            </div>
+            <div class="box-content">
+                <form>
+                    <fieldset>
+                        <div class="row-fluid">
+                            <label class="control-label" for="hfmdEntityType">组织名称</label>
+                            <div class="controls">
+                                <input id="hfmdEntityType" name="hfmdEntityType" class="input-medium span12" />
+                            </div>
+                        </div>
+                        <div class="row-fluid">
+                            <label class="control-label" for="hfmdEntityType">组织负责人</label>
+                            <div class="controls">
+                                <select id="hfmdEntityType" name="hfmdEntityType" class="input-medium span12" data-code="hfmd_entity.hfmd_entity_type"></select>
+                            </div>
+                        </div>
+
+                        <div class="form-actions" style="text-align: right;">
+                            <a data-toggle="collapse" href="#More" aria-expanded="false" aria-controls="More" style="background-color: #f5f5f5"><i class=" icon-angle-down"></i></a>&nbsp;
+                            <button class="btn hfhref btn-primary" onclick="javascript:void(0)" params="" >保存</button>
+                            <button class="btn hfhref">删除</button>
+                            <button class="btn hfhref">重置</button>
+                        </div>
+                        <div id="More" class="row-fluid collapse">
+                            <div class="row-fluid">
+                                <label class="control-label" for="hfmdEntityType">添加</label>
+                                <div class="controls">
+                                    <input id="rootNodeRadio" name="hfmdEntityType" type="radio" />根节点
+                                    <input id="childNodeRadio" name="hfmdEntityType" type="radio" checked="checked" />子节点
+                                </div>
+                            </div>
+                            <div class="row-fluid">
+                                <label class="control-label" for="hfmdEntityType">组织名称</label>
+                                <div class="controls">
+                                    <input id="hfmdEntityType" name="hfmdEntityType" class="input-medium span12" />
+                                </div>
+                            </div>
+                            <div class="row-fluid">
+                                <label class="control-label" for="hfmdEntityType">组织负责人</label>
+                                <div class="controls">
+                                    <select id="hfmdEntityType" name="hfmdEntityType" class="input-medium span12" data-code="hfmd_entity.hfmd_entity_type"></select>
+                                </div>
+                            </div>
+                            <div class="form-actions" style="text-align: right;">
+                                <button class="btn hfhref btn-primary" onclick="javascript:void(0)" params="" >保存</button>
+                                <button class="btn hfhref">取消</button>
+                            </div>
+                        </div>
+                        <div  style="text-align: center">
+                            #if($treeChart.EOF)
+                                <div class="form-actions" align="center">
+                                    #foreach($item in $treeChart.EOF)
+                                        $item.component
+                                    #end
+                                </div>
+                            #end
+##                            <button type="button" class="btn hfhref btn-primary span12"  id="chart-submit"  style="padding: 8px;"><i class="icon-save"></i>保存布局</button>
+                        </div>
+                    </fieldset>
+                </form>
+            </div>
+
+        </div>
+    </div>
+</div>
+#if($isPop)
+    #parse("blank_endpart.vm")
+#else
+    #parse("default_endpart.vm")
+#end
+

@@ -1,0 +1,10 @@
+<ul class="nav pull-right">
+    #foreach($element in $elements)
+        <li class="dropdown hidden-phone">
+            <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
+                <i class="$element.icon"></i>
+            </a>
+            $element.context
+        </li>
+    #end
+</ul>

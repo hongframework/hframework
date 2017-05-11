@@ -1,0 +1,26 @@
+
+<input  type="text" class="form-control" placeholder="-��ѡ��-"  id="${column.javaVarName}-$map.get("RandomNum")-inputField"  value='$!oldObjectValue.get(${column.Name})'  name='$map.get("ViewObject").$column.javaVarName' style='$widthStype' />
+
+<span id="${column.javaVarName}-$map.get("RandomNum")-trigger" class="glyphicon glyphicon-calendar" aria-hidden="true"  style='cursor:hand;'></span>
+ <div id="${column.javaVarName}-$map.get("RandomNum")_cont"></div>
+       <script type="text/javascript">
+            var LEFT_CAL = Calendar.setup({
+                    cont: "${column.javaVarName}-$map.get("RandomNum")_cont",
+                    weekNumbers: true,
+                    trigger    : "${column.javaVarName}-$map.get("RandomNum")-trigger",
+        			inputField : "${column.javaVarName}-$map.get("RandomNum")-inputField",
+                    selectionType: Calendar.SEL_MULTIPLE,
+                    selection     : Calendar.dateToInt(new Date()),
+                    dateFormat:"%Y-%m-%d %H:%M:%S",
+                    showTime: 12,
+                      fdow     : 1,
+                      onSelect      : function() {
+				        var count = this.selection.countDays();
+				        if (count == 1) {
+				            this.hide();
+				        }
+				    }
+            })
+            LEFT_CAL.hide();
+             LEFT_CAL.setLanguage("cn");
+              </script>

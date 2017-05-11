@@ -1,0 +1,7 @@
+##<input type="text" class="form-control" id="$map.get("ViewObject").$column.javaVarName" placeholder="-请输入-"  name='$map.get("ViewObject").$column.javaVarName' style='$!widthStype$!heightStype'
+###########################if($null.isNull($oldObjectValue.get(${column.Name})))这种方法无效，为什么呢
+##	#if($oldObjectValue.get(${column.Name}))
+##       value='$oldObjectValue.get(${column.Name})'
+##	#end
+##        />
+<textarea class="" id="$column.code"  name="$column.code" value="$!value" rows="12" not-null="$!column.notNull"  style="width:800px">$!value</textarea>

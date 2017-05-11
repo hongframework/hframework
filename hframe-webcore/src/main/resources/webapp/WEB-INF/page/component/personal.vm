@@ -1,0 +1,20 @@
+<!-- start: User Dropdown -->
+<li class="dropdown">
+    <a class="btn account dropdown-toggle" data-toggle="dropdown" href="#">
+        <div class="avatar"><img src="$!{personal.user.avatar}" alt="头像" /></div>
+        <div class="user">
+            <span class="hello">欢迎!</span>
+            <span class="name">$!{personal.user.name}</span>
+        </div>
+    </a>
+    <ul class="dropdown-menu">
+        <li class="dropdown-menu-title">
+
+        </li>
+        <li><a href="$!{personal.centerUrl}"><i class="icon-user"></i> 个人中心</a></li>
+        <li><a href="$!{personal.settingUrl}"><i class="icon-cog"></i> 系统设置</a></li>
+        <li><a href="$!{personal.messageUrl}"><i class="icon-envelope"></i>我的消息</a></li>
+        <li><a href="$!{personal.logoutUrl}"><i class="icon-off"></i>退出</a></li>
+    </ul>
+</li>
+<!-- end: User Dropdown -->

@@ -1,0 +1,45 @@
+<div class="row-fluid">
+    <div class="login-box">
+        <h2>登录到您的帐户</h2>
+        <form class="form-horizontal"/>
+        <fieldset>
+            <input name="dc" id="dc" type="hidden" value="$form.dc" />
+            #foreach($column in $form.columns)
+                #set($href = "")
+                #if(${form.ELE.get($column.code)})
+                    #set($href = $!{form.ELE.get($column.code)})
+                #end
+
+                #if($column.editType == "hidden")
+                    #set($data = $form.data)
+                    #set($value = $!data.get($column.code))
+                    #parse("component/element/field.vm")
+                    #set($value = "")
+                #else
+                    #if("$column.editType" == "input")
+                        <input class="input-large span12" name="$column.code" id="$column.code" type="text" placeholder="$column.name" />
+                    #else
+                        <input class="input-large span12" name="$column.code" id="$column.code" type="password" placeholder="$column.name" />
+                    #end
+
+                    <div class="clearfix"></div>
+                #end
+            #end
+
+            <div class="clearfix"></div>
+
+            <label class="remember" for="remember"><input type="checkbox" id="remember" />记住我</label>
+
+            <div class="clearfix"></div>
+
+            <button class="hfhref btn btn-primary span12 " params="thisForm" action='{"ajaxSubmit":{"action":"/login.json"},"pageFwd":{"action":"$!loginFowardUrl"}}'> 登 录 </button>
+        </fieldset>
+
+        </form>
+        <hr />
+        <h3>忘记密码？</h3>
+        <p>
+            没问题, <a href="#">点击这里</a> 获取一个新的密码.
+        </p>
+    </div>
+</div><!--/row-->

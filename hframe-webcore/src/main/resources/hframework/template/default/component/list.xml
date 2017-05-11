@@ -1,0 +1,118 @@
+<component id="old_list" init="true" type="json" data-set="${dataSet}" data-auth="${dataAuth}">
+    <!--<element id="id" type="characters" relId="icons" default-value=""></element>-->
+    <!--<element id="icon" type="enum" relId="icons" default-value=""></element>-->
+    <!--<element id="title" type="characters"  default-value=""></element>-->
+    <!--<element id="columns" type="array"  default-value="">-->
+        <!--<element id="code" type="characters"  default-value=""></element>-->
+        <!--<element id="name" type="characters"  default-value=""></element>-->
+        <!--<element id="type" type="hidden"  default-value=""></element>-->
+    <!--</element>-->
+    <!--<element id="data" type="array*2"  default-value="" example-value="[1001,张三,29,女,四川成都,''],-->
+                                                                     <!--[1002,李四,31,女，北京,'']"></element>-->
+    <!--<element id="pager" type="array*2"  default-value="" example-value="">-->
+        <!--<element id="text" position="0" type="int"  default-value="" example-value="1"></element>-->
+        <!--<element id="value" position="1" type="int"  default-value="" example-value="1"></element>-->
+        <!--<element id="disabled" position="2" type="int"  default-value="" example-value="disabled"></element>-->
+        <!--<element id="active" position="3" type="int"  default-value="" example-value="active"></element>-->
+    <!--</element>-->
+
+    <!--&lt;!&ndash; 下面这两条偏重于数据 &ndash;&gt;-->
+    <!--<element id="pagination" type="object"  default-value="">-->
+        <!--<element id="pageSize" type="int"  default-value=""></element>-->
+        <!--<element id="pageIndex" type="int"  default-value=""></element>-->
+        <!--<element id="total" type="int"  default-value=""></element>-->
+        <!--<element id="pageCount" type="int"  default-value=""></element>-->
+    <!--</element>-->
+    <!--<element id="memo" type="map"></element>-->
+    <!--<baseEvents>-->
+
+        <!--&lt;!&ndash;<event id="init" type="init" name="初始化" >&ndash;&gt;-->
+            <!--&lt;!&ndash;<element id="globalParams" type="params"></element>&ndash;&gt;-->
+        <!--&lt;!&ndash;</event>&ndash;&gt;-->
+        <!--<event id="setPageSize" type="list" name="设置页面大小">-->
+            <!--<element id="pageSize" type="this.val()"></element>-->
+        <!--</event>-->
+        <!--<event id="search" type="list" name="搜索">-->
+            <!--<element id="condition" type="this.val()"></element>-->
+        <!--</event>-->
+
+        <!--<event id="sortBy" type="list" name="排序">-->
+            <!--<element id="condition" type="this.val()"></element>-->
+        <!--</event>-->
+        <!--<event id="pagination" type="list" name="翻页"></event>-->
+    <!--</baseEvents>-->
+    <!--<events>-->
+        <!--<event name="edit">-->
+            <!--<attach position="EOFR" component="icon" componentParam='{fillclass:"btn-success",iconclass:"icon-zoom-in"}'></attach>-->
+            <!--<source scope="CROW" param="${id}"></source>-->
+            <!--<effect type="pageFwd" action='${edit}' isStack="true"></effect>-->
+            <!--<effect type="component.reload"></effect>-->
+        <!--</event>-->
+        <!--<event name="delete">-->
+            <!--<attach position="EOFR" component="icon" componentParam='{fillclass:"btn-success",iconclass:"icon-zoom-in"}'></attach>-->
+            <!--<source scope="CROW" param='${id}'></source>-->
+            <!--<effect type="dialogTip" param='你是否删除${name}该数据!'></effect>-->
+            <!--<effect type="ajaxSubmit" action="${delete}"></effect>-->
+            <!--<effect type="component.reload"></effect>-->
+        <!--</event>-->
+        <!--<event name="detail">-->
+            <!--<attach position="name"></attach>-->
+            <!--<source scope="CROW" param="${id}"></source>-->
+            <!--<effect type="pageFwd" action='${detail}' isStack="true"></effect>-->
+        <!--</event>-->
+        <!--<event name="create">-->
+            <!--<attach position="name"></attach>-->
+            <!--<effect type="pageFwd" action='${create}' isStack="true"></effect>-->
+            <!--<effect type="component.reload"></effect>-->
+        <!--</event>-->
+        <!--<event name="batchDelete">-->
+            <!--<attach position="EOF" component="button" componentParam='{fillclass:"btn-success",iconclass:"icon-zoom-in"}'></attach>-->
+            <!--<source scope="COMP">-->
+                <!--<element id="ids" type="checkbox" param="${ids}"></element>-->
+            <!--</source>-->
+            <!--<effect type="ajaxSubmit" action='${batchDelete}' param="ids" isStack="true"></effect>-->
+            <!--<effect type="component.reload"></effect>-->
+        <!--</event>-->
+    <!--</events>-->
+
+    <!--<example>-->
+        <!--<![CDATA[-->
+            <!--{-->
+               <!--id:"mylist",-->
+               <!--icon:'icon-user',-->
+               <!--title:"我的列表",-->
+               <!--columns:[{code:"id",name:"学号"},-->
+                        <!--{code:"name",name:"姓名"},-->
+                        <!--{code:"age",name:"年龄"},-->
+                        <!--{code:"gender",name:"性别"},-->
+                        <!--{code:"address",name:"地址"},-->
+                        <!--{code:"remark",name:"备注"}],-->
+               <!--data:[-->
+                <!--[1001,"张三",29,"女","四川成都",''],-->
+                <!--[1002,"李四",31,"女","北京",'']-->
+               <!--],-->
+               <!--pagination:{-->
+                 <!--pageSize:2,-->
+                 <!--pageIndex:1,-->
+                 <!--total:100,-->
+                 <!--pageCount:50-->
+               <!--},-->
+               <!--memo:{-->
+                 <!--"dataset":"user"-->
+               <!--},-->
+               <!--order:{-->
+                 <!--"name":"DESC",-->
+                 <!--"age":"ASC"-->
+               <!--},-->
+               <!--pager:[-->
+                 <!--["上一页","1","disabled",""],-->
+                 <!--["1","1","disabled","active"],-->
+                 <!--["2","2","",""],-->
+                 <!--["3","3","",""],-->
+                 <!--["4","4","",""],-->
+                 <!--["下一页","5","",""]-->
+               <!--]-->
+            <!--}-->
+        <!--]]>-->
+    <!--</example>-->
+</component>

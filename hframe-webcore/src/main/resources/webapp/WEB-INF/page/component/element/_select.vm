@@ -1,0 +1,10 @@
+##<select name='$map.get("ViewObject").$column.javaVarName' class="form-control"  style='$widthStype' >
+##	#foreach($option in $column.ShowType.optionList)
+##		<option  value=$option.Value
+##		#if("{$oldObjectValue.get(${column.Name})}"=="{$option.Value}")
+##		selected='selected'
+##		#end
+##		>$option.Text</option>
+##	#end
+##</select>
+<select id='$column.code'  name='$column.code' class="input-$!{elementSize}  #if($!{href.params}) hfselect hfselect-init #end" data-value="$!value"  style='$widthStype' data-code="$column.dataCode" data-condition="1=1" relat-element="$!column.dataCondition"  params="$!{href.params}" action='$!{href.action}' not-null="$!column.notNull"></select>

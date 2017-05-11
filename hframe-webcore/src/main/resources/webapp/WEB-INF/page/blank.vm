@@ -1,0 +1,5 @@
+#parse("blank_startpart.vm")
+<div class="row-fluid">
+    #parse("component/queryForm.vm")
+</div>
+#parse("blank_endpart.vm")

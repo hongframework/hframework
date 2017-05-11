@@ -1,0 +1,15 @@
+<mapper component-id="dForm">
+    <baseMapper>
+        <mapping id="id" value="${code}QueryForm"></mapping>
+        <mapping id="icon" value="${icon}"></mapping>
+        <mapping id="title" value="${name}详情"></mapping>
+        <mapping id="columns" value="${columns}">
+            <mapping id="code" value="${code}"></mapping>
+            <mapping id="name" value="${name}"></mapping>
+            <mapping id="editType" value="${editType}"></mapping>
+            <mapping id="dataCode" value="${enumClass||entityCode}"></mapping>
+            <mapping id="dataCondition" value="${relColumns}"></mapping>
+        </mapping>
+        <mapping id="data" value="${data}"></mapping>
+    </baseMapper>
+</mapper>

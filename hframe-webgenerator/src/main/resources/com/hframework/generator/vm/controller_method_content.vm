@@ -1,0 +1,88 @@
+##第一部分：传入参数
+#set($map=$MAP)
+#set($className = $map.get("ClassName"))
+#set($varName = $map.get("VarName"))
+#set($entityName = $map.get("EntityName"))
+
+#set($seviceVarName = $map.get("SeviceVarName"))
+#set($poExampleClassName = $map.get("PoExampleClassName"))
+
+#set($moduleName = $map.get("ModuleName"))
+
+##模板内容
+    /**
+    * 创建${entityName}
+    * @param ${varName}
+    * @return
+    * @throws Throwable
+    */
+    @RequestMapping(value = "/create.html")
+    public ModelAndView create(@ModelAttribute("${varName}") ${className} ${varName}) throws Throwable {
+        ModelAndView mav = new ModelAndView();
+        ${seviceVarName}.create(${varName});
+        mav.addObject("${varName}Id", ${varName}.get${className}Id());
+        mav.setViewName("/${moduleName}/${varName}/${moduleName}_${varName}_create");
+        return mav;
+    }
+
+    /**
+    * 查询展示${entityName}
+    * @param ${varName}
+    * @return
+    * @throws Throwable
+    */
+    @RequestMapping(value = "/create.html")
+    public ModelAndView list(@ModelAttribute("${varName}") ${className} ${varName}) throws Throwable {
+        ModelAndView mav = new ModelAndView();
+        ${poExampleClassName} example = new ${poExampleClassName}();
+        ExampleUtils.parseExample(${varName},example);
+
+        List< ${className}> ${varName}List = ${seviceVarName}.get${className}ListByExample(example);
+
+        mav.addObject("${varName}List", ${varName}List);
+        mav.setViewName("/${moduleName}/${varName}/${moduleName}_${varName}_list");
+        return mav;
+    }
+
+
+    /**
+    * 异步创建${entityName}
+    * @param ${varName}
+    * @return
+    * @throws Throwable
+    */
+    @RequestMapping(value = "/createByAjax.html")
+    @ResponseBody
+    public ResultMessage createByAjax(@ModelAttribute("${varName}") ${className} ${varName}) throws Throwable {
+        ResultMessage message = new ResultMessage();
+        ${seviceVarName}.create(${varName});
+        return message;
+    }
+
+    /**
+    * 异步更新${entityName}
+    * @param ${varName}
+    * @return
+    * @throws Throwable
+    */
+    @RequestMapping(value = "/updateByAjax.html")
+    @ResponseBody
+    public ResultMessage updateByAjax(@ModelAttribute("${varName}") ${className} ${varName}) throws Throwable {
+        ResultMessage message = new ResultMessage();
+        ${seviceVarName}.update(${varName});
+        return message;
+    }
+
+    /**
+    * 异步删除${entityName}
+    * @param ${varName}
+    * @return
+    * @throws Throwable
+    */
+    @RequestMapping(value = "/deleteByAjax.html")
+    @ResponseBody
+    public ResultMessage deleteByAjax(@ModelAttribute("${varName}") ${className} ${varName}) throws Throwable {
+        ResultMessage message = new ResultMessage();
+        ${seviceVarName}.delete(${varName});
+        return message;
+    }

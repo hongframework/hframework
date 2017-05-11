@@ -1,0 +1,48 @@
+#set($widthStype='')
+#set($showType1=$column.ShowType)
+
+#if($column.ShowType.Width!=0)
+		#set($widthStype="width:$column.ShowType.Width;")
+#end
+#if($column.ShowType.Height!=0)
+		#set($heightStype="height:$column.ShowType.Height;")
+#else
+	#set($heightStype="")	
+#end
+
+#if(!$null.isNull($showType1))
+	$!column.ShowType.PreStr
+#end
+##只有一个类型的时候
+#if($column.editType=='input')
+	#parse("component/element/_input.vm")
+#elseif($column.editType=='hidden')
+	#parse("component/element/_hidden.vm")
+#elseif($column.editType=='select')
+	#parse("component/element/_select.vm")
+#elseif($column.editType=='muti-select')
+	#parse("component/element/_multiple-select.vm")
+#elseif($column.editType=='datetime')
+		#parse("component/element/_datetime.vm")
+#elseif($column.editType=='tipinput')
+		#parse("component/element/tipinput_FORGRID.vm")
+#elseif($column.editType=='checkbox')
+	#parse("component/element/_checkbox.vm")
+#elseif($column.editType=='radio')
+	#parse("component/element/_radio.vm")
+#elseif($column.editType=='switch')
+	#parse("component/element/_switch.vm")
+#elseif($column.editType=='openwin')
+	#parse("component/element/_openwin.vm")
+#elseif($column.editType=='textarea')
+	#parse("component/element/_textarea.vm")
+#elseif($column.editType=='text')
+	#parse("component/element/_text.vm")
+#elseif($column.editType=='select-panel')
+	#parse("component/element/_select-panel.vm")
+#else
+	UNKOWN
+#end
+#if(!$null.isNull($showType1))
+$!column.ShowType.AfterStr
+#end

@@ -1,0 +1,18 @@
+    <li class="dropdown hidden-phone">
+        <a class="btn hfhref" data-toggle="" href="javascript:void(0)" param="" action='{"ajaxSubmit":{"action":"/context/reload/full.json"},"alert":{"content":"加载成功!"}}'>
+            <i class="icon-play"></i>
+        </a>
+    </li>
+    <li class="dropdown hidden-phone">
+        <a class="btn btn-primary " data-toggle="collapse" href="#breadcrumb" aria-expanded="false" aria-controls="breadcrumb"><i class="icon-filter"></i></a>
+    </li>
+
+##    #foreach($element in $elements)
+##        <li class="dropdown hidden-phone">
+##            <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
+##                <i class="$element.icon"></i>
+##            </a>
+##            $!element.context
+##        </li>
+##    #end
+

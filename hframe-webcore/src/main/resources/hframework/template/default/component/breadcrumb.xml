@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component id="breadcrumb" init="true" type="xxx" data-set="${dataSet}" data-auth="${dataAuth}" path="component/breadcrumb.vm">
+    <element id="columns" type="objects"  default-value="">
+        <element id="code" type="characters"  default-value=""></element>
+        <element id="name" type="characters"  default-value=""></element>
+        <element id="editType" type="enums" relId="#{TYPE}"  default-value=""></element>
+        <element id="dataCode" type="characters"  default-value=""></element>
+        <element id="dataCondition" type="characters"  default-value=""></element>
+    </element>
+    <element id="data" type="object"  default-value=""></element>
+    <events>
+        <!--<event name="submit">-->
+            <!--<attach anchor="EOFC">-->
+                <!--<appendElement type="button" param='{btnclass:"btn-primary",btnText:" 确 定 "}'></appendElement>-->
+            <!--</attach>-->
+            <!--<source scope="EOC" param="thisForm"></source>-->
+            <!--<effect type="ajaxSubmit" action="${createByAjax}"></effect>-->
+            <!--<effect type="component.reload" target-id="list"></effect>-->
+        <!--</event>-->
+    </events>
+    <example>
+        <![CDATA[
+
+        ]]>
+    </example>
+</component>

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component id="personal" init="true" type="detail" data-set="${dataSet}" data-auth="${dataAuth}" path="component/personal.vm">
+    <element id="user" type="object"  default-value="">
+        <element id="name" type="characters"  default-value=""></element>
+        <element id="avatar" type="characters"  default-value=""></element>
+    </element>
+    <element id="centerUrl" type="characters"  default-value=""></element>
+    <element id="settingUrl" type="characters"  default-value=""></element>
+    <element id="messageUrl" type="characters"  default-value=""></element>
+    <element id="logoutUrl" type="characters"  default-value=""></element>
+    <events>
+    </events>
+    <example>
+        <![CDATA[
+
+        ]]>
+    </example>
+</component>

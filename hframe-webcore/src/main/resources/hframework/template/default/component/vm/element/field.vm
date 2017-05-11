@@ -1,0 +1,24 @@
+#set($widthStype='')
+#set($showType1=$column.ShowType)
+
+#if($column.ShowType.Width!=0)
+		#set($widthStype="width:$column.ShowType.Width;")
+#end
+#if($column.ShowType.Height!=0)
+		#set($heightStype="height:$column.ShowType.Height;")
+#else
+	#set($heightStype="")	
+#end
+
+#if(!$null.isNull($showType1))
+	$!column.ShowType.PreStr
+#end
+##只有一个类型的时候
+#parse("component/element/_field.vm")
+##拥有多个类型的时候
+
+<div class="form-group form-inline">
+#foreach($showType in $column.ShowTypes)
+	#parse("component/element/_field.vm")
+#end
+</div>

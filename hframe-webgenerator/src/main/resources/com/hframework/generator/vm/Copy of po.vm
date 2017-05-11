@@ -1,0 +1,61 @@
+##第一部分：传入参数
+#set($map=$MAP)
+#set($classPackage=$map.get("CLASS_PACKAGE"))
+#set($className=$map.get("CLASS_NAME"))
+#set($importClassList=$map.get("IMPORT_CLASS_LIST"))
+#set($sigleVarList=$map.get("SIGLE_VAR_LIST"))
+#set($multiVarList=$map.get("MULTI_VAR_LIST"))
+#set($constructorList = $map.get("CONSTRUCTOR_LIST"))
+#set($classDef = $map.get("CONSTRUCTOR_LIST"))
+##模板内容
+package $classPackage;
+import java.util.*;
+#foreach($importClass in $importClassList)
+import $importClass;
+#end
+public class $!className implements java.io.Serializable {
+#foreach($sigleVar in $sigleVarList)
+	private $sigleVar.get(0) $sigleVar.get(1);
+#end
+#foreach($multiVar in $multiVarList)
+	private List<$multiVar.get(0)> ${multiVar.get(1)}List;
+#end
+	public  $!className() {
+	}
+#foreach($constructor in $constructorList)
+    public $className($constructor.get(0).get(0)) {
+    #set($cnt=0)
+    #foreach($param in $constructor)
+    	#set($cnt=$cnt+1)
+      	#if($cnt > 1)
+      this.$param.get(0)=$param.get(1);
+		#end
+      #end
+	 }
+ #end
+ 
+#foreach($sigleVar in $sigleVarList)
+    public $sigleVar.get(0) get$sigleVar.get(2)(){
+    	return $sigleVar.get(1);
+    }
+#end
+
+#foreach($multiVar in $multiVarList)
+	public List<$multiVar.get(0)> get${multiVar.get(0)}List() {
+		return ${multiVar.get(1)}List;
+	}
+#end
+
+#foreach($sigleVar in $sigleVarList)
+    public void set$sigleVar.get(2)($sigleVar.get(0) $sigleVar.get(1)){
+    	this.$sigleVar.get(1) = $sigleVar.get(1);
+    }
+#end
+
+#foreach($multiVar in $multiVarList)
+	public void set${multiVar.get(0)}List(List<$multiVar.get(0)> ${multiVar.get(1)}List) {
+		this.${multiVar.get(1)}List =  ${multiVar.get(1)}List;
+	}
+#end
+    
+}

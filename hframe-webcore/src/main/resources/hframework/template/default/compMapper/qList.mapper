@@ -1,0 +1,34 @@
+<mapper component-id="qList">
+    <baseMapper>
+        <mapping id="id" value="${code}_list"></mapping>
+        <mapping id="icon" value="${icon}"></mapping>
+        <mapping id="title" value="${name}列表"></mapping>
+        <mapping id="columns" value="${columns}">
+            <mapping id="code" value="${code}"></mapping>
+            <mapping id="name" value="${name}"></mapping>
+            <mapping id="showType" value="${showType}"></mapping>
+            <mapping id="dataCode" value="${enumClass||entityCode}"></mapping>
+            <mapping id="dataCondition" value="${relColumns}"></mapping>
+        </mapping>
+        <mapping id="data" value="${data}"></mapping>
+
+        <mapping id="pager" value="${pager}">
+            <mapping id="text" value="${text}"></mapping>
+            <mapping id="value"  value="${value}"></mapping>
+            <mapping id="disabled" value="${disabled}"></mapping>
+            <mapping id="active" value="${active}"></mapping>
+        </mapping>
+    </baseMapper>
+    <eventMapper>
+        <mapping id="id" value="${id}"></mapping>
+        <mapping id="DS" value="${DS}"></mapping>
+        <mapping id="ids" value="${id}"></mapping>
+        <mapping id="name" value="${name}"></mapping>
+        <mapping id="create" value="${create}.html"></mapping>
+        <mapping id="edit" value="${edit}.html"></mapping>
+        <mapping id="detail" value="${detail}.html"></mapping>
+        <mapping id="delete" value="${deleteByAjax}.json"></mapping>
+        <mapping id="updateByAjax" value="${updateByAjax}.json"></mapping>
+        <mapping id="batchDelete" value="${batchDelete}.html"></mapping>
+    </eventMapper>
+</mapper>

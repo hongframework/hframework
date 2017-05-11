@@ -1,0 +1,7 @@
+<html>
+<center>
+    <a href="javascript:history.go(-1)">
+        <img src='$staticResourcePath/img/500.png'>
+    </a>
+</center>
+</html>

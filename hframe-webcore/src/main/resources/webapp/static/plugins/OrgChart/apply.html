@@ -1,0 +1,495 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Organization Chart Plugin</title>
+
+    <link rel="icon" type="image/x-icon" href="img/logo.ico">
+    <link rel="stylesheet" href="css/font-awesome.min.css">
+    <link rel="stylesheet" href="css/ol.min.css">
+    <link rel="stylesheet" href="css/jquery.orgchart.css">
+    <link rel="stylesheet" href="css/style.css">
+    <style type="text/css">
+        html,body {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+            font-size: 14px;
+            line-height: 1.428571429;
+            color: #333333;
+            background-image: url(img/background.jpg);
+        }
+
+        #headline {
+            background-color: rgba(0,0,0,0.5);
+            text-align: center;
+        }
+
+        .demo-heading {
+            padding: 40px 10px 0px 10px;
+            margin: 0px;
+            font-size: 3em;
+            color: #fff;
+        }
+
+        .demo-container {
+            position: relative;
+            display: inline-block;
+            top: 10px;
+            left: 10px;
+            height: 420px;
+            width: calc(100% - 24px);
+            border: 2px dashed #eee;
+            border-radius: 5px;
+            overflow: auto;
+            text-align: center;
+        }
+
+        .orgchart {
+            background: rgba(0, 0, 0, 0.5);
+        }
+
+        .orgchart>.spinner {
+            color: rgba(255, 255, 0, 0.75);
+        }
+
+        .orgchart .node .title {
+            background-color: #fff;
+            color: #000;
+        }
+
+        .orgchart .node .content {
+            border-color: transparent;
+            border-top-color: #333;
+        }
+
+        .orgchart .node>.spinner {
+            color: rgba(184, 0, 54, 0.75);
+        }
+
+        .orgchart .node:hover {
+            background-color: rgba(255, 255, 0, 0.6);
+        }
+
+        .orgchart .node.focused {
+            background-color: rgba(255, 255, 0, 0.6);
+        }
+
+        .orgchart .node .edge {
+            color: rgba(0, 0, 0, 0.6);
+        }
+
+        .orgchart .edge:hover {
+            color: #000;
+        }
+
+        .orgchart td.left, .orgchart td.top, .orgchart td.right {
+            border-color: #fff;
+        }
+
+        .orgchart td>.down {
+            background-color: #fff;
+        }
+
+        .orgchart .second-menu-icon {
+            transition: opacity .5s;
+            opacity: 0;
+            right: -5px;
+            top: -5px;
+            z-index: 2;
+            color: rgba(184, 0, 100, 0.8);
+            font-size: 18px;
+            position: absolute;
+        }
+
+        .orgchart .second-menu-icon:hover {
+            color: #b80064;
+        }
+
+        .orgchart .node:hover .second-menu-icon {
+            opacity: 1;
+        }
+
+        .orgchart .node .second-menu {
+            display: none;
+            position: absolute;
+            top: 0;
+            right: -70px;
+            border-radius: 35px;
+            box-shadow: 0 0 4px 1px #999;
+            background-color: #fff;
+            z-index: 1;
+        }
+
+        .orgchart .node .second-menu .avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 30px;
+            float: left;
+            margin: 5px;
+        }
+
+        .orgchart~.mask .spinner {
+            color: rgba(255, 255, 0, 0.75);
+        }
+
+        #integrate-map {
+            position:absolute;
+            left: 40px;
+            width: calc(100% - 80px);
+            z-index:100;
+        }
+
+        #integrate-map .orgchart {
+            padding: 0px;
+            min-height: 154px;
+
+        }
+
+        #integrate-map .orgchart>table:first-child {
+            margin: 5px auto;
+        }
+
+        .orgchart.view-state .edge {
+            display: none;
+        }
+
+        #edit-panel {
+            position: relative;
+            left: 10px;
+            width: calc(100% - 40px);
+            border-radius: 4px;
+            float: left;
+            margin-top: 10px;
+            padding: 10px;
+            color: #fff;
+            background-color: #449d44;
+        }
+
+        #edit-panel .btn-inputs {
+            font-size: 24px;
+        }
+
+        #edit-panel.view-state>:not(#chart-state-panel) {
+            display: none;
+        }
+
+        #edit-panel label {
+            font-weight: bold;
+        }
+
+        #edit-panel.edit-parent-node .selected-node-group{
+            display: none;
+        }
+
+        #chart-state-panel, #selected-node, #btn-remove-input {
+            margin-right: 20px;
+        }
+
+        #edit-panel button, #btn-export-hier {
+            color: #333;
+            background-color: #fff;
+            display: inline-block;
+            padding: 6px 12px;
+            margin-bottom: 0;
+            line-height: 1.42857143;
+            text-align: center;
+            white-space: nowrap;
+            vertical-align: middle;
+            -ms-touch-action: manipulation;
+            touch-action: manipulation;
+            cursor: pointer;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            background-image: none;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        #edit-panel.edit-parent-node button:not(#btn-add-nodes) {
+            display: none;
+        }
+
+        #edit-panel button:hover,.edit-panel button:focus,.edit-panel button:active {
+            border-color: #eea236;
+            box-shadow:  0 0 10px #eea236;
+        }
+
+        #new-nodelist {
+            display: inline-block;
+            list-style:none;
+            margin-top: -2px;
+            padding: 0;
+            vertical-align: text-top;
+        }
+
+        #new-nodelist>* {
+            padding-bottom: 4px;
+        }
+
+        .btn-inputs {
+            vertical-align: sub;
+        }
+
+        #edit-panel.edit-parent-node .btn-inputs {
+            display: none;
+        }
+
+        .btn-inputs:hover {
+            text-shadow: 0 0 4px #fff;
+        }
+
+        .radio-panel input[type='radio'] {
+            display: inline-block;
+            height: 24px;
+            width: 24px;
+            vertical-align: top;
+        }
+
+        #edit-panel.view-state .radio-panel input[type='radio']+label {
+            vertical-align: -webkit-baseline-middle;
+        }
+
+        #btn-add-nodes {
+            margin-left: 20px;
+        }
+
+        #btn-export-hier {
+            vertical-align: top;
+            margin-top: 200px;
+            margin-left: 50px;
+        }
+
+        #btn-export-hier+pre {
+            display: inline-block;
+            vertical-align: top;
+            color: #fff;
+            font-size: 18px;
+            font-weight: bold;
+            margin-top: -80px;
+            margin-left: 50px;
+        }
+
+        #color-coded .orgchart {
+            background: transparent;
+        }
+        .orgchart .middle-level .title {
+            background-color: #006699;
+        }
+        .orgchart .product-dept .title {
+            background-color: #009933;
+        }
+        .orgchart .rd-dept .title {
+            background-color: #993366;
+        }
+        .orgchart .pipeline1 .title {
+            background-color: #996633;
+        }
+        .orgchart .frontend1 .title {
+            background-color: #cc0066;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .orgchart .drill-icon {
+            transition: opacity .5s;
+            opacity: 0;
+            right: -14px;
+            top: -14px;
+            z-index: 2;
+            color: rgba(184, 0, 100, 0.8);
+            font-size: 24px;
+            position: absolute;
+        }
+
+        .orgchart .drill-icon:hover {
+            color: #b80064;
+        }
+
+        .orgchart .node:hover .drill-icon {
+            opacity: 1;
+        }
+
+    </style>
+
+</head>
+<body id="pageBody">
+<div id="headline">
+    <img src="img/orgchart-heading.png">
+</div>
+
+<p class="demo-heading">chart editing</p>
+<div class="demo-container" id="chart-edit" style="text-align: left;"></div>
+<div id="edit-panel" class="view-state">
+    <span id="chart-state-panel" class="radio-panel">
+      <input type="radio" name="chart-state" id="rd-view" value="view" checked="true"><label for="rd-view">View</label>
+      <input type="radio" name="chart-state" id="rd-edit" value="edit"><label for="rd-edit">Edit</label>
+    </span>
+    <label class="selected-node-group">selected node:</label>
+    <input type="text" id="selected-node" class="selected-node-group">
+    <label>new node:</label>
+    <ul id="new-nodelist">
+        <li><input type="text" class="new-node"></li>
+    </ul>
+    <i class="fa fa-plus-circle btn-inputs" id="btn-add-input"></i>
+    <i class="fa fa-minus-circle btn-inputs" id="btn-remove-input"></i>
+    <span id="node-type-panel" class="radio-panel">
+      <input type="radio" name="node-type" id="rd-parent" value="parent"><label for="rd-parent">Parent(root)</label>
+      <input type="radio" name="node-type" id="rd-child" value="children"><label for="rd-child">Child</label>
+      <input type="radio" name="node-type" id="rd-sibling" value="siblings"><label for="rd-sibling">Sibling</label>
+    </span>
+    <button type="button" id="btn-add-nodes">Add</button>
+    <button type="button" id="btn-delete-nodes">Delete</button>
+    <button type="button" id="btn-reset">Reset</button>
+</div>
+
+
+<script type="text/javascript" src="js/jquery.min.js"></script>
+<script type="text/javascript" src="js/jquery.mockjax.min.js"></script>
+<script type="text/javascript" src="js/html2canvas.min.js"></script>
+<script type="text/javascript" src="js/ol.min.js"></script>
+<script type="text/javascript" src="js/jquery.orgchart.js"></script>
+<script type="text/javascript">
+    (function($) {
+
+        $(function() {
+
+            /*********************** chart editing **********************/
+            var jsonDs4 = {
+                'name': 'Ball game',
+                'relationship': '001',
+                'title': 'department manager',
+                'children': [
+                    { 'name': 'Football', 'relationship': '110', 'title': 'department manager' },
+                    { 'name': 'Basketball', 'relationship': '110', 'title': 'department manager' },
+                    { 'name': 'Volleyball', 'relationship': '110', 'title': 'department manager' }
+                ]
+            };
+            $('#chart-edit').orgchart({
+                'data' : jsonDs4,
+                'direction': 'l2r',
+                'draggable': true,
+                'exportButton': true,
+                'exportFilename': 'SportsChart',
+                'parentNodeSymbol': 'fa-th-large',
+                'nodeContent': 'title',
+//                'nodeID': 'id',
+                'createNode': function($node, data) {
+                    $node.on('click', function(event) {
+                        if (!$(event.target).is('.edge')) {
+                            $('#selected-node').val(data.name).data('node', $node);
+                        }
+                    });
+                }
+            }).on('click', '.orgchart', function(event) {
+                        if (!$(event.target).closest('.node').length) {
+                            $('#selected-node').val('');
+                        }
+                });
+            $('input[name="chart-state"]').on('click', function() {
+                $('#chart-edit').children('.orgchart').toggleClass('view-state');
+                $('#edit-panel').toggleClass('view-state');
+                if ($(this).val() === 'edit') {
+                    $('.orgchart').find('tr').removeClass('hidden')
+                            .find('td').removeClass('hidden')
+                            .find('.node').removeClass('slide-up slide-down slide-right slide-left');
+                } else {
+                    $('#btn-reset').trigger('click');
+                }
+            });
+            $('input[name="node-type"]').on('click', function() {
+                var $this = $(this);
+                if ($this.val() === 'parent') {
+                    $('#edit-panel').addClass('edit-parent-node');
+                    $('#new-nodelist').children(':gt(0)').remove();
+                } else {
+                    $('#edit-panel').removeClass('edit-parent-node');
+                }
+            });
+            $('#btn-add-input').on('click', function() {
+                $('#new-nodelist').append('<li><input type="text" class="new-node"></li>');
+            });
+            $('#btn-remove-input').on('click', function() {
+                var inputs = $('#new-nodelist').children('li');
+                if (inputs.length > 1) {
+                    inputs.last().remove();
+                }
+            });
+            $('#btn-add-nodes').on('click', function() {
+                var $chartEdit = $('#chart-edit');
+                var nodeVals = [];
+                $('#new-nodelist').find('.new-node').each(function(index, item) {
+                    var validVal = item.value.trim();
+                    if (validVal.length) {
+                        nodeVals.push(validVal);
+                    }
+                });
+                var $node = $('#selected-node').data('node');
+                if (!nodeVals.length) {
+                    alert('Please input value for new node');
+                    return;
+                }
+                var nodeType = $('input[name="node-type"]:checked');
+                if (nodeType.val() !== 'parent' && !$node) {
+                    alert('Please select one node in orgchart');
+                    return;
+                }
+                if (!nodeType.length) {
+                    alert('Please select a node type');
+                    return;
+                }
+                if (nodeType.val() === 'parent') {
+                    $chartEdit.orgchart('addParent', $chartEdit.find('.node:first'), { 'name': nodeVals[0] });
+                } else if (nodeType.val() === 'siblings') {
+                    $chartEdit.orgchart('addSiblings', $node,
+                            { 'siblings': nodeVals.map(function(item) { return { 'name': item, 'relationship': '110' }; })
+                            });
+                } else {
+                    var hasChild = $node.parent().attr('colspan') > 0 ? true : false;
+                    if (!hasChild) {
+                        var rel = nodeVals.length > 1 ? '110' : '100';
+                        $chartEdit.orgchart('addChildren', $node, {
+                            'children': nodeVals.map(function(item) {
+                                return { 'name': item, 'relationship': rel };
+                            })
+                        }, $.extend({}, $chartEdit.find('.orgchart').data('options'), { depth: 0 }));
+                    } else {
+                        $chartEdit.orgchart('addSiblings', $node.closest('tr').siblings('.nodes').find('.node:first'),
+                                { 'siblings': nodeVals.map(function(item) { return { 'name': item, 'relationship': '110' }; })
+                                });
+                    }
+                }
+            });
+            $('#btn-delete-nodes').on('click', function() {
+                var $node = $('#selected-node').data('node');
+                if (!$node) {
+                    alert('Please select one node in orgchart');
+                    return;
+                }
+                $('#chart-edit').orgchart('removeNodes', $node);
+                $('#selected-node').data('node', null);
+            });
+            $('#btn-reset').on('click', function() {
+                $('#chart-edit').children('.orgchart').trigger('click');
+                $('#new-nodelist').find('input:first').val('').parent().siblings().remove();
+                $('#node-type-panel').find('input').prop('checked', false);
+            });
+        });
+
+    })(jQuery);
+</script>
+</body>
+</html>

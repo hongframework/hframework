@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<event-store group="ELE">
+    <event name="goto.detail" description="明细">
+        <attach anchor="${name}"></attach>
+        <source scope="CROW" param="${id}"></source>
+        <effect type="pageFwd" action='${detail}' isStack="true"></effect>
+    </event>
+</event-store>

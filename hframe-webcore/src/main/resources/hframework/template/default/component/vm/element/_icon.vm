@@ -1,0 +1,7 @@
+<a class="btn ${fillclass} hfhref" href="javascript:void(0)"  params="${id}" action="${action}">
+    <i class="${iconclass}"></i>
+</a>
+
+<a class="btn btn-success hfhref" href="javascript:void(0)"  params="user_id" action="{pageFwd:{action:'uc/user/edit',isStack:true}">
+    <i class="icon-zoom-in"></i>
+</a>

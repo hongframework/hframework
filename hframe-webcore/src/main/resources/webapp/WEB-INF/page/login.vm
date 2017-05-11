@@ -1,0 +1,20 @@
+#parse("blank_startpart.vm")
+
+<body>
+<div class="container-fluid-full">
+    <div class="row-fluid">
+		#foreach($element in $elements.entrySet())
+            <div class="row-fluid">
+				#if($element.value.component == "cForm")
+							#set($form = $element.value)
+							#parse("component/login.vm")
+						#end
+            </div>
+		#end
+    </div><!--/fluid-row-->
+
+</div><!--/.fluid-container-->
+
+	#parse("blank_endpart.vm")
+</body>
+</html>

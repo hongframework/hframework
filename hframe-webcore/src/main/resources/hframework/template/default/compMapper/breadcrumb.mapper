@@ -1,0 +1,15 @@
+<mapper component-id="breadcrumb" data-auth="pageflow">
+    <baseMapper>
+        <mapping id="columns" value="${columns}">
+            <mapping id="code" value="${code}"></mapping>
+            <mapping id="name" value="${name}"></mapping>
+            <mapping id="editType" value="${editType}"></mapping>
+            <mapping id="dataCode" value="${enumClass||entityCode}"></mapping>
+            <mapping id="dataCondition" value="${relColumns}"></mapping>
+        </mapping>
+        <mapping id="data" value="${data}"></mapping>
+    </baseMapper>
+    <eventMapper>
+        <mapping id="createByAjax" value="${updateByAjax}.json"></mapping>
+    </eventMapper>
+</mapper>

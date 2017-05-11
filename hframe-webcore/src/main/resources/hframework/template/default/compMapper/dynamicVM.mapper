@@ -1,0 +1,4 @@
+<mapper component-id="dynamicVM">
+    <baseMapper>
+    </baseMapper>
+</mapper>

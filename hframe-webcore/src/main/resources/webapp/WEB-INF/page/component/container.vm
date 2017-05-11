@@ -1,0 +1,81 @@
+<div class="box span12 hfcontainer" id='$container.id'  module="$module" page="$page" param="$!container.param" path="$!filePath" component="$container.component" style="border: 1px solid #B1D2EC">
+    #set($isPop = true)
+    #set($elements = $container.modelMap.elements)
+    #set($style ="margin-bottom:5px;")
+##    $fileContainer.dataGroups.get(0).elementMap
+
+##    $container.dataSet
+    #set($cnt = 0)
+    #foreach($element in $elements.entrySet())
+        #set($cnt = $cnt + 1)
+        #set($compData = $fileContainer.dataGroups.get(0).elementMap.get($element.value.dataSet))
+        <div class="row-fluid" dc="$element.value.dc">
+
+            #if($element.value.component == "cForm")
+                #set($form = $element.value)
+                #set($form.data = $compData.one)
+                #parse("component/createForm.vm")
+            #elseif($element.value.component == "eForm")
+                #set($form = $element.value)
+                #set($form.data = $compData.one)
+                #parse("component/createForm.vm")
+            #elseif($element.value.component == "qForm")
+                #set($form = $element.value)
+                #set($form.data = $compData.one)
+                #parse("component/queryForm.vm")
+            #elseif($element.value.component == "cList")
+                #set($list = $element.value)
+                #set($list.data = $compData.componentData.data)
+                #parse("component/editList.vm")
+            #elseif($element.value.component == "eList")
+                #set($list = $element.value)
+                #set($list.data = $compData.componentData.data)
+                #parse("component/editList.vm")
+            #elseif($element.value.component == "qList")
+                #set($list = $element.value)
+                #set($list.data = $compData.componentData.data)
+                #parse("component/queryList.vm")
+            #elseif($element.value.component == "mutexContainer")
+                #set($container = $element.value)
+                <div class="box span12 hfmutexcont hftab" id='$container.id'  module="$module" page="$page" param="$!container.param" component="$container.component" style="$!style">
+                    <div class="box-header">
+                        <h2><i class="icon-th"></i>$container.title</h2>
+                        <div class="box-icon">
+                            <a href="#" class="btn-setting"><i class="icon-wrench"></i></a>
+                            <a href="#" class="btn-minimize"><i class="icon-chevron-up"></i></a>
+                            <a href="#" class="btn-close"><i class="icon-remove"></i></a>
+                        </div>
+                    </div>
+                    <div class="box-content">
+                        <ul class="nav nav-tabs">
+                            #foreach($curDataGroup in $compData.dataGroups)
+                                <li class=""><a href="#$curDataGroup.name">${curDataGroup.node.name}[$curDataGroup.name]</a></li>
+                            #end
+                            <li class=""><a href="#newnode$cnt">新增</a></li>
+                        </ul>
+                        <div  class="tab-content">
+                            #foreach($curDataGroup in $compData.dataGroups)
+                                <div class="tab-pane" id="$curDataGroup.name">
+                                    #parse("component/mutexContainer.vm")
+                                </div>
+                            #end
+##                            <div class="tab-pane" id="newnode$cnt">
+##                                #set($curDataGroup ="")
+##                                #parse("component/mutexContainer.vm")
+##                            </div>
+                        </div>
+                    </div>
+                    #if($container.EOF)
+                        <div class="form-actions" align="center">
+                            #foreach($item in $container.EOF)
+                                $container.component
+                            #end
+                        </div>
+                    #end
+                </div>
+            #end
+        </div>
+    #end
+##
+##    #parse("${container.view}.vm")
+</div>

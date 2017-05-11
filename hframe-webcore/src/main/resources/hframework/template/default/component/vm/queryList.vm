@@ -1,0 +1,78 @@
+
+<div class="box span12 hflist" id='$list.id' dataset="user" module="uc" >
+    <div class="box-header">
+        <h2><i class="$list.icon"></i><span class="break"></span>$list.title</h2>
+        <div class="box-icon">
+            <a href="#" class="btn-setting"><i class="icon-wrench"></i></a>
+            <a href="#" class="btn-minimize"><i class="icon-chevron-up"></i></a>
+            <a href="#" class="btn-close"><i class="icon-remove"></i></a>
+        </div>
+    </div>
+    <div class="box-content">
+        <table class="table table-bordered table-striped table-condensed">
+            <thead>
+            <tr>
+                #if($list.BOFR)
+                    <th width="20px">$list.EBOFR.get(0).component</th>
+                #end
+                #foreach($column in $list.columns)
+                    <th>$column.name</th>
+                #end
+                #if($list.EOFR)
+                    <th width="200px;">操作</th>
+                #end
+            </tr>
+            </thead>
+            <tbody class='hflist-data'>
+                #foreach($row in $list.data)
+                <tr>
+                    #if($list.BOFR)
+                        <th>$list.BOFR.get(0).component</th>
+                    #end
+                    #set($count=0)
+                    #foreach($item in $row)
+                        #set($count=$count+1)
+                        <td>
+                            #if(${list.ELE.get("${count}")})
+                                #set($href=${list.ELE.get("${count}")})
+                                <a class="${href.fillclass} hfhref" href="javascript:void(0)"  params="${href.params}" action='${href.action}'>
+                                    <span class="hflist-data-item" code="$count">$item</span>
+                                </a>
+                            #else
+                                <span code="$count">$item</span>
+                            #end
+                        </td>
+                    #end
+
+                    #if($list.EOFR)
+                        <td class="center">
+                            #foreach($item in $list.EOFR)
+                                <a class="btn ${item.fillclass} hfhref" href="javascript:void(0)"  params="${item.params}" action='${item.action}'>
+                                    $item.component
+                                </a>
+                            #end
+                        </td>
+                    #end
+
+                </tr>
+                #end
+            </tbody>
+        </table>
+        <div class="pagination pagination-centered">
+            <ul class='hflist-pager'>
+                #foreach($pageObj in $list.pager)
+                    <li  #if($pageObj.get(3) == "active")   class="active"  #end
+                    ><a href="#" class='hflist-pager-button' pageNo='$pageObj.get(1)' disabled='$pageObj.get(2)'>$pageObj.get(0)</a></li>
+                #end
+            </ul>
+        </div>
+        #if($list.EOF)
+            <div class="form-actions" align="center">
+                #foreach($item in $list.EOF)
+                    $item.component
+                #end
+            </div>
+        #end
+
+    </div>
+</div>

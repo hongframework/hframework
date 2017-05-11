@@ -1,0 +1,51 @@
+#parse("blank_startpart.vm")
+<body>
+<!-- start: Header -->
+<div class="navbar">
+    <div class="navbar-inner">
+        <div class="container-fluid">
+            <a class="btn btn-navbar" data-toggle="collapse" data-target=".top-nav.nav-collapse,.sidebar-nav.nav-collapse">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </a>
+            <a id="main-menu-toggle" class="hidden-phone open"><i class="icon-reorder"></i></a>
+            <div class="row-fluid">
+                <a class="brand span2" href="/index.html"><span>${programName}</span></a>
+            </div>
+            <!-- start: Header Menu -->
+            <div class="nav-no-collapse header-nav">
+                <ul class="nav pull-right">
+                #parse("component/topFastMenu.vm")
+                #parse("component/personal.vm")
+                </ul>
+            </div>
+            <!-- end: Header Menu -->
+
+        </div>
+    </div>
+</div>
+<span id="globalRuler" style="display: none;">$!{globalRuler}</span>
+<!-- start: Header -->
+<div class="container-fluid-full">
+    <div class="row-fluid">
+
+        <!-- start: Main Menu -->
+        <div id="sidebar-left" class="span2">
+
+            <div class="row-fluid actions">
+
+                <input type="text" class="search span12" placeholder="..." />
+
+            </div>
+
+            <div class="nav-collapse sidebar-nav">
+                #set($menus = $leftMenuTree.menus)
+                #parse("component/leftMenuTree.vm")
+            </div>
+        </div>
+        <!-- end: Main Menu -->
+
+        <!-- start: Content -->
+        <div id="content" class="span10" style="overflow-y: auto;overflow-x: hidden"">
+            #parse("component/breadcrumb.vm")

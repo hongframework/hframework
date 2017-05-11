@@ -1,0 +1,18 @@
+<ul class="dropdown-menu notifications">
+    <li class="dropdown-menu-title">
+        <span>你一共有${result.count}条通知未处理</span>
+    </li>
+
+    #foreach($data in $result.data)
+        <li>
+            <a href="#">
+                <span class="icon blue"><i class="${data.icon}"></i></span>
+                <span class="message">${data.message}</span>
+                <span class="time">${data.time}</span>
+            </a>
+        </li>
+    #end
+    <li class="dropdown-menu-sub-footer">
+        <a href="#">查看更多</a>
+    </li>
+</ul>

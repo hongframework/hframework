@@ -1,0 +1,38 @@
+##第一部分：传入参数
+#set($map=$MAP)
+#set($classDef = $map.get("CLASS"))
+##模板内容
+package $classDef.classPackage;
+
+#foreach($importClass in $classDef.importClassList)
+import $importClass;
+#end
+
+$!classDef.annotation
+public $classDef.type $classDef.className $!classDef.superClassStr $!classDef.implementsStr {
+
+#foreach($field in $classDef.fieldList)
+	$!field.fieldAnno
+	private $field.type $field.name;
+#end
+#foreach($constructor in $classDef.constructorList)
+
+    public ${classDef.className}($!constructor.parameterStr) {
+    #foreach($codeLine in $constructor.codelnList)
+    	 $!codeLine
+    #end
+	}
+ #end
+  $!classDef.extMethodStr
+ #foreach($field in $classDef.fieldList)
+
+ 	$!fieldgetMethodAnno
+	public $field.type get${field.ucName}(){
+		return $field.name;
+	}
+
+	public void set${field.ucName}(${field.type} ${field.name}){
+    	this.$field.name = $field.name;
+    }
+#end
+}

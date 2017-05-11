@@ -1,0 +1,20 @@
+#set($tree = $jsonObject)
+<div class="box span12 hftree" id='$tree.id'  module="$module" page="$page" param="$!tree.param" component="$tree.component">
+    <span  class="ruler" style="display: none;">$!tree.ruler</span>
+    <span  class="helper" style="display: none;">$!tree.helper</span>
+    <div class="box-header">
+        <h2><i class="$tree.icon"></i><span class="break"></span>$!tree.title</h2>
+    </div>
+    <div class="box-content">
+        <div id="tree1" class="tree"></div>
+
+        <pre class="dyn-tree-ele" style="display: none;">
+            #foreach($element in $tree.ELE)
+                <span params="$element.params" action='$element.action'></span>
+            #end
+        </pre>
+        <pre id="dyn-tree-data" style="display: none;">
+            $tree.children
+        </pre>
+    </div>
+</div>

@@ -1,0 +1,47 @@
+<script type="text/javascript">
+    $(document).ready(function(e) {
+        $("input[name=basicProductId]").initCol({tagClass:"dfinput",dataSrc:"table",dataCode:"PC.BasicProduct.Id.Name",dataCond:"",dataHide:"spvId",async:"false",
+            onload:function (){
+                $.thisObj = $("select[name=basicProductId]");
+                var spvId = $.thisObj.find("option:checked").attr("data-hide");
+                var condition = "Id=" + spvId;
+                $("input[name=spvId]").initCol({tagClass:"dfinput",dataSrc:"table",dataCode:"UC.Organization.Id.Name",dataCond:condition});
+                $("select[name=spvId]").val(spvId);
+            },
+            onchange:function (){
+                var spvId = $(this).find("option:selected").attr("data-hide");
+                var condition = "Id=" + spvId;
+                $("[name=spvId]").initCol({tagClass:"dfinput",dataSrc:"table",dataCode:"UC.Organization.Id.Name",dataCond:condition});
+                $("select[name=spvId]").val(spvId);
+            }
+        });
+        $("input[name=assetCategoryCode]").initCol({tagClass:"dfinput",dataSrc:"table",dataCode:"AA.AssetCategory.Code.Name"});
+
+        $("[name=templateId]").initCol({tagClass:"dfinput",dataSrc:"table",dataCode:"PC.ContractTemplate.Id.Name",async:false,
+            onchange:function (){
+                var srcTemplateId = $(this).val();
+                $.ajax({
+                    url: "/ajax/getdata/contractTemplate/single.json?Id=" + srcTemplateId,
+                    type: 'post',
+                    dataType: 'json',
+                    success: function (jsonData) {
+
+                        if (typeof jsonData !== 'undefined') {
+                            var contractTemplate = jsonData.contractTemplate;
+                            $("[name='name']").val(contractTemplate.name);
+                            $("[name='code']").val(contractTemplate.code);
+                            $("[name='content']").val(contractTemplate.templateContent);
+
+
+                        }
+                    },
+                    error: function () {
+                    }
+                });
+            }
+
+        });
+        getDicText("CC.Member.Id.Name",data,true);
+    });
+
+</script>

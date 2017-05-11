@@ -1,0 +1,20 @@
+#if($isPop)
+    #parse("blank_startpart.vm")
+#else
+    #parse("default_startpart.vm")
+#end
+
+##<div class="row-fluid">
+###set($form = $eForm)
+###parse("component/createForm.vm")
+##</div>
+<div class="row-fluid">
+#set($list = $eList)
+#parse("$eList.vmpath")
+</div>
+
+#if($isPop)
+    #parse("blank_endpart.vm")
+#else
+    #parse("default_endpart.vm")
+#end

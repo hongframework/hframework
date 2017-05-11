@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hframework.base.dao.CommonDataMapper" >
+  <resultMap id="dynamicDictionaryResult" type="com.hframework.base.bean.KVBean">
+    <result property="value" column="dictionary_value" javaType="java.lang.String" />
+    <result property="text" column="dictionary_text" javaType="java.lang.String" />
+    <result property="extInfo" column="dictionary_extInfo" javaType="java.lang.String" />
+  </resultMap>
+
+  <select id="selectDynamicTableDataList" resultMap="dynamicDictionaryResult" parameterType="java.util.Map">
+    select
+    ${keyColumn} as dictionary_value
+    ,${valueColumn} as dictionary_text
+    <if test="extColumn != null  and extColumn != ''">,${extColumn} as dictionary_extInfo</if>
+    from ${tableName}
+    <if test="condition != null  and condition != ''"> where ${condition}</if>
+  </select>
+
+  <select id="selectDynamicTableDataOne" resultType="java.util.Map"  parameterType="java.util.Map">
+    select
+    *
+    from ${tableName}
+    <if test="condition != null  and condition != ''"> where ${condition}</if>
+  </select>
+
+  <select id="selectDynamicTableDataSome" resultType="java.util.Map"  parameterType="java.util.Map">
+    ${sql}
+  </select>
+
+  <insert id="executeDBStructChange" parameterType="java.util.Map" statementType="STATEMENT">
+    ${sql}
+  </insert>
+
+  <select id="showTables" parameterType="java.util.Map" resultType="String"  >
+    SHOW TABLES;
+  </select>
+
+  <select id="showCreateTable" parameterType="java.util.Map" resultType="java.util.Map"  >
+    SHOW CREATE TABLE ${tableName};
+  </select>
+
+</mapper>

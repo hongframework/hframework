@@ -1,0 +1,207 @@
+##第一部分：传入参数
+#set($map=$MAP)
+#set($className = $map.get("ClassName"))
+#set($varName = $map.get("VarName"))
+#set($fKList = $map.get("FKList"))
+#set($HQL = $map.get("HQL"))
+#set($CascadeContent = $map.get("CascadeContent"))
+##模板内容
+
+
+/**************下面为日常常用方法************************/
+
+ 	/**
+     * 保存
+     */	
+  public void create(${className} ${varName}){
+    try{
+      ${varName}DAO.save(${varName});
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+  }
+    /**
+     * 更新
+     */	
+  public void update(${className} ${varName}){
+    try{
+      ${varName}DAO.update(${varName});
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+  }
+
+    /**
+     * 删除对象
+     */	
+  public void delete(${className} ${varName}){
+    try{
+      ${varName}DAO.delete(${varName});
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+  }
+	/**
+     * 通过ID删除
+     */	
+  public void delete(Serializable id){
+    try{
+      ${varName}DAO.delete(id);
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+  }
+
+  /**
+     * 查找所有
+     */			
+	public List<${className}> find${className}All(){
+		    return ${varName}DAO.find(" from ${className} a");
+	}
+	
+	/**
+     * 通过主键查找
+     */	
+	public ${className} find${className}ByPK(String id) {
+
+		try {
+			return (${className}) ${varName}DAO.findByPrimaryKey(id);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
+	/**
+     * 通过参数查找
+     */			
+	public List<${className}> find${className}ByParam(Map<String, Object> params){
+
+			String hql=" from ${className} a where 1=1";
+	
+		  	Set<String> keyset=params.keySet(); 
+		  	for (String key : keyset) {
+		  		
+		  		Object value=params.get(key);
+				
+		  		if(value!=null){
+		  			
+		  			if (value instanceof Integer ||value instanceof Double) {
+						Integer valueInt = (Integer) value;
+						
+						hql+="  and a."+key+"="+valueInt;
+						
+					}else {
+						hql+="  and a."+key+"='"+value+"'";
+					}
+		  		}
+		  		
+			}	  	
+		    return ${varName}DAO.find(hql);
+	}
+	
+	 
+	/**************下面为find外键查詢************************/
+	#foreach($fK in $fKList)
+		#set($FkClassName = $fK.get("FkClassName"))
+		#set($FkVarName = $fK.get("FkVarName"))
+		#set($Sign = $fK.get("Sign"))
+		#set($FKType = $fK.get("FKType"))
+		#if(${FKType}=='2')
+	public ${className} get${className}By${FkClassName}(String id){
+		return ($className)${varName}DAO.find(" from $className where $FkVarName=$Sign"+id+"$Sign");
+	}
+		#else
+	/**
+     * 根据外间找出列表
+     */
+	public List<$className> get${className}By${FkClassName}(String id){
+		return ${varName}DAO.find(" from $className where $FkVarName= $Sign"+id+"$Sign");
+	}
+		#end
+	#end
+	/**************上面为find外键查詢************************/
+	
+	/**************下面为find包含外键级联运算************************/
+	/**
+     * 级联查找（暂弃）
+     */	
+	public List<$className> find${className}ByParamCascade(Map<String, Object> params){
+
+			String hql="${HQL}";
+	
+		  	Set<String> keyset=params.keySet(); 
+		  	for (String key : keyset) {
+		  		
+		  		Object value=params.get(key);
+				
+		  		if(value!=null){
+		  			
+		  			if (value instanceof Integer ||value instanceof Double) {
+						Integer valueInt = (Integer) value;
+						
+						hql+="  and $varName."+key+"="+valueInt;
+						
+					}else {
+						hql+="  and $varName."+key+"='"+value+"'";
+					}
+		  		}
+		  		
+			}	  	
+		    return ${varName}DAO.find(hql);
+	}
+	
+	/**
+	 * 通过Id找出该元素，并且级联运算..
+	 * @param id 该元素主键
+	 * @param casecadeLevel 级联级别
+	 * @return 该元素对象
+	 */
+	public ${className} find${className}ByPK(String id,int cascadeLevel){
+		
+		${className} $varName = null;
+		try {//找出该对象
+			${varName} = (${className}) ${varName}DAO.findByPrimaryKey(id);
+			
+			//级联运算...
+			if($varName!=null&&cascadeLevel>0){
+				$!{CascadeContent} 
+			}
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	
+		return ${varName};
+	}
+	
+	#foreach($fK in $fKList)
+		#set($FkClassName = $fK.get("FkClassName"))
+		#set($FkVarName = $fK.get("FkVarName"))
+		#set($Sign = $fK.get("Sign"))
+		#set($FKType = $fK.get("FKType"))
+		#if($FKType=='2')
+				//TODO
+		#else
+	/**
+     * 根据外间找出列表
+     */
+	public List<${className}> get${className}By${FkClassName}(String id,int cascadeLevel){
+		List<${className}> ${varName}List = ${varName}DAO.find(" from${className} where ${FkVarName}= $Sign"+id+"$Sign");
+		//级联运算...
+		
+		if(${varName}List!=null&&cascadeLevel>0&&${varName}List.size()>0){
+		
+			for (${className} ${varName} : ${varName}List) {
+				$!{CascadeContent} 
+			}
+		}
+		
+		return ${varName}List;
+	}
+		#end
+	#end
+	
+	
+	
+	/**************上面为find包含外键级联运算************************/

@@ -1,0 +1,10 @@
+<mapper component-id="mutexContainer">
+    <baseMapper>
+        <mapping id="id" value="${code}Container"></mapping>
+        <!--<mapping id="data" value="${data}"></mapping>-->
+    </baseMapper>
+    <eventMapper>
+        <mapping id="updateByAjax" value="${updateByAjax}.json"></mapping>
+        <mapping id="saveOrUpdateByAjax" value="${saveOrUpdateByAjax}.json"></mapping>
+    </eventMapper>
+</mapper>

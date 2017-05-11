@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component id="treeChart" init="true" type="tree" data-set="${dataSet}" data-auth="${dataAuth}">
+    <element id="children" type="objectTree" default-value="">
+        <element id="id" type="characters"  default-value=""></element>
+        <element id="icon" type="characters"  default-value=""></element>
+        <element id="url" type="characters"  default-value=""></element>
+        <element id="name" type="characters" relId="#{TYPE}"  default-value=""></element>
+        <element id="children" type="objects" default-value="">
+        </element>
+    </element>
+
+    <example>
+        <![CDATA[
+        ]]>
+    </example>
+</component>

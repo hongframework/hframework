@@ -1,0 +1,280 @@
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+
+    <link rel="stylesheet" href="/VAADIN/themes/activiti/styles.css" type="text/css" media="screen">
+    <link rel="stylesheet" href="style.css" type="text/css" media="screen">
+    <link rel="stylesheet" href="/VAADIN/widgetsets/org.activiti.explorer.CustomWidgetset/dcharts/styles.css" type="text/css" media="screen">
+    <script src="js/jstools.js" type="text/javascript" charset="utf-8"></script>
+    <script src="js/raphael.js" type="text/javascript" charset="utf-8"></script>
+
+    <script src="js/jquery/jquery.js" type="text/javascript" charset="utf-8"></script>
+    <script src="js/jquery/jquery.progressbar.js" type="text/javascript" charset="utf-8"></script>
+    <script src="js/jquery/jquery.asyncqueue.js" type="text/javascript" charset="utf-8"></script>
+
+    <script src="js/index.js" type="text/javascript" charset="utf-8"></script>
+    <script src="js/Color.js" type="text/javascript" charset="utf-8"></script>
+    <script src="js/Polyline.js" type="text/javascript" charset="utf-8"></script>
+    <script src="js/ActivityImpl.js" type="text/javascript" charset="utf-8"></script>
+    <script src="js/ActivitiRest.js" type="text/javascript" charset="utf-8"></script>
+    <script src="js/LineBreakMeasurer.js" type="text/javascript" charset="utf-8"></script>
+    <script src="js/ProcessDiagramGenerator.js" type="text/javascript" charset="utf-8"></script>
+    <script src="js/ProcessDiagramCanvas.js" type="text/javascript" charset="utf-8"></script>
+
+    <style type="text/css" media="screen">
+
+    </style>
+    <style type="text/css"></style>
+</head>
+<body>
+<div class="wrapper">
+    <div id="pb1"></div>
+    <div id="overlayBox" >
+        <div id="diagramBreadCrumbs" class="diagramBreadCrumbs" onmousedown="return false" onselectstart="return false"></div>
+        <div id="diagramHolder" class="diagramHolder"></div>
+        <div class="diagram-info" id="diagramInfo"></div>
+    </div>
+    <html>
+    <head></head>
+    <body>
+    <div style="height: 28px; width: 1044px; overflow: hidden; padding-left: 5px; padding-top: 20px;padding-bottom:10px;"><div style="float: left; margin-left: 0px;"><div class="v-label v-label-h3 h3 v-label-block-holder block-holder v-label-no-line no-line" style="width: 1044px;">任务</div></div></div>
+    <div style="height:; width: 1044px; overflow: hidden; padding-left: 5px; padding-top: 0px;">
+        <div style="float: left; margin-left: 0px;">
+            <div class="v-table v-table-proc-inst-task-list proc-inst-task-list" style="width: 1044px;">
+                <div class="v-table-header-wrap" style="width: 1042px;">
+                    <div class="v-table-header" style="overflow: hidden;">
+                        <div style="width: 900000px;">
+                            <table>
+                                <tbody>
+                                <tr>
+                                    <td style="width: 33px;">
+                                        <div class="v-table-resizer"></div>
+                                        <div class="v-table-sort-indicator"></div>
+                                        <div class="v-table-caption-container v-table-caption-container-align-center" style="width: 19px;"></div></td>
+                                    <td class="v-table-header-cell" style="width: 121px;">
+                                        <div class="v-table-resizer"></div>
+                                        <div class="v-table-sort-indicator"></div>
+                                        <div class="v-table-caption-container" style="width: 107px;">
+                                            名称
+                                        </div></td>
+                                    <td class="v-table-header-cell" style="width: 156px;">
+                                        <div class="v-table-resizer"></div>
+                                        <div class="v-table-sort-indicator"></div>
+                                        <div class="v-table-caption-container" style="width: 142px;">
+                                            优先级
+                                        </div></td>
+                                    <td style="width: 263px;">
+                                        <div class="v-table-resizer"></div>
+                                        <div class="v-table-sort-indicator"></div>
+                                        <div class="v-table-caption-container" style="width: 249px;">
+                                            办理人
+                                        </div></td>
+                                    <td style="width: 156px;">
+                                        <div class="v-table-resizer"></div>
+                                        <div class="v-table-sort-indicator"></div>
+                                        <div class="v-table-caption-container" style="width: 142px;">
+                                            到期日
+                                        </div></td>
+                                    <td style="width: 195px;">
+                                        <div class="v-table-resizer"></div>
+                                        <div class="v-table-sort-indicator"></div>
+                                        <div class="v-table-caption-container" style="width: 181px;">
+                                            创建时间
+                                        </div></td>
+                                    <td style="width: 118px;">
+                                        <div class="v-table-resizer"></div>
+                                        <div class="v-table-sort-indicator"></div>
+                                        <div class="v-table-caption-container" style="width: 104px;">
+                                            完成
+                                        </div></td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="v-table-column-selector" style="display: none;"></div>
+                </div>
+                <div tabindex="-1" class="v-scrollable v-table-body-wrapper v-table-body" style="zoom: 1; position: relative; width: 1042px; height: ;overflow-x : hidden;">
+                    <div class="v-table-body-noselection" style="height: ;">
+                        <div class="v-table-row-spacer" style="height: 0px;"></div>
+                        <table class="v-table-table">
+                            <tbody>
+##                            <tr class="v-table-row">
+##                                <td class="v-table-cell-content" style="width: 22px;">
+##                                    <div class="v-table-cell-wrapper" style="text-align: center; width: 22px;">
+##                                        <div class="v-embedded v-embedded-image" style="width: 22px; height: 22px;">
+##                                            <img src="/VAADIN/themes/activiti/img/task-22.png" />
+##                                        </div>
+##                                    </div></td>
+##                                <td class="v-table-cell-content" style="width: 110px;">
+##                                    <div class="v-table-cell-wrapper" style="width: 110px;">
+##                                        未生效
+##                                    </div></td>
+##                                <td class="v-table-cell-content" style="width: 145px;">
+##                                    <div class="v-table-cell-wrapper" style="width: 145px;">
+##                                        50
+##                                    </div></td>
+##                                <td class="v-table-cell-content" style="width: 252px;">
+##                                    <div class="v-table-cell-wrapper" style="width: 252px;">
+##                                        <div class="v-horizontallayout v-horizontallayout-profile-link profile-link" style="overflow: hidden; width: 92px; height: 30px;">
+##                                            <div style="overflow: hidden; margin: 0px; width: 92px; height: 30px;">
+##                                                <div style="height: 30px; width: 30px; overflow: hidden; float: left; padding-left: 0px; padding-top: 0px;">
+##                                                    <div style="float: left; margin-left: 0px;">
+##                                                        <div class="v-embedded v-embedded-clickable clickable v-embedded-image" style="height: 30px; width: 30px;">
+##                                                            <img src="/ui/APP/7/1image/jpeg" style="width: 30px; height: 30px;" />
+##                                                        </div>
+##                                                    </div>
+##                                                </div>
+##                                                <div style="height: 22px; width: 55px; overflow: hidden; float: left; padding-left: 7px; padding-top: 8px;">
+##                                                    <div style="float: left; margin-left: 0px;">
+##                                                        <div tabindex="0" class="v-button v-button-link link" role="button">
+##                                                            <span class="v-button-wrap"><span class="v-button-caption"> 一灯大师</span></span>
+##                                                        </div>
+##                                                    </div>
+##                                                </div>
+##                                                <div style="width: 0px; height: 0px; clear: both; overflow: hidden;"></div>
+##                                            </div>
+##                                        </div>
+##                                    </div></td>
+##                                <td class="v-table-cell-content" style="width: 145px;">
+##                                    <div class="v-table-cell-wrapper" style="width: 145px;">
+##                                        <div class="v-label" style="width: 144px;">
+##                                            尚未完成
+##                                        </div>
+##                                    </div></td>
+##                                <td class="v-table-cell-content" style="width: 184px;">
+##                                    <div class="v-table-cell-wrapper" style="width: 184px;">
+##                                        <div class="v-label" style="width: 184px;">
+##                                            7 小时 之前
+##                                        </div>
+##                                    </div></td>
+##                                <td class="v-table-cell-content" style="width: 107px;">
+##                                    <div class="v-table-cell-wrapper" style="width: 107px;">
+##                                        <div class="v-label" style="width: 107px;"></div>
+##                                    </div></td>
+##                            </tr>
+                                #foreach($task in $tasks)
+
+                                <tr class="v-table-row">
+                                    <td class="v-table-cell-content" style="width: 22px;">
+                                        <div class="v-table-cell-wrapper" style="text-align: center; width: 22px;">
+                                            <div class="v-embedded v-embedded-image" style="width: 22px; height: 22px;">
+                                                <img src="$!task.finished" />
+
+##                                            #if("$!task.endTime" == "")
+##                                                <img src="/VAADIN/themes/activiti/img/task-22.png" />
+##                                            #else
+##                                                <img src="/VAADIN/themes/activiti/img/task-finished-22.png" />
+##                                            #end
+                                            </div>
+                                        </div></td>
+                                    <td class="v-table-cell-content" style="width: 110px;">
+                                        <div class="v-table-cell-wrapper" style="width: 110px;">
+                                            $!task.name
+                                        </div></td>
+                                    <td class="v-table-cell-content" style="width: 145px;">
+                                        <div class="v-table-cell-wrapper" style="width: 145px;">
+                                            $!task.priority
+                                        </div></td>
+                                    <td class="v-table-cell-content" style="width: 252px;">
+                                        <div class="v-table-cell-wrapper" style="width: 252px;">
+                                            <div class="v-horizontallayout v-horizontallayout-profile-link profile-link" style="overflow: hidden; width: 92px; height: 30px;">
+                                                <div style="overflow: hidden; margin: 0px; width: 92px; height: 30px;">
+                                                    <div style="height: 30px; width: 30px; overflow: hidden; float: left; padding-left: 0px; padding-top: 0px;">
+                                                        <div style="float: left; margin-left: 0px;">
+                                                            <div class="v-embedded v-embedded-clickable clickable v-embedded-image" style="height: 30px; width: 30px;">
+                                                                #if("$!task.assigneePhoto" != "")
+                                                                    <img src="$!task.assigneePhoto" style="width: 30px; height: 30px;" />
+                                                                #end
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div style="height: 22px; width: 55px; overflow: hidden; float: left; padding-left: 7px; padding-top: 8px;">
+                                                        <div style="float: left; margin-left: 0px;">
+                                                            <div tabindex="0" class="v-button v-button-link link" role="button">
+                                                                <span class="v-button-wrap"><span class="v-button-caption"> $!task.assigneeName</span></span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div style="width: 0px; height: 0px; clear: both; overflow: hidden;"></div>
+                                                </div>
+                                            </div>
+                                        </div></td>
+                                    <td class="v-table-cell-content" style="width: 145px;">
+                                        <div class="v-table-cell-wrapper" style="width: 145px;">
+                                            <div class="v-label" style="width: 144px;">
+                                                $!task.dueDate
+                                            </div>
+                                        </div></td>
+                                    <td class="v-table-cell-content" style="width: 184px;">
+                                        <div class="v-table-cell-wrapper" style="width: 184px;">
+                                            <div class="v-label" style="width: 184px;">
+                                                $!task.startDate
+                                            </div>
+                                        </div></td>
+                                    <td class="v-table-cell-content" style="width: 107px;">
+                                        <div class="v-table-cell-wrapper" style="width: 107px;">
+                                            <div class="v-label" style="width: 107px;">
+                                                $!task.endDate
+                                            </div>
+                                        </div></td>
+                                </tr>
+
+                                #end
+                            </tbody>
+                        </table>
+                        <div class="v-table-row-spacer" style="height: 0px;"></div>
+                    </div>
+                    <div tabindex="-1" style="position: fixed; top: 0px; left: 0px;"></div>
+                </div>
+
+                <div class="v-table-footer-wrap" style="display: none; width: 1042px;">
+                    <div class="v-table-footer" style="overflow: hidden;">
+                        <div style="width: 900000px;">
+                            <table>
+                                <tbody>
+                                <tr>
+                                    <td style="width: 32px;">
+                                        <div class="v-table-footer-container" style="text-align: center; width: 21px;">
+                                            &nbsp;
+                                        </div></td>
+                                    <td style="width: 120px;">
+                                        <div class="v-table-footer-container" style="width: 109px;">
+                                            &nbsp;
+                                        </div></td>
+                                    <td style="width: 155px;">
+                                        <div class="v-table-footer-container" style="width: 144px;">
+                                            &nbsp;
+                                        </div></td>
+                                    <td style="width: 262px;">
+                                        <div class="v-table-footer-container" style="width: 251px;">
+                                            &nbsp;
+                                        </div></td>
+                                    <td style="width: 155px;">
+                                        <div class="v-table-footer-container" style="width: 144px;">
+                                            &nbsp;
+                                        </div></td>
+                                    <td style="width: 194px;">
+                                        <div class="v-table-footer-container" style="width: 183px;">
+                                            &nbsp;
+                                        </div></td>
+                                    <td style="width: 117px;">
+                                        <div class="v-table-footer-container" style="width: 106px;">
+                                            &nbsp;
+                                        </div></td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    </body>
+    </html></div>
+<script language='javascript'>
+
+</script>
+</body>
+</html>

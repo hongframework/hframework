@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <!-- start: Meta -->
+    <meta charset="utf-8" />
+    <title>${programName}</title>
+    <meta name="description" content="${programName} - Flat & Responsive Bootstrap Admin Template." />
+    <meta name="author" content="Łukasz Holeczek" />
+    <meta name="keyword" content="${programName}, Dashboard, Bootstrap, Admin, Template, Theme, Responsive, Fluid, Retina" />
+    <!-- end: Meta -->
+
+    <!-- start: Mobile Specific -->
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <!-- end: Mobile Specific -->
+    <link rel="stylesheet" href="$staticResourcePath/plugins/ice/css/ace.min.css" />
+    <link rel="stylesheet" href="$staticResourcePath/plugins/ice/css/ace-rtl.min.css" />
+    <link rel="stylesheet" href="$staticResourcePath/plugins/ice/css/ace-skins.min.css" />
+    <!-- start: CSS -->
+    <link href="$staticResourcePath/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="$staticResourcePath/css/bootstrap-responsive.min.css" rel="stylesheet" />
+    <link href="$staticResourcePath/css/style.min.css" rel="stylesheet" />
+    <link href="$staticResourcePath/css/style-responsive.min.css" rel="stylesheet" />
+    <link href="$staticResourcePath/css/retina.css" rel="stylesheet" />
+
+    <link href="/static/plugins/layer/skin/layer.css" rel="stylesheet" />
+
+    <link href="$staticResourcePath/css/hframe.css" rel="stylesheet" />
+
+##    <link href="//cdn.bootcss.com/bootstrap/3.3.6/css/bootstrap.css" rel="stylesheet">
+    <link href="/static/plugins/cityPicker/css/city-picker.css" rel="stylesheet">
+
+    <link rel="stylesheet" href="$staticResourcePath/plugins/timepicker/jquery-ui-timepicker-addon.min.css" />
+    <link rel="stylesheet" href="$staticResourcePath/plugins/bootstrapSwitch/css/bootstrap-switch.min.css" />
+##    <link rel="stylesheet" href="$staticResourcePath/plugins/timepicker/css/jquery-ui.css" />
+##    <style type="text/css">
+##        .ui-timepicker-div .ui-widget-header { margin-bottom: 8px; }
+##        .ui-timepicker-div dl { text-align: left; }
+##        .ui-timepicker-div dl dt { height: 25px; margin-bottom: -25px; }
+##        .ui-timepicker-div dl dd { margin: 0 10px 10px 65px; }
+##        .ui-timepicker-div td { font-size: 90%; }
+##        .ui-tpicker-grid-label { background: none; border: none; margin: 0; padding: 0; }
+##        .ui_tpicker_hour_label,.ui_tpicker_minute_label,.ui_tpicker_second_label,
+##        .ui_tpicker_millisec_label,.ui_tpicker_time_label{padding-left:20px}
+##    </style>
+
+
+
+##    <link href="/static/plugins/cityPicker/css/main.css" rel="stylesheet">
+    <!-- end: CSS -->
+
+
+    <!-- The HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+    <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <link id="ie-style" href="css/ie.css" rel="stylesheet">
+    <![endif]-->
+
+    <!--[if IE 9]>
+    <link id="ie9style" href="css/ie9.css" rel="stylesheet">
+    <![endif]-->
+
+    <!-- start: Favicon and Touch Icons -->
+    <link rel="apple-touch-icon-precomposed" sizes="144x144" href="$staticResourcePath/ico/apple-touch-icon-144-precomposed.png" />
+    <link rel="apple-touch-icon-precomposed" sizes="114x114" href="$staticResourcePath/ico/apple-touch-icon-114-precomposed.png" />
+    <link rel="apple-touch-icon-precomposed" sizes="72x72" href="$staticResourcePath/ico/apple-touch-icon-72-precomposed.png" />
+    <link rel="apple-touch-icon-precomposed" href="$staticResourcePath/ico/apple-touch-icon-57-precomposed.png" />
+    <link rel="shortcut icon" href="$staticResourcePath/ico/favicon.png" />
+    <!-- end: Favicon and Touch Icons -->
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /></head>

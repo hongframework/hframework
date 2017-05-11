@@ -1,0 +1,123 @@
+#set($list = $jsonObject)
+<div class="box span12 hflist" id='$list.id'  module="$module" page="$page" param="$!list.param" component="$list.component">
+    <div class="box-header">
+        <h2><i class="$list.icon"></i><span class="break"></span>$list.title</h2>
+        <div class="box-icon">
+            <a href="#" class="btn-setting"><i class="icon-wrench"></i></a>
+            <a href="#" class="btn-minimize"><i class="icon-chevron-up"></i></a>
+            <a href="#" class="btn-close"><i class="icon-remove"></i></a>
+        </div>
+    </div>
+    <div class="box-content">
+    ##        <div class="row-fluid">
+    ##            <div class="span4">
+    ##                <div id="DataTables_Table_0_length" class="dataTables_length">
+    ##                    <label><select size="1" name="DataTables_Table_0_length" aria-controls="DataTables_Table_0"><option value="10" selected="selected">10</option><option value="25">25</option><option value="50">50</option><option value="100">100</option></select> records per page</label>
+    ##                </div>
+    ##            </div>
+    ##            <div class="span4">
+    ##                <div class="dataTables_filter" id="DataTables_Table_0_filter"><label>Search: <input type="text" aria-controls="DataTables_Table_0"></label>
+    ##                </div>
+    ##            </div>
+    ##            <div class="span4">
+    ##                <div class="dataTables_filter" id="DataTables_Table_0_filter"><label>Search: <input type="text" aria-controls="DataTables_Table_0"></label>
+    ##                </div>
+    ##            </div>
+    ##        </div>
+
+            <div class="row-fluid" style="padding-bottom:10px">
+                #if($list.BOF)
+                    #foreach($item in $list.BOF)
+                        $item.component
+                    #end
+                #end
+            </div>
+
+
+
+
+        <table class="table table-bordered table-striped table-condensed">
+            <thead>
+            <tr>
+                #if($list.BOFR)
+                    <th width="20px">$list.BOFR.get(0).component</th>
+                #end
+                #foreach($column in $list.columns)
+                ##                    #if("$!{column.showType}" != "hidden")
+                    <th width="$!column.width" code="$!column.code" dataCode="$!column.dataCode" #if("$!{column.showType}" == "hidden") style="display: none"  #end>$column.name</th>
+                ##                    #end
+
+                #end
+                #if($list.EOFR)
+                    <th width="150px;">操作</th>
+                #end
+            </tr>
+            </thead>
+            <tbody class='hflist-data'>
+                #if($list.dataIsEmpty)
+                    <tr>
+                        <td colspan="100%" style="text-align:center;padding:8px;">
+                            <span>没有查询到对应记录！</span>
+                        </td>
+                    </tr>
+                #else
+                    #foreach($row in $list.data)
+                    <tr>
+                        #if($list.BOFR)
+                            <th>$list.BOFR.get(0).component</th>
+                        #end
+                        #set($count=0)
+                        #foreach($item in $row)
+                        ##                        #if("$!{list.columns.get($count).showType}" != "hidden")
+                            <td #if("$!{list.columns.get($count).showType}" == "hidden") style="display: none"  #end>
+                                #if($!{list.ELE.get($!{list.columns.get($count).code})})
+                                    #set($href = $!{list.ELE.get($!{list.columns.get($count).code})})
+
+                                    <a class="${href.fillclass} hfhref" href="javascript:void(0)"  params="$!{href.params}" action='${href.action}' title="$!{href.description}">
+                                        <span class="hflist-data-item" code="$!{list.columns.get($count).code}">$item</span>
+                                    </a>
+                                #else
+                                    <span code="$!{list.columns.get($count).code}">$item</span>
+                                #end
+                                #set($count=$count+1)
+                            </td>
+                        ##                        #end
+                        #end
+
+                        #if($list.EOFR)
+                            <td class="center"  style="text-align: center">
+                                #foreach($item in $list.EOFR)
+                                    <a class="btn ${item.fillclass} hfhref" href="javascript:void(0)"  params="$!{item.params}" action='${item.action}' title="$!{item.description}"  when='$!{item.when}'>
+                                        $item.component
+                                    </a>
+                                #end
+                            </td>
+                        #end
+
+                    </tr>
+                    #end
+                #end
+            </tbody>
+        </table>
+
+        #if($list.pager.size() > 3)
+            <div class="pagination pagination-centered">
+                <ul class='hflist-pager'>
+                    #foreach($pageObj in $list.pager)
+                        <li  #if($pageObj.get(2) == "active")   class="active"  #end
+                                ><a href="javascript:void(0)" class='hflist-pager-button' pageNo='$pageObj.get(1)' disabled='$pageObj.get(3)'>$pageObj.get(0)</a></li>
+                    #end
+                </ul>
+            </div>
+        #end
+
+        #if($list.EOF)
+            <div class="form-actions" align="center">
+                #foreach($item in $list.EOF)
+                    $item.component
+                #end
+            </div>
+        #end
+
+    </div>
+</div>

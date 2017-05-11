@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component id="eTList" init="true" type="eTList" data-set="${dataSet}" data-auth="${dataAuth}" path="component/editTreeList.vm">
+    <element id="id" type="characters" default-value=""></element>
+    <element id="icon" type="enums" relId="icons" default-value=""></element>
+    <element id="title" type="characters"  default-value=""></element>
+    <element id="columns" type="objects"  default-value="">
+        <element id="code" type="characters"  default-value=""></element>
+        <element id="name" type="characters"  default-value=""></element>
+        <element id="editType" type="enums" relId="#{TYPE}"  default-value=""></element>
+        <element id="notNull" type="characters"  default-value=""></element>
+        <element id="tipinfo" type="characters"  default-value=""></element>
+        <element id="width" type="characters" default-value=""></element>
+        <element id="dataCode" type="characters"  default-value=""></element>
+        <element id="dataCondition" type="characters"  default-value=""></element>
+    </element>
+    <element id="children" type="objectTree" default-value="">
+        <element id="id" type="characters"  default-value=""></element>
+        <element id="icon" type="characters"  default-value=""></element>
+        <element id="url" type="characters"  default-value=""></element>
+        <element id="name" type="characters" relId="#{TYPE}"  default-value=""></element>
+        <element id="data" type="objects" default-value=""></element>
+        <element id="children" type="objects" default-value=""></element>
+
+    </element>
+
+    <!--&lt;!&ndash; 下面这两条偏重于数据 &ndash;&gt;-->
+    <!--<element id="pagination" type="object"  default-value="">-->
+        <!--<element id="pageSize" type="int"  default-value=""></element>-->
+        <!--<element id="pageIndex" type="int"  default-value=""></element>-->
+        <!--<element id="total" type="int"  default-value=""></element>-->
+        <!--<element id="pageCount" type="int"  default-value=""></element>-->
+    <!--</element>-->
+    <!--<element id="memo" type="map"></element>-->
+    <!--<baseEvents>-->
+        <!--<event id="pagination" type="list" name="翻页">-->
+            <!--<attach anchor="pager"></attach>-->
+            <!--<source scope="pager" param="pageIndex=${this.value}"></source>-->
+            <!--<effect type="component.reload" ></effect>-->
+        <!--</event>-->
+        <!--<event rel="#EOFR.row.insert" />-->
+        <!--<event rel="#EOFR.row.copy" />-->
+        <!--<event rel="#EOFR.row.down" />-->
+        <!--<event rel="#EOFR.row.up" />-->
+        <!--<event rel="#EOFR.row.delete" />-->
+    <!--</baseEvents>-->
+    <events>
+        <event rel="#EOFC.batch.save" />
+    </events>
+
+    <example>
+        <![CDATA[
+            {
+               id:"mylist",
+               icon:'icon-user',
+               title:"我的列表",
+               columns:[{code:"id",name:"学号"},
+                        {code:"name",name:"姓名"},
+                        {code:"age",name:"年龄"},
+                        {code:"gender",name:"性别"},
+                        {code:"address",name:"地址"},
+                        {code:"remark",name:"备注"}],
+               data:[
+                [1001,"张三",29,"女","四川成都",''],
+                [1002,"李四",31,"女","北京",'']
+               ],
+               pagination:{
+                 pageSize:2,
+                 pageIndex:1,
+                 total:100,
+                 pageCount:50
+               },
+               memo:{
+                 "dataset":"user"
+               },
+               order:{
+                 "name":"DESC",
+                 "age":"ASC"
+               },
+               pager:[
+                 ["上一页","1","disabled",""],
+                 ["1","1","disabled","active"],
+                 ["2","2","",""],
+                 ["3","3","",""],
+                 ["4","4","",""],
+                 ["下一页","5","",""]
+               ]
+            }
+        ]]>
+    </example>
+</component>

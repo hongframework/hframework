@@ -1,0 +1,70 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE generatorConfiguration
+        PUBLIC "-//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN"
+        "http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd">
+<generatorConfiguration>
+    <properties resource="properties/dataSource.properties"></properties>
+    <!-- <classPathEntry location="E:\\Users\\zhangqh6\\.m2\\repository\\mysql\\mysql-connector-java\\5.1.21\\mysql-connector-java-5.1.21.jar"/> -->
+    <context id="default" targetRuntime="MyBatis3">
+
+        <plugin type="org.mybatis.generator.plugins.RenameExampleClassPlugin">
+            <property name="searchString" value="Example$" />
+            <property name="replaceString" value="_Example" />
+        </plugin>
+
+        <plugin type="com.hframework.generator.web.mybatis.plugins.PaginationPlugin"></plugin>
+        <plugin type="com.hframework.generator.web.mybatis.plugins.JointQueryPlugin"></plugin>
+        <plugin type="com.hframework.generator.web.mybatis.plugins.MapperAnnotationPlugin"></plugin>
+        <plugin type="com.hframework.generator.web.mybatis.plugins.NoParamConstructorPlugin"></plugin>
+
+
+
+        <commentGenerator type="com.hframework.generator.web.mybatis.override.MybatisCommentGenerator">
+            <property name="suppressAllComments" value="true" />
+            <property name="suppressDate" value="false" />
+        </commentGenerator>
+        <jdbcConnection driverClass="${jdbc.driverClass}" connectionURL="${jdbc.url}" userId="${jdbc.user}" password="${jdbc.password}">
+        </jdbcConnection>
+        <javaTypeResolver >
+            <property name="forceBigDecimals" value="false" />
+        </javaTypeResolver>
+        <!-- BO 对象实体 -->
+        <javaModelGenerator targetPackage="com.ucf.first.ao" targetProject="hframe-target/src/main/java">
+            <property name="constructorBased" value="true"/>
+            <property name="enableSubPackages" value="false"/>
+            <property name="immutable" value="true"/>
+            <!--<property name="rootClass" value="com.foo.louis.Hello"/> -->
+            <property name="trimStrings" value="true"/>
+        </javaModelGenerator>
+
+        <!-- mapper配置文件 -->
+        <sqlMapGenerator targetPackage="mapper" targetProject="hframe-target/src/main/resources">
+            <property name="enableSubPackages" value="false"/>
+        </sqlMapGenerator>
+        <!-- DAO 对象实体 -->
+        <javaClientGenerator targetPackage="com.ucf.first.dao" targetProject="hframe-target/src/main/java" type="ANNOTATEDMAPPER">
+            <property name="enableInsert" value="true"/>
+            <property name="enableSubPackages" value=""/>
+            <property name="exampleMethodVisibility" value="false"/>
+            <property name="methodNameCalculator" value=""/>
+            <property name="rootInterface" value=""/>
+        </javaClientGenerator>
+
+        <!-- 表名  schema="louis" -->
+        <!--<table schema="" tableName="beetle_article"><property name="chineseName" value="通知"></property></table>-->
+        <table schema="" tableName="ncf_setting"><property name="chineseName" value="设置"></property></table>
+
+        <!--
+        <table schema="" tableName="v_test"
+               domainObjectName="QTest"
+               enableInsert="false"
+               enableUpdateByPrimaryKey="false"
+               enableDeleteByPrimaryKey="false"
+               enableDeleteByExample="false"
+               enableUpdateByExample="false">
+        </table>
+ -->
+
+
+    </context>
+</generatorConfiguration>

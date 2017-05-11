@@ -1,0 +1,7 @@
+#foreach($option in $column.ShowType.optionList)
+<input name='$map.get("ViewObject").$column.javaVarName' style='$widthStype' type='radio' value='$option.Value'
+    #if("{$oldObjectValue.get(${column.Name})}"=="{$option.Value}")
+       selected='selected'
+    #end
+        >$option.Text
+#end

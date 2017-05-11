@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<event-store group="EOFR">
+    <!--qlist事件-->
+    <event name="goto.create" description="新建">
+        <attach anchor="EOFR">
+            <appendElement type="icon" param='{fillclass:"btn-info",iconclass:"icon-zoom-in"}'></appendElement>
+        </attach>
+        <effect type="pageFwd" action='${create}' isStack="true"></effect>
+        <effect type="component.reload"></effect>
+    </event>
+    <event name="goto.edit" description="修改">
+        <attach anchor="EOFR">
+            <appendElement type="icon" param='{fillclass:"btn-success",iconclass:"icon-edit"}'></appendElement>
+        </attach>
+        <source scope="CROW" param="${id}"></source>
+        <effect type="pageFwd" action='${edit}' isStack="true"></effect>
+        <effect type="component.reload"></effect>
+    </event>
+    <event name="refresh.create" description="新建">
+        <attach anchor="EOFR">
+            <appendElement type="icon" param='{fillclass:"btn-success",iconclass:"icon-zoom-in"}'></appendElement>
+        </attach>
+        <source scope="CROW" param="${pid}"></source>
+        <effect type="component.reload" target-id="cForm"></effect>
+    </event>
+    <event name="refresh.edit" description="修改">
+        <attach anchor="EOFR">
+            <appendElement type="icon" param='{fillclass:"btn-info",iconclass:"icon-edit"}'></appendElement>
+        </attach>
+        <source scope="CROW" param="${id}"></source>
+        <effect type="component.reload" target-id="eForm"></effect>
+    </event>
+    <event name="tree.confirm.delete" description="删除">
+        <attach anchor="EOFR">
+            <appendElement type="icon" param='{fillclass:"btn-danger",iconclass:"icon-trash"}'></appendElement>
+        </attach>
+        <source scope="CROW" param='${id}'></source>
+        <effect type="confirm" content="是否删除 &lt;span style=&quot;color:red&quot;&gt;{${name}}&lt;/span&gt; ?"></effect>
+        <effect type="ajaxSubmit" action="${delete}"></effect>
+        <effect type="page.reload"></effect>
+    </event>
+    <event name="confirm.delete" description="删除">
+        <attach anchor="EOFR">
+            <appendElement type="icon" param='{fillclass:"btn-danger",iconclass:"icon-trash"}'></appendElement>
+        </attach>
+        <source scope="CROW" param='${id}'></source>
+        <effect type="confirm" content="是否删除 &lt;span style=&quot;color:red&quot;&gt;{${name}}&lt;/span&gt; ?"></effect>
+        <effect type="ajaxSubmit" action="${delete}"></effect>
+        <effect type="component.reload"></effect>
+    </event>
+    <event name="confirm.on" description="生效">
+        <attach anchor="EOFR">
+            <appendElement type="icon" param='{fillclass:"btn-danger",iconclass:"icon-unlock"}'></appendElement>
+        </attach>
+        <source scope="CROW" param="${id}&amp;_DI=${id}&amp;_DS=${DS}&amp;_WFB=1"></source>
+        <effect type="confirm" content="是否生效 &lt;span style=&quot;color:red&quot;&gt;{${name}}&lt;/span&gt; ?"></effect>
+        <effect type="ajaxSubmit" action="${updateByAjax}"></effect>
+        <effect type="component.reload"></effect>
+    </event>
+    <event name="confirm.off" description="失效">
+        <attach anchor="EOFR">
+            <appendElement type="icon" param='{fillclass:"btn-danger",iconclass:"icon-lock"}'></appendElement>
+        </attach>
+        <source scope="CROW" param="${id}&amp;_DI=${id}&amp;_DS=${DS}&amp;_WFB=1"></source>
+        <effect type="confirm" content="是否失效 &lt;span style=&quot;color:red&quot;&gt;{${name}}&lt;/span&gt; ?"></effect>
+        <effect type="ajaxSubmit" action="${updateByAjax}"></effect>
+        <effect type="component.reload"></effect>
+    </event>
+    <event name="confirm.play" description="启动">
+        <attach anchor="EOFR">
+            <appendElement type="icon" param='{fillclass:"btn-danger",iconclass:"icon-play"}'></appendElement>
+        </attach>
+        <source scope="CROW" param="${id}&amp;_DI=${id}&amp;_DS=${DS}&amp;_WFB=1"></source>
+        <effect type="confirm" content="是否启动 &lt;span style=&quot;color:red&quot;&gt;{${name}}&lt;/span&gt; ?"></effect>
+        <effect type="ajaxSubmit" action="${updateByAjax}"></effect>
+        <effect type="component.reload"></effect>
+    </event>
+    <event name="confirm.pause" description="暂停">
+        <pre-handle case="status" when="2" then="3"></pre-handle>
+        <attach anchor="EOFR">
+            <appendElement type="icon" param='{fillclass:"btn-danger",iconclass:"icon-pause"}'></appendElement>
+        </attach>
+        <source scope="CROW" param="${id}&amp;_DI=${id}&amp;_DS=${DS}&amp;_WFB=1"></source>
+        <effect type="confirm" content="是否暂停 &lt;span style=&quot;color:red&quot;&gt;{${name}}&lt;/span&gt; ?"></effect>
+        <effect type="ajaxSubmit" action="${updateByAjax}"></effect>
+        <effect type="component.reload"></effect>
+    </event>
+    <event name="confirm.stop" description="停止">
+        <attach anchor="EOFR">
+            <appendElement type="icon" param='{fillclass:"btn-danger",iconclass:"icon-stop"}'></appendElement>
+        </attach>
+        <source scope="CROW" param="${id}&amp;_DI=${id}&amp;_DS=${DS}&amp;_WFB=1"></source>
+        <effect type="confirm" content="是否停止 &lt;span style=&quot;color:red&quot;&gt;{${name}}&lt;/span&gt; ?"></effect>
+        <effect type="ajaxSubmit" action="${updateByAjax}"></effect>
+        <effect type="component.reload"></effect>
+    </event>
+
+    <!--eList 常用事件-->
+    <event name="row.insert" description="新建行">
+        <attach anchor="EOFR">
+            <appendElement type="icon" param='{fillclass:"btn-success",iconclass:" icon-file-alt"}'></appendElement>
+        </attach>
+        <effect type="component.row.add"></effect>
+    </event>
+    <event name="row.copy" description="复制行">
+        <attach anchor="EOFR">
+            <appendElement type="icon" param='{fillclass:"btn-success",iconclass:" icon-copy"}'></appendElement>
+        </attach>
+        <effect type="component.row.copy"></effect>
+    </event>
+    <event name="row.down" description="下移一行">
+        <attach anchor="EOFR">
+            <appendElement type="icon" param='{fillclass:"btn-info",iconclass:"icon-circle-arrow-down"}'></appendElement>
+        </attach>
+        <effect type="component.row.down"></effect>
+    </event>
+    <event name="row.up" description="上移一行">
+        <attach anchor="EOFR">
+            <appendElement type="icon" param='{fillclass:"btn-info",iconclass:" icon-circle-arrow-up"}'></appendElement>
+        </attach>
+        <effect type="component.row.up"></effect>
+    </event>
+    <event name="row.delete" description="删除行">
+        <attach anchor="EOFR">
+            <appendElement type="icon" param='{fillclass:"btn-danger",iconclass:"icon-trash"}'></appendElement>
+        </attach>
+        <source scope="CROW" param='${id}'></source>
+        <effect type="confirm" content="是否删除 &lt;span style=&quot;color:red&quot;&gt;{${name}}&lt;/span&gt; ?"></effect>
+        <effect type="ajaxSubmit" action="${delete}"></effect>
+        <!--<effect type="component.reload"></effect>-->
+    </event>
+
+
+    <event name="confirm.process.start" description="启动">
+        <attach anchor="EOFR">
+            <appendElement type="icon" param='{fillclass:"btn-danger",iconclass:"icon-play-circle"}'></appendElement>
+        </attach>
+        <source scope="CROW" param="${id}&amp;_DI=${id}&amp;_DS=${DS}&amp;_WFB=1"></source>
+        <effect type="confirm" content="是否启动 &lt;span style=&quot;color:red&quot;&gt;{${name}}&lt;/span&gt; ?"></effect>
+        <effect type="ajaxSubmit" action="${updateByAjax}"></effect>
+        <effect type="component.reload"></effect>
+    </event>
+    <event name="openPage.process.diagram" description="查看流程">
+        <attach anchor="EOFR">
+            <appendElement type="icon" param='{fillclass:"btn-info",iconclass:"icon-retweet"}'></appendElement>
+        </attach>
+        <source scope="CROW" param="_DI=${id}&amp;_DS=${DS}"></source>
+        <effect type="openPage" action='/diagram-viewer/forwarder.html' isStack="true"></effect>
+    </event>
+
+</event-store>

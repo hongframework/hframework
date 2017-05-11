@@ -1,0 +1,116 @@
+##第一部分：传入参数
+#set($map=$MAP)
+#set($className = $map.get("ClassName"))
+#set($varName = $map.get("VarName"))
+#set($entityName = $map.get("EntityName"))
+#set($parentIdPropertyClassName = $map.get("ParentIdPropertyClassName"))
+
+##模板内容
+    /**
+    * 创建${entityName}
+    * @param ${varName}
+    * @return
+    * @throws Exception
+    */
+    public int create(${className} ${varName}) throws  Exception;
+
+    /**
+    * 批量维护${entityName}
+    * @param ${varName}s
+    * @return
+    * @throws Exception
+    */
+    public int batchOperate(${className}[] ${varName}s) throws  Exception;
+    /**
+    * 更新${entityName}
+    * @param ${varName}
+    * @return
+    * @throws Exception
+    */
+    public int update(${className} ${varName}) throws  Exception;
+
+    /**
+    * 通过查询对象更新${entityName}
+    * @param ${varName}
+    * @param example
+    * @return
+    * @throws Exception
+    */
+    public int updateByExample(${className} ${varName}, ${className}_Example example) throws  Exception;
+
+    /**
+    * 删除${entityName}
+    * @param ${varName}
+    * @return
+    * @throws Exception
+    */
+    public int delete(${className} ${varName}) throws  Exception;
+
+
+    /**
+    * 删除${entityName}
+    * @param ${varName}Id
+    * @return
+    * @throws Exception
+    */
+    public int delete(long ${varName}Id) throws  Exception;
+
+
+    /**
+    * 查找所有${entityName}
+    * @return
+    */
+    public List<${className}> get${className}All()  throws  Exception;
+
+    /**
+    * 通过${entityName}ID查询${entityName}
+    * @param ${varName}Id
+    * @return
+    * @throws Exception
+    */
+    public ${className} get${className}ByPK(long ${varName}Id)  throws  Exception;
+
+    /**
+    * 通过MAP参数查询${entityName}
+    * @param params
+    * @return
+    * @throws Exception
+    */
+    public List<${className}> get${className}ListByParam(Map<String, Object> params)  throws  Exception;
+
+
+    /**
+    * 通过查询对象查询${entityName}
+    * @param example
+    * @return
+    * @throws Exception
+    */
+    public List<${className}> get${className}ListByExample(${className}_Example example) throws  Exception;
+
+#if("$!{parentIdPropertyClassName}" != "" )
+    /**
+    * 通过父级${entityName}ID查询${entityName}树
+    * @param ${varName}
+    * @return
+    * @throws Exception
+    */
+    public Map<Long, List<${className}>> get${className}TreeByParentId(${className} ${varName}, ${className}_Example example)  throws  Exception;
+#end
+
+    /**
+    * 通过MAP参数查询${entityName}数量
+    * @param params
+    * @return
+    * @throws Exception
+    */
+    public int get${className}CountByParam(Map<String, Object> params)  throws  Exception;
+
+
+    /**
+    * 通过查询对象查询${entityName}数量
+    * @param example
+    * @return
+    * @throws Exception
+    */
+    public int get${className}CountByExample(${className}_Example example) throws  Exception;
+

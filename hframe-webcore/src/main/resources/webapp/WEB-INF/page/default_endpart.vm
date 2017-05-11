@@ -1,0 +1,38 @@
+        </div>
+        <!-- end: Content -->
+
+    </div><!--/fluid-row-->
+
+    <div class="modal hide fade" id="myModal">
+        <div class="modal-header">
+            <button type="button" class="close hfconfirm-btn-cancel">×</button>
+            <h3>提示</h3>
+        </div>
+        <div class="modal-body">
+            <p class="hfconfirm-content">您确定需要删除用户【张三】吗?</p>
+        </div>
+        <div class="modal-footer">
+            <a href="javascript:void(0)" class="btn hfconfirm-btn-cancel" data-dismiss="modal">取消</a>
+            <a href="javascript:void(0)" class="btn btn-primary hfconfirm-btn-ok">确定</a>
+        </div>
+    </div>
+
+    <div class="modal hide fade" id="processBar">
+        <div class="progress progress-info progress-striped active">
+            <div class="bar" style="width: 100%"></div>
+        </div>
+    </div>
+
+        <div class="clearfix"></div>
+
+    <footer>
+        <p>
+            <span style="text-align:left;float:left">Copyright &copy; 2016.hframework All rights reserved.</span>
+        </p>
+
+    </footer>
+
+</div><!--/.fluid-container-->
+            #parse("blank_endpart.vm")
+</body>
+</html>

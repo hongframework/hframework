@@ -1,0 +1,83 @@
+##第一部分：传入参数
+#set($map=$MAP)
+#set($className = $map.get("ClassName"))
+#set($varName = $map.get("VarName"))
+#set($fKList = $map.get("FKList"))
+#set($HQL = $map.get("HQL"))
+#set($CascadeContent = $map.get("CascadeContent"))
+##模板内容
+
+	                            
+    public String list(){
+        setFourScope();
+        Map<String, String> params=new HashMap<String, String>();
+        List<Comment> list=commentServ.findCommentAll();
+        request.setAttribute("list", list);
+        return SUCCESS;
+    }
+    
+    /**
+     * 创建
+     */	
+    public String create(){
+        setFourScope();
+        String commentId=COMMON.uuid();
+        comment.setCommentId(commentId);
+        comment.setCreatetime(COMMON.getNowTime());
+        commentServ.create(comment);
+        ////如果有子关系一起保存
+        String diaryId=COMMON.uuid();
+        diary.setDiaryId(diaryId);
+        diary.setCreatetime(COMMON.getNowTime());
+        diary.setDiaryId(commentId);
+        diaryServ.create(diary);
+        return SUCCESS;
+    }
+    /**
+     * 删除
+     */	
+    public String delete(){
+        setFourScope();
+        commentServ.delete(comment);
+        return SUCCESS;
+
+    }
+	/**
+     * 更新
+     */	
+    public String update(){
+        setFourScope();
+        commentServ.update(comment);
+        return SUCCESS;
+
+    }
+	/**
+     * 搜索
+     */	
+    public String search(){
+        setFourScope();
+        if(comment!=null){
+            Map param=new HashMap();
+            if(comment.getCommentId()!=null){
+           		 param.put("commentId", comment.getCommentId());
+            }
+            if(comment.getSrcId()!=null){
+           		 param.put("srcId", comment.getSrcId());
+            }
+            if(comment.getUserId()!=null){
+           		 param.put("userId", comment.getUserId());
+            }
+            if(comment.getContent()!=null){
+           		 param.put("content", comment.getContent());
+            }
+            if(comment.getCreatetime()!=null){
+           		 param.put("createtime", comment.getCreatetime());
+            }
+             List<Comment> list=  commentServ.findCommentByParam(param);
+             request.setAttribute("list", list);
+       		return SUCCESS;
+       }
+       List<Comment> list=  commentServ.findCommentAll();
+       request.setAttribute("list", list);
+       return SUCCESS;
+    }

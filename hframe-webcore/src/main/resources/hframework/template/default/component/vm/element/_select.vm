@@ -1,0 +1,9 @@
+<select name='$map.get("ViewObject").$column.javaVarName' class="form-control"  style='$widthStype' >
+	#foreach($option in $column.ShowType.optionList)
+		<option  value=$option.Value
+		#if("{$oldObjectValue.get(${column.Name})}"=="{$option.Value}")
+		selected='selected'
+		#end
+		>$option.Text</option>
+	#end
+</select>

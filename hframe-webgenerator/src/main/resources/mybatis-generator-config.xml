@@ -1,0 +1,197 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE generatorConfiguration
+        PUBLIC "-//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN"
+        "http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd">
+<generatorConfiguration>
+    <properties resource="properties/dataSource.properties"></properties>
+    <!-- <classPathEntry location="E:\\Users\\zhangqh6\\.m2\\repository\\mysql\\mysql-connector-java\\5.1.21\\mysql-connector-java-5.1.21.jar"/> -->
+    <context id="default" targetRuntime="MyBatis3">
+        
+        <plugin type="org.mybatis.generator.plugins.RenameExampleClassPlugin">
+            <property name="searchString" value="Example$" />
+            <property name="replaceString" value="_Example" />
+        </plugin>
+
+        <plugin type="com.hframework.generator.web.mybatis.plugins.PaginationPlugin"></plugin>
+        <plugin type="com.hframework.generator.web.mybatis.plugins.JointQueryPlugin"></plugin>
+        <plugin type="com.hframework.generator.web.mybatis.plugins.MapperAnnotationPlugin"></plugin>
+        <plugin type="com.hframework.generator.web.mybatis.plugins.NoParamConstructorPlugin"></plugin>
+        <plugin type="com.hframework.generator.web.mybatis.plugins.MapperXmlOverwritePlugin"></plugin>
+
+
+        <commentGenerator type="com.hframework.generator.web.mybatis.override.MybatisCommentGenerator">
+            <property name="suppressAllComments" value="true" />
+            <property name="suppressDate" value="false" />
+        </commentGenerator>
+        <jdbcConnection driverClass="${jdbc.driverClass}" connectionURL="${jdbc.url}" userId="${jdbc.user}" password="${jdbc.password}">
+        </jdbcConnection>
+        <javaTypeResolver >
+            <property name="forceBigDecimals" value="false" />
+        </javaTypeResolver>
+        <!-- BO 对象实体 -->
+        <javaModelGenerator targetPackage="com.hframe.domain.model" targetProject="hframe-core/src/main/java">
+            <property name="constructorBased" value="true"/>
+            <property name="enableSubPackages" value="false"/>
+            <property name="immutable" value="true"/>
+            <!--<property name="rootClass" value="com.foo.louis.Hello"/> -->
+            <property name="trimStrings" value="true"/>
+        </javaModelGenerator>
+
+        <!-- mapper配置文件 -->
+        <sqlMapGenerator targetPackage="mapper" targetProject="hframe-core/src/main/resources">
+            <property name="enableSubPackages" value="false"/>
+        </sqlMapGenerator>
+        <!-- DAO 对象实体 -->
+        <!-- ANNOTATEDMAPPER  MIXEDMAPPER   XMLMAPPER-->
+        <javaClientGenerator targetPackage="com.hframe.dao" targetProject="hframe-core/src/main/java" type="XMLMAPPER">
+            <property name="enableInsert" value="true"/>
+            <property name="enableSubPackages" value=""/>
+            <property name="exampleMethodVisibility" value="false"/>
+            <property name="methodNameCalculator" value=""/>
+            <property name="rootInterface" value=""/>
+        </javaClientGenerator>
+
+        <!--&lt;!&ndash; 表名  schema="louis" &ndash;&gt;-->
+        <!--<table schema="" tableName="hfcfg_login_page">-->
+            <!--<property name="chineseName" value="登陆页"></property>-->
+            <!--<generatedKey column="hfcfg_login_page_id" sqlStatement="MySql" identity="true" />-->
+        <!--</table>-->
+        <!--<table schema="" tableName="hfcfg_page_template">-->
+            <!--<property name="chineseName" value="页面模板"></property>-->
+            <!--<generatedKey column="hfcfg_page_template_id" sqlStatement="MySql" identity="true" />-->
+        <!--</table>-->
+        <!--<table schema="" tableName="hfcfg_program_skin">-->
+            <!--<property name="chineseName" value="皮肤"></property>-->
+            <!--<generatedKey column="hfcfg_program_skin_id" sqlStatement="MySql" identity="true" />-->
+        <!--</table>-->
+        <!--<table schema="" tableName="hfcfg_program_template">-->
+            <!--<property name="chineseName" value="项目模板"></property>-->
+            <!--<generatedKey column="hfcfg_program_template_id" sqlStatement="MySql" identity="true" />-->
+        <!--</table>-->
+
+        <!--<table schema="" tableName="hfmd_entity">-->
+            <!--<property name="chineseName" value="实体"></property>-->
+            <!--<generatedKey column="hfmd_entity_id" sqlStatement="MySql" identity="true" />-->
+        <!--</table>-->
+        <!--<table schema="" tableName="hfmd_entity_attr">-->
+            <!--<property name="chineseName" value="实体属性"></property>-->
+            <!--<generatedKey column="hfmd_entity_attr_id" sqlStatement="MySql" identity="true" />-->
+        <!--</table>-->
+        <!--<table schema="" tableName="hfmd_entity_rel">-->
+            <!--<property name="chineseName" value="实体关系"></property>-->
+            <!--<generatedKey column="hfmd_entity_rel_id" sqlStatement="MySql" identity="true" />-->
+        <!--</table>-->
+        <!--<table schema="" tableName="hfmd_enum">-->
+            <!--<property name="chineseName" value="枚举"></property>-->
+            <!--<generatedKey column="hfmd_enum_id" sqlStatement="MySql" identity="true" />-->
+        <!--</table>-->
+        <!--<table schema="" tableName="hfmd_enum_class">-->
+            <!--<property name="chineseName" value="枚举组"></property>-->
+            <!--<generatedKey column="hfmd_enum_class_id" sqlStatement="MySql" identity="true" />-->
+        <!--</table>-->
+
+        <!--<table schema="" tableName="hfpm_data_field">-->
+            <!--<property name="chineseName" value="数据列"></property>-->
+            <!--<generatedKey column="hfpm_data_field_id" sqlStatement="MySql" identity="true" />-->
+        <!--</table>-->
+        <!--<table schema="" tableName="hfpm_data_set">-->
+            <!--<property name="chineseName" value="数据集"></property>-->
+            <!--<generatedKey column="hfpm_data_set_id" sqlStatement="MySql" identity="true" />-->
+        <!--</table>-->
+        <!--<table schema="" tableName="hfpm_entity_bind_rule">-->
+            <!--<property name="chineseName" value="实体捆绑规则"></property>-->
+            <!--<generatedKey column="hfpm_entity_bind_rule_id" sqlStatement="MySql" identity="true" />-->
+        <!--</table>-->
+        <!--<table schema="" tableName="hfpm_entity_permission">-->
+            <!--<property name="chineseName" value="实体权限"></property>-->
+            <!--<generatedKey column="hfpm_entity_permission_id" sqlStatement="MySql" identity="true" />-->
+        <!--</table>-->
+        <!--<table schema="" tableName="hfpm_field_show_type">-->
+            <!--<property name="chineseName" value="列展示类型"></property>-->
+            <!--<generatedKey column="hfpm_field_show_type_id" sqlStatement="MySql" identity="true" />-->
+        <!--</table>-->
+        <!--<table schema="" tableName="hfpm_module">-->
+            <!--<property name="chineseName" value="模块"></property>-->
+            <!--<generatedKey column="hfpm_module_id" sqlStatement="MySql" identity="true" />-->
+        <!--</table>-->
+        <!--<table schema="" tableName="hfpm_page">-->
+            <!--<property name="chineseName" value="页面"></property>-->
+            <!--<generatedKey column="hfpm_page_id" sqlStatement="MySql" identity="true" />-->
+        <!--</table>-->
+        <!--<table schema="" tableName="hfpm_page_cfg">-->
+            <!--<property name="chineseName" value="页面配置"></property>-->
+            <!--<generatedKey column="hfpm_page_cfg_id" sqlStatement="MySql" identity="true" />-->
+        <!--</table>-->
+        <!--<table schema="" tableName="hfpm_page_component">-->
+            <!--<property name="chineseName" value="页面组件"></property>-->
+            <!--<generatedKey column="hfpm_page_component_id" sqlStatement="MySql" identity="true" />-->
+        <!--</table>-->
+        <!--<table schema="" tableName="hfpm_page_entity_rel">-->
+            <!--<property name="chineseName" value="页面关联实体"></property>-->
+            <!--<generatedKey column="hfpm_page_entity_rel_id" sqlStatement="MySql" identity="true" />-->
+        <!--</table>-->
+        <!--<table schema="" tableName="hfpm_page_event">-->
+            <!--<property name="chineseName" value="页面事件"></property>-->
+            <!--<generatedKey column="hfpm_page_event_id" sqlStatement="MySql" identity="true" />-->
+        <!--</table>-->
+        <!--<table schema="" tableName="hfpm_page_event_attr">-->
+            <!--<property name="chineseName" value="事件属性"></property>-->
+            <!--<generatedKey column="hfpm_page_event_attr_id" sqlStatement="MySql" identity="true" />-->
+        <!--</table>-->
+        <!--<table schema="" tableName="hfpm_program">-->
+            <!--<property name="chineseName" value="项目"></property>-->
+            <!--<generatedKey column="hfpm_program_id" sqlStatement="MySql" identity="true" />-->
+        <!--</table>-->
+        <!--<table schema="" tableName="hfpm_program_cfg">-->
+            <!--<property name="chineseName" value="项目配置"></property>-->
+            <!--<generatedKey column="hfpm_program_cfg_id" sqlStatement="MySql" identity="true" />-->
+        <!--</table>-->
+
+        <table schema="" tableName="hfus_entity_attr">
+            <property name="chineseName" value="常用实体属性"></property>
+            <generatedKey column="hfus_entity_attr_id" sqlStatement="MySql" identity="true" />
+        </table>
+        <!--<table schema="" tableName="hfus_entity_type_relat_entity_attr">-->
+            <!--<property name="chineseName" value="常用实体类型关联属性"></property>-->
+            <!--<generatedKey column="hfus_entity_type_relat_entity_attr_id" sqlStatement="MySql" identity="true" />-->
+        <!--</table>-->
+        <!--<table schema="" tableName="hfus_page_event">-->
+            <!--<property name="chineseName" value="常用页面事件"></property>-->
+            <!--<generatedKey column="hfus_page_event_id" sqlStatement="MySql" identity="true" />-->
+        <!--</table>-->
+        <!--<table schema="" tableName="hfus_program_entity_attr">-->
+            <!--<property name="chineseName" value="常用项目实体属性"></property>-->
+            <!--<generatedKey column="hfus_program_entity_attr_id" sqlStatement="MySql" identity="true" />-->
+        <!--</table>-->
+        <!--<table schema="" tableName="hfus_word_store">-->
+            <!--<property name="chineseName" value="单词库"></property>-->
+            <!--<generatedKey column="hfus_word_store_id" sqlStatement="MySql" identity="true" />-->
+        <!--</table>-->
+
+        <!--<table schema="" tableName="hfsec_menu">-->
+            <!--<property name="chineseName" value="菜单"></property>-->
+            <!--<property name="parentId" value="parent_hfsec_menu_id"></property>-->
+            <!--<generatedKey column="hfsec_menu_id" sqlStatement="MySql" identity="true" />-->
+        <!--</table>-->
+        <!--<table schema="" tableName="hfsec_user">-->
+            <!--<property name="chineseName" value="用户"></property>-->
+            <!--<generatedKey column="hfsec_user_id" sqlStatement="MySql" identity="true" />-->
+        <!--</table>-->
+        <!--<table schema="" tableName="hfmd_entity_join_rule">-->
+            <!--<property name="chineseName" value="实体属性连带规则"></property>-->
+            <!--<generatedKey column="hfmd_entity_join_rule_id" sqlStatement="MySql" identity="true" />-->
+        <!--</table>-->
+        <!--
+        <table schema="" tableName="v_test"
+               domainObjectName="QTest"
+               enableInsert="false"
+               enableUpdateByPrimaryKey="false"
+               enableDeleteByPrimaryKey="false"
+               enableDeleteByExample="false"
+               enableUpdateByExample="false">
+        </table>
+ -->
+
+
+    </context>
+</generatorConfiguration>

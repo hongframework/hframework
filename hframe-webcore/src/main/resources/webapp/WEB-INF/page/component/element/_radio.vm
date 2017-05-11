@@ -1,0 +1,20 @@
+###foreach($option in $column.ShowType.optionList)
+##<input name='$map.get("ViewObject").$column.javaVarName' style='$widthStype' type='radio' value='$option.Value'
+##    #if("{$oldObjectValue.get(${column.Name})}"=="{$option.Value}")
+##       selected='selected'
+##    #end
+##        >$option.Text
+###end
+##
+####<input name='$column.code' style='$widthStype' type='radio' value='$option.Value' >
+##
+##<label class="radio inline" data-code="hfmd_entity.hfmd_entity_id.hfmd_entity_name" data-condition="1=1" relat-element="spvId">
+##    <div class="radio" id="$column.code-optionsRadios1"  >
+##        <span class="checked"><input type="radio" name="$column.code" id="$column.code" value="#value" ></span>
+##    </div>
+##    #text
+##</label>
+
+<label class="radio hfradio inline" data-code="$column.dataCode" data-condition="1=1"  data-value="$!value" not-null="$!column.notNull" style="display: none">
+    <input type="radio" name="$column.code" value="" />
+</label>

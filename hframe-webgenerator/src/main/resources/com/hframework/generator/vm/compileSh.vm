@@ -1,0 +1,7 @@
+#set($map=$MAP)
+#set($companyCode = $map.get("companyCode"))
+#set($programCode = $map.get("programCode"))
+#set($projectBasePath = $map.get("projectBasePath"))
+
+cd $projectBasePath
+mvn compile

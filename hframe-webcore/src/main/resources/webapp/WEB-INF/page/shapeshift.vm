@@ -1,0 +1,105 @@
+#if($isPop)
+    #parse("blank_startpart.vm")
+#else
+    #parse("default_startpart.vm")
+#end
+
+<style>
+    .dragbox {
+        border: 1px dashed #CCC;
+        position: relative;
+        /*min-height: 40px;;*/
+    }
+
+    .dragbox-oper {
+        text-align: right;
+    }
+
+    .dragbox > div {
+        background: #36a9e1;
+        position: absolute;
+        text-align: center;
+        color:#ffffff;
+        height: 40px;
+        width: 200px;
+    }
+
+    .dragbox > .ss-placeholder-child {
+        background: transparent;
+        border: 1px dashed blue;
+    }
+
+    .dragbox > div[data-ss-colspan="2"] { width: 210px; }
+    .dragbox > div[data-ss-colspan="3"] { width: 320px; }
+</style>
+
+<div class="row-fluid">
+    <div class="span3">
+        待处理实体
+        <div class="dragbox">
+            #foreach($item in $ExtMap.TodoList)
+                <div class="row-fluid" data-id="$!item.hfmdEntityCode">$item.hfmdEntityName【$item.hfmdEntityCode】</div>
+            #end
+        </div>
+    </div>
+    <div class="span9">
+        #foreach($module in $ExtMap.DownList.keySet())
+            <div class="dragbox-area" module-code="$module.code">
+                $module.code
+##                #if(${ExtMap.DownList.get($module).size()} == 0)
+##                    <div class="dragbox">
+##                    </div>
+##                    <script>
+##                        $($newGrid).shapeshift({
+##                            colWidth: 100
+##                        });
+##                    </script>
+##                #end
+
+                #foreach($rows in $ExtMap.DownList.get($module))
+                <div class="dragbox">
+                    #foreach($item in $rows)
+                        <div class="row-fluid" data-id="$!item.hfmdEntityCode">$!item.hfmdEntityName【$!item.hfmdEntityCode】</div>
+                    #end
+                </div>
+                #end
+                <div class="dragbox-oper">
+                    <button class="addGrid"> 添加网格</button>
+                    <button class="submitDraw"> 提交</button>
+                </div>
+            </div>
+        #end
+    </div>
+</div>
+
+##
+##<div class="dragbox">
+##    <div></div>
+##    <div></div>
+##    <div></div>
+##    <div></div>
+##    <div></div>
+##    <div></div>
+##    <div></div>
+##    <div></div>
+##</div>
+##<div class="dragbox cloneable">
+##    <div data-ss-colspan="2"></div>
+##    <div></div>
+##    <div></div>
+##    <div></div>
+##    <div></div>
+##    <div></div>
+##    <div></div>
+##    <div></div>
+##</div>
+##<div class="dragbox trashable">
+##    <div data-ss-colspan="3"></div>
+##</div>
+
+
+#if($isPop)
+    #parse("blank_endpart.vm")
+#else
+    #parse("default_endpart.vm")
+#end

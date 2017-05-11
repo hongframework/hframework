@@ -1,0 +1,98 @@
+#if($isPop)
+    #parse("blank_startpart.vm")
+#else
+    #parse("default_startpart.vm")
+#end
+
+<div class="row-fluid">
+#foreach($element in $elements.entrySet())
+    #if($element.value.component == "container")
+        <div class="hfspan #if("$!element.value.container" !="") $element.value.container #end " group="$!element.value.group">
+            #set($container = $element.value)
+            #parse("component/container.vm")
+            #if($element.value.EOF)
+                <div class="form-actions" align="center">
+                    #foreach($item in $element.value.EOF)
+                            $item.component
+                        #end
+                </div>
+            #end
+        </div>
+    #elseif($element.value.component == "mutexContainer")
+        <div class="#if("$!element.value.container" !="") $element.value.container #end"  group="$!element.value.group">
+            #set($container = $element.value)
+                    #parse("component/mutexContainer.vm")
+        </div>
+    #elseif(!$element.value.isDefaultComponent)
+        <div class="#if("$!element.value.container" !="") $element.value.container #end" group="$!element.value.group">
+            #set($jsonObject = $element.value)
+            #parse("$element.value.vmpath")
+        </div>
+    #end
+
+##
+##        #if($element.value.component == "cForm")
+##            <div class="#if("$!element.value.container" !="") $element.value.container #end" group="$!element.value.group">
+##                #set($form = $element.value)
+##                #parse("component/createForm.vm")
+##            </div>
+##        #elseif($element.value.component == "eForm")
+##            <div class="#if("$!element.value.container" !="") $element.value.container #end" group="$!element.value.group">
+##                #set($form = $element.value)
+##                #parse("component/createForm.vm")
+##            </div>
+##        #elseif($element.value.component == "qForm")
+##            <div class="#if("$!element.value.container" !="") $element.value.container #end" group="$!element.value.group">
+##                #set($form = $element.value)
+##                #parse("component/queryForm.vm")
+##            </div>
+##        #elseif($element.value.component == "cList")
+##            <div class="#if("$!element.value.container" !="") $element.value.container #end" group="$!element.value.group">
+##                #set($list = $element.value)
+##                #parse("component/editList.vm")
+##            </div>
+##        #elseif($element.value.component == "eList")
+##            <div class="#if("$!element.value.container" !="") $element.value.container #end" group="$!element.value.group">
+##                #set($list = $element.value)
+##                #parse("component/editList.vm")
+##            </div>
+##        #elseif($element.value.component == "eTList")
+##            <div class="#if("$!element.value.container" !="") $element.value.container #end" group="$!element.value.group">
+##                #set($list = $element.value)
+##                #parse("component/editTreeList.vm")
+##            </div>
+##        #elseif($element.value.component == "qList")
+##            <div class="#if("$!element.value.container" !="") $element.value.container #end" group="$!element.value.group">
+##                #set($list = $element.value)
+##                #parse("component/queryList.vm")
+##            </div>
+##        #elseif($element.value.component == "dynTree")
+##            <div class="#if("$!element.value.container" !="") $element.value.container #end" group="$!element.value.group">
+##                #set($tree = $element.value)
+##                #parse("component/dynTree.vm")
+##            </div>
+##        #elseif($element.value.component == "container")
+##            <div class="hfspan #if("$!element.value.container" !="") $element.value.container #end " group="$!element.value.group">
+##                #set($container = $element.value)
+##                #parse("component/container.vm")
+##                #if($element.value.EOF)
+##                    <div class="form-actions" align="center">
+##                        #foreach($item in $element.value.EOF)
+##                        $item.component
+##                    #end
+##                    </div>
+##                #end
+##            </div>
+##        #elseif($element.value.component == "mutexContainer")
+##            <div class="#if("$!element.value.container" !="") $element.value.container #end"  group="$!element.value.group">
+##                #set($container = $element.value)
+##                #parse("component/mutexContainer.vm")
+##            </div>
+##        #end
+#end
+</div>
+#if($isPop)
+    #parse("blank_endpart.vm")
+#else
+    #parse("default_endpart.vm")
+#end

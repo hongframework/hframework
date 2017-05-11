@@ -1,0 +1,34 @@
+##<input name='$map.get("ViewObject")s.${column.javaVarName}' style='$widthStype'   type='hidden' value="$!oldObjectValue.get(${column.Name})"
+##        /><input style='$widthStype'   type='checkbox' onclick='trueFalseCheckboxOnClick_Sys(this)'
+###########################if($null.isNull($oldObjectValue.get(${column.Name})))这种方法无效，为什么呢
+###if($oldObjectValue.get(${column.Name}))
+##             value="1"
+###end
+##
+###if($!oldObjectValue.get(${column.Name})==1)
+##             checked="checked"
+###end
+##/>
+
+
+<label class="checkbox hfcheckbox inline" data-code="$column.dataCode" data-condition="1=1"  data-value="$!value" not-null="$!column.notNull" style="display: none"  relat-element="$!column.dataCondition"  >
+    <input type="checkbox" name="$column.code" value="" />
+</label>
+
+##<input class="form-control hfselect" readonly type="text" name="$column.code" onchange="alert(1);" data-value="$!value" data-code="$column.dataCode" data-condition="1=1" data-level="city" placeholder="请选择" provinceName="实体" cityName="属性" districtName="1" not-null="$!column.notNull">
+
+
+##<label class="checkbox">
+##    <div class="checker disabled" id="uniform-optionsCheckbox2"><span><input type="checkbox" id="optionsCheckbox2" name="$column.code" value="option1" disabled=""></span></div>
+##    This is a disabled checkbox
+##</label>
+
+##<label class="checkbox inline">
+##    <input type="checkbox" id="inlineCheckbox1" value="option1" /> Option 1
+##</label>
+##<label class="checkbox inline">
+##    <input type="checkbox" id="inlineCheckbox2" value="option2" /> Option 2
+##</label>
+##<label class="checkbox inline">
+##    <input type="checkbox" id="inlineCheckbox3" value="option3" /> Option 3
+##</label>

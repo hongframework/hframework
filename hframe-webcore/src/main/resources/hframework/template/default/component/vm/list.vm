@@ -1,0 +1,62 @@
+#set($map=$MAP)
+#set($id=$map.get("id"))
+#set($icon=$map.get("icon"))
+#set($title=$map.get("title"))
+#set($columns=$map.get("columns"))
+#set($list=$map.get("data"))
+#set($pager=$map.get("pager"))
+
+<div class="box span12 hflist" id='$id' dataset="user" module="uc" >
+    <div class="box-header">
+        <h2><i class="$icon"></i><span class="break"></span>$title</h2>
+        <div class="box-icon">
+            <a href="#" class="btn-setting"><i class="icon-wrench"></i></a>
+            <a href="#" class="btn-minimize"><i class="icon-chevron-up"></i></a>
+            <a href="#" class="btn-close"><i class="icon-remove"></i></a>
+        </div>
+    </div>
+    <div class="box-content">
+        <table class="table table-bordered table-striped table-condensed">
+            <thead>
+            <tr>
+                #foreach($column in $columns)
+                    <th>$column</th>
+                #end
+                <th>操作</th>
+            </tr>
+            </tr>
+            </thead>
+            <tbody class='hflist-data'>
+                #foreach($row in $list)
+                <tr>
+                    #foreach($item in $row)
+                        <td>$item</td>
+                    #end
+                    <td class="center">
+                        <a class="btn btn-success hfhref" href="javascript:void(0)" dataset="user" module="uc" operate="create" params='id=$row.id'>
+                            <i class="icon-zoom-in"></i>
+                        </a>
+                        <a class="btn btn-info" href="#">
+                            <i class="icon-edit "></i>
+                        </a>
+                        <a class="btn btn-danger" href="#">
+                            <i class="icon-trash "></i>
+                        </a>
+                    </td>
+                </tr>
+                #end
+            </tbody>
+        </table>
+        <div class="pagination pagination-centered">
+            <ul class='hflist-pager'>
+                #foreach($pageObj in $pager)
+                    <li
+                        #if($pageObj[3] == 'active')
+                                class="active"
+                        #end
+                            ><a href="#" class='hflist-pager-index' pageNo='$pageObj[1]' disabled='$pageObj[2]'>$pageObj[0]</a></li>
+                #end
+            </ul>
+        </div>
+    </div>
+</div>

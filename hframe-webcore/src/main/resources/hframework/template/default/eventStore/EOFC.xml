@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<event-store group="EOFC">
+
+    <event name="create.submit" description="提交">
+        <attach anchor="EOFC">
+            <appendElement type="button" param='{btnclass:"btn-primary",btnText:" 提 交 ", iconclass:"icon-file-alt"}'></appendElement>
+        </attach>
+        <source scope="EOC" param="thisForm"></source>
+        <effect type="ajaxSubmit" action="${createByAjax}"></effect>
+        <effect type="confirm" content='创建成功，是否返回列表页？'></effect>
+        <effect type="pageFwd" action='${mgr}' isStack="true"></effect>
+    </event>
+    <event name="update.submit" description="提交">
+        <attach anchor="EOFC">
+            <appendElement type="button" param='{btnclass:"btn-primary",btnText:" 提 交 "}'></appendElement>
+        </attach>
+        <source scope="EOC" param="thisForm"></source>
+        <effect type="ajaxSubmit" action="${updateByAjax}"></effect>
+        <effect type="confirm" content='修改，是否返回列表页？'></effect>
+        <effect type="pageFwd" action='${mgr}' isStack="true"></effect>
+    </event>
+    <event name="createOrUpdate.submit" description="提交">
+        <attach anchor="EOFC">
+            <appendElement type="button" param='{btnclass:"btn-primary",btnText:" 提 交 "}'></appendElement>
+        </attach>
+        <source scope="EOC" param="thisForm"></source>
+        <effect type="ajaxSubmit" action="${saveOrUpdateByAjax}"></effect>
+        <effect type="page.reload"></effect>
+    </event>
+
+    <event name="batch.delete"  description="批量删除">
+        <attach anchor="EOFC">
+            <appendElement type="button" param='{btnclass:"btn-primary",btnText:"批量删除"}'></appendElement>
+        </attach>
+        <source scope="BOFR">
+            <appendElement type="checkbox" param='${id}|${name}'></appendElement>
+        </source>
+        <effect type="ajaxSubmit" action='${batchDelete}' param="ids" isStack="true"></effect>
+        <effect type="component.reload"></effect>
+    </event>
+    <event name="batch.save" description="批量提交">
+        <attach anchor="EOFC">
+            <appendElement type="button" param='{btnclass:"btn-primary",btnText:" 提 交 "}'></appendElement>
+        </attach>
+        <source scope="EOC" param="thisForm"></source>
+        <effect type="ajaxSubmitByJson" action="${batchCreate}"></effect>
+        <effect type="component.reload"></effect>
+    </event>
+</event-store>

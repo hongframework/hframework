@@ -1,0 +1,11 @@
+#parse("blank_startpart.vm")
+
+<!-- Content -->
+
+    <form class="form-inline">
+        <div style="position: relative;">
+            <input class="form-control" readonly type="text" name="city" data-toggle="city-picker" value="北京市/北京市/海淀区" placeholder="请选择">
+        </div>
+    </form>
+
+#parse("blank_endpart.vm")

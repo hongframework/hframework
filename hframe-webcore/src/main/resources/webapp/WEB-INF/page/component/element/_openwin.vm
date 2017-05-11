@@ -1,0 +1,6 @@
+<div class="form-group form-inline">
+    <input   style='$widthStype' type='hidden'  name='$map.get("ViewObject").${column.javaVarName}'  	 value='$!oldObjectValue.get(${column.Name})'/>
+    <input  type="text" class="form-control" id='$map.get("ViewObject").${column.javaVarName}_DISPNAME' placeholder="-请选择-" disabled  style='$widthStype'	 value='$!oldObjectValue.get("${column.Name}_DISPNAME")' />
+    <a href="javascript:void(0);" onclick="magnifier_Sys(this,'myDialog.jsp?VIEW=${column.ShowType.ShowTypeAttr.View}&TYPE=${column.ShowType.ShowTypeAttr.Type}&CONDITION=$!{column.ShowType.ShowTypeAttr.Condition}&TITLE=$!{column.ShowType.ShowTypeAttr.Title}','{user_id=100&user_name=zhangsan&SCHEMA_MODE=0}',400,500)">
+        <img src="test/fangdajing.jpg" width="20" height="20" class="magnifier_img_sys"></a>
+</div>

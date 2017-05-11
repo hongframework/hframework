@@ -1,0 +1,278 @@
+##第一部分：传入参数
+#set($map=$MAP)
+#set($className = $map.get("ClassName"))
+#set($varName = $map.get("VarName"))
+#set($entityName = $map.get("EntityName"))
+#set($keyProperty = $map.get("KeyProperty"))
+#set($parentIdPropertyClassName = $map.get("ParentIdPropertyClassName"))
+
+
+#set($seviceVarName = $map.get("SeviceVarName"))
+#set($poExampleClassName = $map.get("PoExampleClassName"))
+
+#set($moduleName = $map.get("ModuleName"))
+
+##模板内容
+
+
+    @InitBinder
+    protected void initBinder(HttpServletRequest request,
+        ServletRequestDataBinder binder) throws Exception {
+        DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        CustomDateEditor editor = new CustomDateEditor(df, false);
+        binder.registerCustomEditor(Date.class, editor);
+    }
+
+    /**
+     * 查询展示${entityName}列表
+     * @param ${varName}
+     * @return
+     * @throws Throwable
+     */
+    @RequestMapping(value = "/queryListByAjax.json")
+    @ResponseBody
+    public ResultData list(@ModelAttribute("${varName}") ${className} ${varName},
+                                      @ModelAttribute("example") ${poExampleClassName} example, Pagination pagination){
+        logger.debug("request : {},{},{}", ${varName}, example, pagination);
+        try{
+            ExampleUtils.parseExample(${varName}, example);
+            //设置分页信息
+            example.setLimitStart(pagination.getStartIndex());
+            example.setLimitEnd(pagination.getEndIndex());
+
+            final List< ${className}> list = ${seviceVarName}.get${className}ListByExample(example);
+            pagination.setTotalCount(${seviceVarName}.get${className}CountByExample(example));
+
+            return ResultData.success().add("list",list).add("pagination",pagination);
+        }catch (Exception e) {
+            logger.error("error : ", e);
+            return ResultData.error(ResultCode.ERROR);
+        }
+    }
+
+
+#if("$!{parentIdPropertyClassName}" != "" )
+    /**
+    * 查询展示${entityName}树
+    * @param ${varName}
+    * @return
+    * @throws Throwable
+    */
+    @RequestMapping(value = "/queryTeeByAjax.json")
+    @ResponseBody
+    public ResultData tree(@ModelAttribute("${varName}") ${className} ${varName},
+                         @ModelAttribute("example") ${poExampleClassName} example){
+        logger.debug("request : {},{}", ${varName}, example);
+        try{
+            ExampleUtils.parseExample(${varName}, example);
+
+            Map<Long, List< ${className}>> treeMap =
+                    ${seviceVarName}.get${className}TreeByParentId(${varName}, example);
+
+            return ResultData.success(treeMap);
+        }catch (Exception e) {
+            logger.error("error : ", e);
+            return ResultData.error(ResultCode.ERROR);
+        }
+    }
+#end
+
+    /**
+     * 查询展示${entityName}明细
+     * @param ${varName}
+     * @return
+     * @throws Throwable
+     */
+    @RequestMapping(value = "/queryOneByAjax.json")
+    @ResponseBody
+    public ResultData detail(@ModelAttribute("${varName}") ${className} ${varName}){
+        logger.debug("request : {},{}", ${varName}.get${keyProperty}(), ${varName});
+        try{
+            ${className} result = null;
+            if(${varName}.get${keyProperty}() != null) {
+                result = ${seviceVarName}.get${className}ByPK(${varName}.get${keyProperty}());
+            }else {
+                ${poExampleClassName} example = ExampleUtils.parseExample(${varName}, ${poExampleClassName}.class);
+                List<${className}> list = ${seviceVarName}.get${className}ListByExample(example);
+                if(list != null && list.size() == 1) {
+                    result = list.get(0);
+                }
+            }
+
+            if(result != null) {
+                return ResultData.success(result);
+            }else {
+                return ResultData.error(ResultCode.RECODE_IS_NOT_EXISTS);
+            }
+        }catch (Exception e) {
+            logger.error("error : ", e);
+            return ResultData.error(ResultCode.ERROR);
+        }
+    }
+
+    /**
+    * 搜索一个${entityName}
+    * @param  ${varName}
+    * @return
+    * @throws Throwable
+    */
+    @RequestMapping(value = "/searchOneByAjax.json")
+    @ResponseBody
+    public ResultData search(@ModelAttribute(" ${varName}") ${className}  ${varName}){
+        logger.debug("request : {}",  ${varName});
+        try{
+            ${className} result = null;
+            if(${varName}.get${keyProperty}() != null) {
+                result =  ${seviceVarName}.get${className}ByPK(${varName}.get${keyProperty}());
+            }else {
+                ${poExampleClassName} example = ExampleUtils.parseExample( ${varName}, ${poExampleClassName}.class);
+
+                example.setLimitStart(0);
+                example.setLimitEnd(1);
+
+                List<${className}> list =  ${seviceVarName}.get${className}ListByExample(example);
+                if(list != null && list.size() > 0) {
+                    result = list.get(0);
+                }
+            }
+
+            if(result != null) {
+                return ResultData.success(result);
+            }else {
+                return ResultData.error(ResultCode.RECODE_IS_NOT_EXISTS);
+            }
+        }catch (Exception e) {
+            logger.error("error : ", e);
+            return ResultData.error(ResultCode.ERROR);
+        }
+    }
+
+    /**
+    * 创建${entityName}
+    * @param ${varName}
+    * @return
+    * @throws Throwable
+    */
+    @RequestMapping(value = "/createByAjax.json")
+    @ResponseBody
+    public ResultData create(@ModelAttribute("${varName}") ${className} ${varName}) {
+        logger.debug("request : {}", ${varName});
+        try {
+            ControllerHelper.setDefaultValue(${varName}, "${varName}Id");
+            int result = ${seviceVarName}.create(${varName});
+            if(result > 0) {
+                return ResultData.success(${varName});
+            }
+        } catch (BusinessException e ){
+            return e.result();
+        } catch (Exception e) {
+            logger.error("error : ", e);
+            return ResultData.error(ResultCode.ERROR);
+        }
+        return ResultData.error(ResultCode.UNKNOW);
+    }
+
+    /**
+    * 批量维护${entityName}
+    * @param ${varName}s
+    * @return
+    * @throws Throwable
+    */
+    @RequestMapping(value = "/createsByAjax.json")
+    @ResponseBody
+    public ResultData batchCreate(@RequestBody ${className}[] ${varName}s) {
+        logger.debug("request : {}", ${varName}s);
+
+        try {
+            ControllerHelper.setDefaultValue(${varName}s, "${varName}Id");
+            ControllerHelper.reorderProperty(${varName}s);
+
+            int result = ${seviceVarName}.batchOperate(${varName}s);
+            if(result > 0) {
+                return ResultData.success(${varName}s);
+            }
+        } catch (BusinessException e ){
+            return e.result();
+        } catch (Exception e) {
+            logger.error("error : ", e);
+            return ResultData.error(ResultCode.ERROR);
+        }
+        return ResultData.error(ResultCode.UNKNOW);
+    }
+
+    /**
+    * 更新${entityName}
+    * @param ${varName}
+    * @return
+    * @throws Throwable
+    */
+    @RequestMapping(value = "/updateByAjax.json")
+    @ResponseBody
+    public ResultData update(@ModelAttribute("${varName}") ${className} ${varName}) {
+        logger.debug("request : {}", ${varName});
+        try {
+            ControllerHelper.setDefaultValue(${varName}, "${varName}Id");
+            int result = ${seviceVarName}.update(${varName});
+            if(result > 0) {
+                return ResultData.success(${varName});
+            }
+        } catch (BusinessException e ){
+            return e.result();
+        } catch (Exception e) {
+            logger.error("error : ", e);
+            return ResultData.error(ResultCode.ERROR);
+        }
+        return ResultData.error(ResultCode.UNKNOW);
+    }
+
+    /**
+    * 创建或更新${entityName}
+    * @param ${varName}
+    * @return
+    * @throws Throwable
+    */
+    @RequestMapping(value = "/saveOrUpdateByAjax.json")
+    @ResponseBody
+    public ResultData saveOrUpdate(@ModelAttribute("${varName}") ${className} ${varName}) {
+        logger.debug("request : {}", ${varName});
+        try {
+            ControllerHelper.setDefaultValue(${varName}, "${varName}Id");
+            int result = ${seviceVarName}.batchOperate(new ${className}[]{${varName}});
+            if(result > 0) {
+                return ResultData.success(${varName});
+            }
+        } catch (BusinessException e ){
+            return e.result();
+        } catch (Exception e) {
+            logger.error("error : ", e);
+            return ResultData.error(ResultCode.ERROR);
+        }
+        return ResultData.error(ResultCode.UNKNOW);
+    }
+
+    /**
+    * 删除${entityName}
+    * @param ${varName}
+    * @return
+    * @throws Throwable
+    */
+    @RequestMapping(value = "/deleteByAjax.json")
+    @ResponseBody
+    public ResultData delete(@ModelAttribute("${varName}") ${className} ${varName}) {
+        logger.debug("request : {}", ${varName});
+
+        try {
+            ControllerHelper.setDefaultValue(${varName}, "${varName}Id");
+            int result = ${seviceVarName}.delete(${varName});
+            if(result > 0) {
+                return ResultData.success(${varName});
+            }else {
+                return ResultData.error(ResultCode.RECODE_IS_NOT_EXISTS);
+            }
+        } catch (BusinessException e ){
+            return e.result();
+        } catch (Exception e) {
+            logger.error("error : ", e);
+            return ResultData.error(ResultCode.ERROR);
+        }
+    }

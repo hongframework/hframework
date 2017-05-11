@@ -1,0 +1,56 @@
+#if($isPop)
+    #parse("blank_startpart.vm")
+#else
+    #parse("default_startpart.vm")
+#end
+
+#foreach($element in $elements.entrySet())
+    <div class="row-fluid">
+    #if($element.value.component == "mutexContainer")
+        <div class="#if("$!element.value.container" !="") $element.value.container #end">
+            #set($container = $element.value)
+                    #parse("component/mutexContainer.vm")
+        </div>
+    #elseif(!$element.value.isDefaultComponent)
+        #set($jsonObject = $element.value)
+        #parse("$element.value.vmpath")
+    #end
+
+##        #if($element.value.component == "cForm")
+##            #set($form = $element.value)
+##            #parse("component/createForm.vm")
+##        #elseif($element.value.component == "eForm")
+##            #set($form = $element.value)
+##            #parse("component/createForm.vm")
+##        #elseif($element.value.component == "qForm")
+##            #set($form = $element.value)
+##            #parse("component/queryForm.vm")
+##        #elseif($element.value.component == "cList")
+##            #set($list = $element.value)
+##            #parse("component/editList.vm")
+##        #elseif($element.value.component == "eList")
+##            #set($list = $element.value)
+##            #parse("component/editList.vm")
+##        #elseif($element.value.component == "eTList")
+##            #set($list = $element.value)
+##            #parse("component/editTreeList.vm")
+##        #elseif($element.value.component == "chart")
+##            #set($chart = $element.value)
+##            #parse("component/chart.vm")
+##        #elseif($element.value.component == "qList")
+##            #set($list = $element.value)
+##            #parse("component/queryList.vm")
+##        #elseif($element.value.component == "mutexContainer")
+##            <div class="#if("$!element.value.container" !="") $element.value.container #end">
+##                #set($container = $element.value)
+##                #parse("component/mutexContainer.vm")
+##            </div>
+##        #end
+    </div>
+#end
+
+#if($isPop)
+    #parse("blank_endpart.vm")
+#else
+    #parse("default_endpart.vm")
+#end

@@ -1,0 +1,58 @@
+<div class="box span12 hfcontainer" id='$container.id'  module="$module" page="$page" param="$!container.param" component="$container.component" >
+    #set($isPop = true)
+    #set($elements = $container.modelMap.elements)
+    #set($style ="margin-bottom:-5px;")
+
+    #foreach($element in $elements.entrySet())
+        #set($compData = $curDataGroup.elementMap.get($element.value.dataSet))
+        #if("$!element.value.dataSet" != "")
+            <div class="row-fluid" dc="$element.value.dc">
+
+                #if($element.key == "cForm")
+                    #set($form = $element.value)
+                    #set($form.data = $compData.one)
+                    #parse("component/createForm.vm")
+                #elseif($element.key == "eForm")
+                    #set($form = $element.value)
+##                    $compData.one
+                    #set($form.data = $compData.one)
+                    #parse("component/createForm.vm")
+                #elseif($element.key == "qForm")
+                    #set($form = $element.value)
+                    #set($form.data = $compData.one)
+                    #parse("component/queryForm.vm")
+                #elseif($element.value.component == "cList")
+                    #set($list = $element.value)
+                    #set($list.data = $compData.componentData.data)
+                    #parse("component/editList.vm")
+                #elseif($element.value.component == "eList")
+                    #set($list = $element.value)
+                    #set($list.data = $compData.componentData.data)
+                    #parse("component/editList.vm")
+                #elseif($element.value.component == "qList")
+                    #set($list = $element.value)
+                    #set($list.data = $compData.componentData.data)
+                    #parse("component/queryList.vm")
+                #elseif($element.value.component == "mutexContainer")
+                    #set($container = $element.value)
+                    <div class="box span12 hfmutexcont" id='$container.id'  module="$module" page="$page" param="$!container.param" component="$container.component" style="$!style">
+                        <div class="box-header">
+                            <h2><i class="$list.icon"></i><span class="break"></span>$container.title</h2>
+                            <div class="box-icon">
+                                <a href="#" class="btn-setting"><i class="icon-wrench"></i></a>
+                                <a href="#" class="btn-minimize"><i class="icon-chevron-up"></i></a>
+                                <a href="#" class="btn-close"><i class="icon-remove"></i></a>
+                            </div>
+                        </div>
+                        <div class="box-content">
+                            #parse("component/mutexContainer.vm")
+                        </div>
+                    </div>
+                #end
+            </div>
+        #end
+
+    #end
+##
+##    #parse("${container.view}.vm")
+</div>

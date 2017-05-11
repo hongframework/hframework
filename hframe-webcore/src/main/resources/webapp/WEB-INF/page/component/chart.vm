@@ -1,0 +1,33 @@
+#set($chart = $jsonObject)
+<div class="box span12 hfchart" id='$chart.id'  module="$module" page="$page" component="$chart.component"  style="$!style;overflow:inherit">
+    <div class="box-header">
+        <h2><i class="$chart.icon"></i>$chart.title</h2>
+        <div class="box-icon">
+            <a href="#" class="btn-setting"><i class="icon-wrench"></i></a>
+            <a href="#" class="btn-minimize"><i class="icon-chevron-up"></i></a>
+            <a href="#" class="btn-close"><i class="icon-remove"></i></a>
+        </div>
+    </div>
+    <div class="box-content">
+        <div class="hfchart-context" id='${chart.id}_content' style="height:500px;"
+##             title="P2P用户投资实时统计"
+             legend-data="$chart.legendName"
+             legend-code="$chart.legendCode"
+             xAxis-type="time"
+             interval="2"
+             refresh="true"
+             type="line"
+             cycle="second"
+             step="200"></div>
+##        <div class="hfchart-context" id='${chart.id}_content' style="height:500px;"
+##        ##             title="P2P用户投资实时统计"
+##             legend-data="['平均耗时','最大耗时','最小耗时']"
+##             legend-code="['avg','max','min']"
+##             xAxis-type="time"
+##             interval="2"
+##             refresh="true"
+##             type="line"
+##             cycle="second"
+##             step="200"></div>
+    </div>
+</div>

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component id="container" init="true" type="container" data-set="${dataSet}" data-auth="${dataAuth}"  path="component/container.vm">
+    <element id="id" type="characters" default-value=""></element>
+    <!--<element id="data" type="object"  default-value=""></element>-->
+    <events>
+        <event name="submit">
+            <attach anchor="EOFC">
+                <appendElement type="button" param='{btnclass:"btn-primary",btnText:" 保 存 "}'></appendElement>
+            </attach>
+            <source scope="EOC" param="thisForm"></source>
+            <effect type="ajaxSubmitByJson" action="ajaxSubmits.json"></effect>
+            <effect type="page.reload"></effect>
+        </event>
+    </events>
+</component>

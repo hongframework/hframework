@@ -1,0 +1,197 @@
+##第一部分：传入参数
+#set($map=$MAP)
+#set($className = $map.get("ClassName"))
+#set($varName = $map.get("VarName"))
+#set($entityName = $map.get("EntityName"))
+#set($keyProperty = $map.get("KeyProperty"))
+#set($parentIdPropertyClassName = $map.get("ParentIdPropertyClassName"))
+
+
+
+##模板内容
+    /**
+    * 创建${entityName}
+    * @param ${varName}
+    * @return
+    * @throws Exception
+    */
+    public int create(${className} ${varName}) throws Exception {
+        return ${varName}Mapper.insertSelective(${varName});
+    }
+
+    /**
+    * 批量维护${entityName}
+    * @param ${varName}s
+    * @return
+    * @throws Exception
+    */
+    public int batchOperate(${className}[] ${varName}s) throws  Exception{
+        int result = 0;
+        if(${varName}s != null) {
+            for (${className} ${varName} : ${varName}s) {
+                if(${varName}.get${keyProperty}() == null) {
+                    result += this.create(${varName});
+                }else {
+                    result += this.update(${varName});
+                }
+            }
+        }
+        return result;
+    }
+
+    /**
+    * 更新${entityName}
+    * @param ${varName}
+    * @return
+    * @throws Exception
+    */
+    public int update(${className} ${varName}) throws  Exception {
+        return ${varName}Mapper.updateByPrimaryKeySelective(${varName});
+    }
+
+    /**
+    * 通过查询对象更新${entityName}
+    * @param ${varName}
+    * @param example
+    * @return
+    * @throws Exception
+    */
+    public int updateByExample(${className} ${varName}, ${className}_Example example) throws  Exception {
+        return ${varName}Mapper.updateByExampleSelective(${varName}, example);
+    }
+
+    /**
+    * 删除${entityName}
+    * @param ${varName}
+    * @return
+    * @throws Exception
+    */
+    public int delete(${className} ${varName}) throws  Exception {
+        return ${varName}Mapper.deleteByPrimaryKey(${varName}.get${keyProperty}());
+    }
+
+    /**
+    * 删除${entityName}
+    * @param ${varName}Id
+    * @return
+    * @throws Exception
+    */
+    public int delete(long ${varName}Id) throws  Exception {
+        return ${varName}Mapper.deleteByPrimaryKey(${varName}Id);
+    }
+
+    /**
+    * 查找所有${entityName}
+    * @return
+    */
+    public List<${className}> get${className}All()  throws  Exception {
+        return ${varName}Mapper.selectByExample(new ${className}_Example());
+    }
+
+    /**
+    * 通过${entityName}ID查询${entityName}
+    * @param ${varName}Id
+    * @return
+    * @throws Exception
+    */
+    public ${className} get${className}ByPK(long ${varName}Id)  throws  Exception {
+        return ${varName}Mapper.selectByPrimaryKey(${varName}Id);
+    }
+
+#if("$!{parentIdPropertyClassName}" != "" )
+    /**
+    * 通过父级${entityName}ID查询${entityName}树
+    * @param ${varName}
+    * @return
+    * @throws Exception
+    */
+    public Map<Long, List<${className}>> get${className}TreeByParentId(${className} ${varName}, ${className}_Example example)  throws  Exception {
+
+        Map<Long, List<${className}>> result = new HashMap<Long, List<${className}>>();
+
+        fill${className}TreeCascade(result, Lists.newArrayList(
+                ${varName}.get${parentIdPropertyClassName}() == null ? -1 : ${varName}.get${parentIdPropertyClassName}() ), example);
+        return result;
+    }
+
+    private void fill${className}TreeCascade(Map<Long, List<${className}>> result, List<Long> parentIds, ${className}_Example templateExample)  throws Exception {
+        if(parentIds.size() == 0) {
+            return ;
+        }
+        if(templateExample == null) {
+            templateExample = new ${className}_Example();
+        }
+        ${className}_Example example = ExampleUtils.clone(templateExample);
+        if(example.getOredCriteria() == null || example.getOredCriteria().size() == 0) {
+            example.createCriteria();
+        }
+
+        example.getOredCriteria().get(0).and${parentIdPropertyClassName}In(parentIds);
+        List<${className}> ${varName}s = ${varName}Mapper.selectByExample(example);
+        if(${varName}s == null || ${varName}s.size() == 0) {
+            return;
+        }
+
+        if(parentIds.size() == 1) {
+            result.put(parentIds.get(0), ${varName}s);
+        }else {
+            for (${className} ${varName} : ${varName}s) {
+                Long parentId = ${varName}.get${parentIdPropertyClassName}();
+                if(!result.containsKey(parentId)) {
+                    result.put(parentId, new ArrayList<${className}>());
+                }
+                result.get(parentId).add(${varName});
+            }
+        }
+
+        List subIds = new ArrayList();
+        for (${className} ${varName} : ${varName}s) {
+            subIds.add(${varName}.get${keyProperty}());
+        }
+
+        fill${className}TreeCascade(result,subIds, templateExample);
+    }
+#end
+
+    /**
+    * 通过MAP参数查询${entityName}
+    * @param params
+    * @return
+    * @throws Exception
+    */
+    public List<${className}> get${className}ListByParam(Map<String, Object> params)  throws  Exception {
+        return null;
+    }
+
+
+
+    /**
+    * 通过查询对象查询${entityName}
+    * @param example
+    * @return
+    * @throws Exception
+    */
+    public List<${className}> get${className}ListByExample(${className}_Example example) throws  Exception {
+        return ${varName}Mapper.selectByExample(example);
+    }
+
+    /**
+    * 通过MAP参数查询${entityName}数量
+    * @param params
+    * @return
+    * @throws Exception
+    */
+    public int get${className}CountByParam(Map<String, Object> params)  throws  Exception {
+        return 0;
+    }
+
+    /**
+    * 通过查询对象查询${entityName}数量
+    * @param example
+    * @return
+    * @throws Exception
+    */
+    public int get${className}CountByExample(${className}_Example example) throws  Exception {
+        return ${varName}Mapper.countByExample(example);
+    }
+

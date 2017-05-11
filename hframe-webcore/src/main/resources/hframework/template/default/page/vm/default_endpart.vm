@@ -1,0 +1,73 @@
+        </div>
+        <!-- end: Content -->
+
+    </div><!--/fluid-row-->
+
+    <div class="modal hide fade" id="myModal">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal">×</button>
+            <h3>Settings</h3>
+        </div>
+        <div class="modal-body">
+            <p>Here settings can be configured...</p>
+        </div>
+        <div class="modal-footer">
+            <a href="#" class="btn" data-dismiss="modal">Close</a>
+            <a href="#" class="btn btn-primary">Save changes</a>
+        </div>
+    </div>
+
+    <div class="clearfix"></div>
+
+    <footer>
+        <p>
+            <span style="text-align:left;float:left">Copyright &copy; 2014.Company name All rights reserved.</span>
+        </p>
+
+    </footer>
+
+</div><!--/.fluid-container-->
+
+<!-- start: JavaScript-->
+<script src="$staticResourcePath/js/jquery-1.10.2.min.js"></script>
+<script src="$staticResourcePath/js/jquery-migrate-1.2.1.min.js"></script>
+<script src="$staticResourcePath/js/jquery-ui-1.10.3.custom.min.js"></script>
+<script src="$staticResourcePath/js/jquery.ui.touch-punch.js"></script>
+<script src="$staticResourcePath/js/modernizr.js"></script>
+<script src="$staticResourcePath/js/bootstrap.min.js"></script>
+<script src="$staticResourcePath/js/jquery.cookie.js"></script>
+<script src='$staticResourcePath/js/fullcalendar.min.js'></script>
+<script src='$staticResourcePath/js/jquery.dataTables.min.js'></script>
+<script src="$staticResourcePath/js/excanvas.js"></script>
+<script src="$staticResourcePath/js/jquery.flot.js"></script>
+<script src="$staticResourcePath/js/jquery.flot.pie.js"></script>
+<script src="$staticResourcePath/js/jquery.flot.stack.js"></script>
+<script src="$staticResourcePath/js/jquery.flot.resize.min.js"></script>
+<script src="$staticResourcePath/js/jquery.flot.time.js"></script>
+
+<script src="$staticResourcePath/js/jquery.chosen.min.js"></script>
+<script src="$staticResourcePath/js/jquery.uniform.min.js"></script>
+<script src="$staticResourcePath/js/jquery.cleditor.min.js"></script>
+<script src="$staticResourcePath/js/jquery.noty.js"></script>
+<script src="$staticResourcePath/js/jquery.elfinder.min.js"></script>
+<script src="$staticResourcePath/js/jquery.raty.min.js"></script>
+<script src="$staticResourcePath/js/jquery.iphone.toggle.js"></script>
+<script src="$staticResourcePath/js/jquery.uploadify-3.1.min.js"></script>
+<script src="$staticResourcePath/js/jquery.gritter.min.js"></script>
+<script src="$staticResourcePath/js/jquery.imagesloaded.js"></script>
+<script src="$staticResourcePath/js/jquery.masonry.min.js"></script>
+<script src="$staticResourcePath/js/jquery.knob.modified.js"></script>
+<script src="$staticResourcePath/js/jquery.sparkline.min.js"></script>
+<script src="$staticResourcePath/js/counter.min.js"></script>
+<script src="$staticResourcePath/js/raphael.2.1.0.min.js"></script>
+<script src="$staticResourcePath/js/justgage.1.0.1.min.js"></script>
+<script src="$staticResourcePath/js/jquery.autosize.min.js"></script>
+<script src="$staticResourcePath/js/retina.js"></script>
+<script src="$staticResourcePath/js/jquery.placeholder.min.js"></script>
+<script src="$staticResourcePath/js/wizard.min.js"></script>
+<script src="$staticResourcePath/js/core.min.js"></script>
+<script src="$staticResourcePath/js/charts.min.js"></script>
+<script src="$staticResourcePath/js/custom.min.js"></script>
+<!-- end: JavaScript-->
+</body>
+</html>

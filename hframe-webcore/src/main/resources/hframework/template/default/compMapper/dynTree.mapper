@@ -1,0 +1,26 @@
+<mapper component-id="dynTree">
+    <baseMapper>
+        <mapping id="id" value="${code}_tree"></mapping>
+        <mapping id="icon" value="${icon}"></mapping>
+        <mapping id="title" value="${name}树"></mapping>
+        <mapping id="children" value="${data}">
+            <mapping id="id" value="${KEY_FIELD}"></mapping>
+            <mapping id="icon" value="icon"></mapping>
+            <mapping id="url" value="url"></mapping>
+            <mapping id="name" value="${NAME_FIELD}"></mapping>
+            <mapping id="children"></mapping>
+        </mapping>
+        <!--<div style="float:right;"><a href="javascript:alert(1)"><i class="icon-leaf green"></i></a><div>-->
+    </baseMapper>
+    <eventMapper>
+        <mapping id="id" value="${KEY_FIELD}"></mapping>
+        <mapping id="name" value="${NAME_FIELD}"></mapping>
+        <mapping id="pid" value="${P_KEY_FIELD}"></mapping>
+        <mapping id="create" value="${create}.html"></mapping>
+        <mapping id="edit" value="${edit}.html"></mapping>
+        <mapping id="detail" value="${detail}.html"></mapping>
+        <mapping id="delete" value="${deleteByAjax}.json"></mapping>
+        <mapping id="updateByAjax" value="${updateByAjax}.json"></mapping>
+        <mapping id="batchDelete" value="${batchDelete}.html"></mapping>
+    </eventMapper>
+</mapper>

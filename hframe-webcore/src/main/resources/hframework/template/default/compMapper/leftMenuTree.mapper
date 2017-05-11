@@ -1,0 +1,11 @@
+<mapper component-id="leftMenuTree">
+    <baseMapper>
+        <mapping id="menus" value="${data}">
+            <mapping id="id" value="${KEY_FIELD}"></mapping>
+            <mapping id="icon" value="icon"></mapping>
+            <mapping id="url" value="url"></mapping>
+            <mapping id="name" value="${NAME_FIELD}"></mapping>
+            <mapping id="menus"></mapping>
+        </mapping>
+    </baseMapper>
+</mapper>

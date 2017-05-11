@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans   http://www.springframework.org/schema/beans/spring-beans.xsd">
+    <!--<bean id="processEngineConfiguration" class="org.activiti.spring.SpringProcessEngineConfiguration">-->
+        <!--<property name="dataSource" ref="dataSource" />-->
+        <!--<property name="transactionManager" ref="transactionManager" />-->
+        <!--<property name="databaseSchemaUpdate" value="true" />-->
+        <!--<property name="jobExecutorActivate" value="false" />-->
+    <!--</bean>-->
+    <!--&lt;!&ndash;<bean id="objectMapper" class="com.fasterxml.jackson.databind.ObjectMapper"/>&ndash;&gt;-->
+
+    <!--<bean id="processEngine" class="org.activiti.spring.ProcessEngineFactoryBean">-->
+        <!--<property name="processEngineConfiguration" ref="processEngineConfiguration" />-->
+    <!--</bean>-->
+
+    <!--<bean id="repositoryService" factory-bean="processEngine"-->
+          <!--factory-method="getRepositoryService" />-->
+    <!--<bean id="runtimeService" factory-bean="processEngine"-->
+          <!--factory-method="getRuntimeService" />-->
+    <!--<bean id="taskService" factory-bean="processEngine"-->
+          <!--factory-method="getTaskService" />-->
+    <!--<bean id="historyService" factory-bean="processEngine"-->
+          <!--factory-method="getHistoryService" />-->
+    <!--<bean id="managementService" factory-bean="processEngine"-->
+          <!--factory-method="getManagementService" />-->
+    <!--<bean id="identityService" factory-bean="processEngine"-->
+          <!--factory-method="getIdentityService" />-->
+    <import resource="classpath:activiti-ui-context.xml"></import>
+    <import resource="classpath:activiti-login-context.xml"></import>
+    <import resource="classpath:activiti-custom-context.xml"></import>
+    <!--<bean id="transactionManager"-->
+          <!--class="org.springframework.jdbc.datasource.DataSourceTransactionManager">-->
+        <!--<property name="dataSource" ref="dataSource" />-->
+    <!--</bean>-->
+</beans>

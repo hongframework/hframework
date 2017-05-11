@@ -1,0 +1,15 @@
+<ul class="nav nav-tabs nav-stacked main-menu">
+#foreach($menu in $menus)
+<li>
+    #if($menu.menus.size() > 0)
+    <a  class="dropmenu"  href="$menu.url"><i class="$menu.icon"></i><span class="hidden-tablet"> $menu.name</span><span class="label">$menu.menus.size()</span></a>
+        <ul>
+            #foreach($submenu in $menu.menus)
+                <li><a class="submenu" href="$submenu.url"><i class="$submenu.icon"></i><span class="hidden-tablet"> $submenu.name</span></a></li>
+            #end
+        </ul>
+    #else
+    <a  href="$menu.url"><i class="$menu.icon"></i><span class="hidden-tablet"> $menu.name</span></a>
+    #end
+#end
+</ul>

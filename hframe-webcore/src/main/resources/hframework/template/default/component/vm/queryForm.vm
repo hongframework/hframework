@@ -1,0 +1,30 @@
+<div class="box span12" id='$form.id'>
+    <div class="box-header">
+        <h2><i class="$form.icon"></i>$form.title</h2>
+        <div class="box-icon">
+            <a href="#" class="btn-setting"><i class="icon-wrench"></i></a>
+            <a href="#" class="btn-minimize"><i class="icon-chevron-up"></i></a>
+            <a href="#" class="btn-close"><i class="icon-remove"></i></a>
+        </div>
+    </div>
+    <div class="box-content">
+        <form class="form-horizontal">
+            <fieldset>
+                #foreach($column in $form.columns)
+                    <div class="control-group">
+                        <label class="control-label" for="$column.code">$column.name</label>
+                        <div class="controls">
+                            #set($data = $form.data)
+                            #parse("component/element/field.vm")
+
+                        </div>
+                    </div>
+                #end
+                <div class="form-actions" >
+                    <button type="submit" class="btn btn-primary">Save changes</button>
+                    <button class="btn">Cancel</button>
+                </div>
+            </fieldset>
+        </form>
+    </div>
+</div>

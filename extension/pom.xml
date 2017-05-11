@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>hframe</artifactId>
+        <groupId>com.github.hongframework</groupId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>extension</artifactId>
+    <properties>
+        <hframe.version>${parent.version}</hframe.version>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.github.hongframework</groupId>
+            <artifactId>hframe-common</artifactId>
+            <version>${hframe.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.hongframework</groupId>
+            <artifactId>hframe-beans</artifactId>
+            <version>${hframe.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.hongframework</groupId>
+            <artifactId>hframe-webcore</artifactId>
+            <version>${hframe.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.hongframework</groupId>
+            <artifactId>hframe-webgenerator</artifactId>
+            <version>${hframe.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.hongframework</groupId>
+            <artifactId>hframe-workflow</artifactId>
+            <version>${hframe.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.hongframework</groupId>
+            <artifactId>basic</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+    </dependencies>
+    <!--<build>-->
+        <!--<filters>-->
+            <!--<filter>${project.basedir}/src/main/filters/build_${env}.properties</filter>-->
+        <!--</filters>-->
+        <!--<resources>-->
+            <!--<resource>-->
+                <!--<directory>${project.basedir}/src/main/resources</directory>-->
+                <!--<filtering>true</filtering>-->
+            <!--</resource>-->
+        <!--</resources>-->
+    <!--</build>-->
+</project>

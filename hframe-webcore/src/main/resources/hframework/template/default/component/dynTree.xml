@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component id="dynTree" init="true" type="tree" data-set="${dataSet}" data-auth="${dataAuth}"  path="component/dynTree.vm">
+    <element id="id" type="characters" default-value=""></element>
+    <element id="icon" type="enums" relId="icons" default-value=""></element>
+    <element id="title" type="characters"  default-value=""></element>
+
+    <element id="children" type="objectTree" default-value="">
+        <element id="id" type="characters"  default-value=""></element>
+        <element id="icon" type="characters"  default-value=""></element>
+        <element id="url" type="characters"  default-value=""></element>
+        <element id="name" type="characters" relId="#{TYPE}"  default-value=""></element>
+        <element id="children" type="objects" default-value="">
+        </element>
+    </element>
+    <events>
+        <event rel="#EOFR.refresh.create"></event>
+        <event rel="#EOFR.refresh.edit"></event>
+        <event rel="#EOFR.tree.confirm.delete"></event>
+        <event rel="#ELE.goto.detail"></event>
+    </events>
+    <example>
+        <![CDATA[
+        ]]>
+    </example>
+</component>

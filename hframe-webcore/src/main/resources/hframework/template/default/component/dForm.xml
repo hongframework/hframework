@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component id="dForm" init="true" type="dForm" data-set="${dataSet}" data-auth="${dataAuth}">
+    <element id="id" type="characters" default-value=""></element>
+    <element id="icon" type="enums" relId="icons" default-value=""></element>
+    <element id="title" type="characters"  default-value=""></element>
+    <element id="columns" type="objects"  default-value="">
+        <element id="code" type="characters"  default-value=""></element>
+        <element id="name" type="characters"  default-value=""></element>
+        <element id="editType" type="enums" relId="#{TYPE}"  default-value=""></element>
+        <element id="dataCode" type="characters"  default-value=""></element>
+        <element id="dataCondition" type="characters"  default-value=""></element>
+    </element>
+    <element id="data" type="object"  default-value=""></element>
+
+    <!--<baseEvents>-->
+    <!--<event id="pagination" type="list" name="翻页">-->
+    <!--<attach anchor="pager"></attach>-->
+    <!--<source scope="pager" param="pageIndex=${this.value}"></source>-->
+    <!--<effect type="component.reload" ></effect>-->
+    <!--</event>-->
+    <!--</baseEvents>-->
+    <!--<events>-->
+    <!--<event name="edit">-->
+    <!--<attach anchor="EOFR">-->
+    <!--<appendElement type="icon" param='{fillclass:"btn-success",iconclass:"icon-zoom-in"}'></appendElement>-->
+    <!--</attach>-->
+    <!--<source scope="CROW" param="${id}"></source>-->
+    <!--<effect type="pageFwd" action='${edit}' isStack="true"></effect>-->
+    <!--<effect type="component.reload"></effect>-->
+    <!--</event>-->
+    <!--<event name="delete">-->
+    <!--<attach anchor="EOFR">-->
+    <!--<appendElement type="icon" param='{fillclass:"btn-success",iconclass:"icon-zoom-in"}'></appendElement>-->
+    <!--</attach>-->
+    <!--<source scope="CROW" param='${id}'></source>-->
+    <!--<effect type="dialogTip" param='你是否删除${name}该数据!'></effect>-->
+    <!--<effect type="ajaxSubmit" action="${delete}"></effect>-->
+    <!--<effect type="component.reload"></effect>-->
+    <!--</event>-->
+    <!--<event name="detail">-->
+    <!--<attach anchor="${name}"></attach>-->
+    <!--<source scope="CROW" param="${id}"></source>-->
+    <!--<effect type="pageFwd" action='${detail}' isStack="true"></effect>-->
+    <!--</event>-->
+    <!--<event name="create">-->
+    <!--<attach anchor="EOFR">-->
+    <!--<appendElement type="icon" param='{fillclass:"btn-success",iconclass:"icon-zoom-in"}'></appendElement>-->
+    <!--</attach>-->
+    <!--<effect type="pageFwd" action='${create}' isStack="true"></effect>-->
+    <!--<effect type="component.reload"></effect>-->
+    <!--</event>-->
+    <!--<event name="batchDelete">-->
+    <!--<attach anchor="EOF">-->
+    <!--<appendElement type="button" param='{fillclass:"btn-success",iconclass:"icon-zoom-in"}'></appendElement>-->
+    <!--</attach>-->
+    <!--<source scope="ROWS">-->
+    <!--<appendElement type="checkbox" param='${id}|${name}'></appendElement>-->
+    <!--</source>-->
+    <!--<effect type="ajaxSubmit" action='${batchDelete}' param="ids" isStack="true"></effect>-->
+    <!--<effect type="component.reload"></effect>-->
+    <!--</event>-->
+    <!--</events>-->
+
+    <example>
+        <![CDATA[
+            {
+              id:"mylist",
+              icon:"icon-user",
+              title:"新增用户",
+              columns:[
+                {code:"id",name:"学号",editType:"hidden"},
+                {code:"name",name:"姓名",editType:"input"},
+                {code:"age",name:"年龄",editType:"select"},
+                {code:"gender",name:"性别",editType:"radio"},
+                {code:"address",name:"地址",editType:"input"},
+                {code:"remark",name:"备注",editType:"textarea"}
+              ],
+              data:{id:"1001",name:"张三",age:29,gender:"女",address:"四川成都",remark:""},
+              memo:{
+                "dataset":"user"
+              }
+            }
+        ]]>
+    </example>
+</component>

@@ -1,0 +1,1 @@
+<input type="text"  id="$column.code" name="$column.code" class="input-$!{elementSize} datepicker"  value="$!value" not-null="$!column.notNull" />

@@ -1,0 +1,53 @@
+#set($form = $jsonObject)
+<div class="box span12 hfform" id='$form.id'  module="$module" page="$page" component="$form.component"  style="$!style;overflow:inherit">
+    <span  class="ruler" style="display: none;">$!form.ruler</span>
+    <div class="box-header">
+        <h2><i class="$form.icon"></i>$form.title</h2>
+        <div class="box-icon">
+            <a href="#" class="btn-setting"><i class="icon-wrench"></i></a>
+            <a href="#" class="btn-minimize"><i class="icon-chevron-up"></i></a>
+            <a href="#" class="btn-close"><i class="icon-remove"></i></a>
+        </div>
+    </div>
+    <div class="box-content">
+        <form class="form-horizontal">
+            <fieldset>
+                #foreach($column in $form.columns)
+                    #set($href = "")
+                    #if(${form.ELE.get($column.code)})
+                        #set($href = $!{form.ELE.get($column.code)})
+                    #end
+
+                    #if($column.editType == "hidden")
+                        #set($data = $form.data)
+                        #set($value = $!data.get($column.code))
+                        #parse("component/element/field.vm")
+                        #set($value = "")
+                    #else
+                        <div class="control-group">
+                            <label class="control-label" for="$column.code">#if($!column.notNull)<span style="color:red;font-size: larger;">* </span> #end $column.name</label>
+                            <div class="controls">
+                                #set($data = $form.data)
+                                #set($value = $!data.get($column.code))
+                                #set($elementSize = "xlarge")
+                                #parse("component/element/field.vm")
+                                #set($value = "")
+                                <span class="help-inline">$!column.tipinfo</span>
+                            </div>
+                        </div>
+                    #end
+                #end
+
+                #if($form.EOF)
+                    <div class="form-actions">
+                        #foreach($item in $form.EOF)
+                            $item.component
+                        #end
+                    ##                        <button type="submit" class="btn btn-primary hfhref">查询</button>
+                        <button class="btn hfhref">取消</button>
+                    </div>
+                #end
+            </fieldset>
+        </form>
+    </div>
+</div>

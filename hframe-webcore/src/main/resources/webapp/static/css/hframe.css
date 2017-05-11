@@ -1,0 +1,3 @@
+.hflist .radio.inline+.radio.inline, .checkbox.inline+.checkbox.inline {
+    margin-left : 0;
+}

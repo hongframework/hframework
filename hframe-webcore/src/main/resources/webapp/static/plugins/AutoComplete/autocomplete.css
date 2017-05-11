@@ -1,0 +1,69 @@
+div.ac {
+	border: 1px solid #ddd;
+	position: absolute;
+	overflow: auto;
+
+	background-color: red;
+	font-size: 16px;
+	-webkit-box-shadow: 0 2px 8px rgba(0,0,0,.2);
+	-moz-box-shadow: 0 2px 8px rgba(0,0,0,.2);
+	box-shadow: 0 2px 8px rgba(0,0,0,.2);
+}
+
+div.ac > ul {
+	margin: 0px;
+	padding: 0px;
+}
+
+div.ac > ul > li {
+	margin: 0px;
+	line-height: 35px;
+	list-style-type: none;
+	background-color: white;
+	word-break: break-all;
+}
+
+div.ac > ul > li > div {
+	cursor: pointer;
+	width: 100%;
+	padding: 0 20px;
+	font-size: 16px;
+}
+
+div.ac > ul > li > div em {
+	background-color: #B0E2FF;
+	font-style: normal;
+}
+
+div.ac > ul > li.normal {
+	padding: 2px 0px 2px 2px;
+}
+
+div.ac > ul > li.normal > div > span{
+	display: table-cell;
+	vertical-align: middle;
+}
+
+div.ac > ul > li.iconList {
+	padding: 0px 0px 0px 2px;
+}
+
+div.ac > ul > li.iconList > div > div {
+	display: table-cell;
+	vertical-align: middle;
+	padding-right: 5px;
+}
+
+div.ac > ul > li.iconList > div > div > img {
+	display: table;
+	display: table-cell\9;
+}   
+
+div.ac > ul > li.iconList > div > span {
+	display: table-cell;
+	vertical-align: middle;
+}
+
+div.ac > ul > li.selected {
+	background-color: #f5f5f5;
+}

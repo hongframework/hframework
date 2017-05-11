@@ -1,0 +1,3 @@
+<div style="position: relative;">
+    <input class="form-control hfselect" readonly type="text" name="$column.code" onchange="alert(1);" data-value="$!value" data-code="$column.dataCode" data-condition="1=1" relat-element="$!column.dataCondition"   data-level="city" placeholder="请选择" provinceName="实体" cityName="属性" districtName="1" not-null="$!column.notNull">
+</div>
