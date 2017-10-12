@@ -159,7 +159,7 @@ public class PageTemplateParseUtil {
 //        Document document = HtmlUtils.getDocumentFromFile(
 //                "e:\\my-doc\\09 哆啦梦项目\\网页模板\\moban480\\index.html");
         Document document = HtmlUtils.getDocumentFromFile(
-                "e:\\my-doc\\09 哆啦梦项目\\网页模板\\chahua3223-高\\index.html");
+                "e:/my-doc/09 哆啦梦项目/网页模板/chahua3223-高/index.html");
         new PageContainer(document.body()).parse();
 
         setElementHfId(document);

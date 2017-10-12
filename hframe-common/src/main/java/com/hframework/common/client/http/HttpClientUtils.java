@@ -206,16 +206,16 @@ public class HttpClientUtils {
 
     public static void main(String[] args) throws Throwable {
         while(true) {
-            String msg = HttpPostUtils.doHttpPost("https://cmcoins.boc.cn/CoinSeller/_bfwajax.do?_locale=zh_CN", new HashMap<String, String>() {{
+            String msg =null;/*  HttpPostUtils.doHttpPost("https://cmcoins.boc.cn/CoinSeller/_bfwajax.do?_locale=zh_CN", new HashMap<String, String>() {{
                 put("json", "{\"method\":\"PsnProvincialInstitution\",\"params\":{\"productId\":\"HSB20170101\",\"province\":\"北京市\"},\"header\":{\"agent\":\"WEB15\",\"version\":\"1.0\",\"device\":\"\",\"platform\":\"Win32\",\"plugins\":\"\",\"page\":\"\",\"local\":\"zh_CN\",\"ext\":\"\"}}");
-            }});
+            }}); */
 
             JSONObject jsonObject = JSONObject.parseObject(msg);
             System.out.println(jsonObject.getJSONArray("result").size());
             if(jsonObject.getJSONArray("result").size() > 0) {
-                HttpClientUtils.post("http://itil.firstp2p.com/api/alarm/push", new ArrayList<BasicNameValuePair>() {{
+                HttpClientUtils.post("http://****.****.com/api/alarm/push", new ArrayList<BasicNameValuePair>() {{
                     add(new BasicNameValuePair("type", "manis"));
-                    add(new BasicNameValuePair("title", "manis阻塞：" + "firstp2p_test"));
+                    add(new BasicNameValuePair("title", "manis阻塞：" + "****_test"));
                     add(new BasicNameValuePair("content", "info"));
                 }});
                 System.out.println(jsonObject.getString("result"));
