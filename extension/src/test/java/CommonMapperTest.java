@@ -100,7 +100,7 @@ public class CommonMapperTest {
                     "  remaining_total_money,\n" +
                     "  is_delete,\n" +
                     "  item_id\n" +
-                    "FROM firstp2p_user_log_47\n" +
+                    "FROM **_user_log_47\n" +
                     "WHERE id = 19102");
 
             if (cnt % 10000 == 0) {
