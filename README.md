@@ -24,7 +24,31 @@ hframework，又名：hongframework，是hframework系统产品的同名基础�
 * 待开放
 
 ## Maven
-* 待开放
+        <dependency>
+            <groupId>com.github.hongframework</groupId>
+            <artifactId>hframe-common</artifactId>
+            <version>${hframe.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.hongframework</groupId>
+            <artifactId>hframe-beans</artifactId>
+            <version>${hframe.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.hongframework</groupId>
+            <artifactId>hframe-webcore</artifactId>
+            <version>${hframe.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.hongframework</groupId>
+            <artifactId>hframe-workflow</artifactId>
+            <version>${hframe.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.hongframework</groupId>
+            <artifactId>hframe-webgenerator</artifactId>
+            <version>${hframe.version}</version>
+        </dependency>
 
 ## 联系我们
 * zqhget1@163.com
