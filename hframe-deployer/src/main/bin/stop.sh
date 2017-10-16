@@ -49,7 +49,7 @@ if [ "$pid" == "" ] ; then
 fi
 
 echo -e "`hostname`: stopping hframe $pid ... "
-kill $pid
+kill -9 $pid
 
 LOOPS=0
 while (true); 
