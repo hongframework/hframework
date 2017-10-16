@@ -173,12 +173,14 @@ public class DictionaryController extends AbstractController{
         try{
             final String[] dataCodeArray = dataCodes.split(";");
             Map<String, KVBean> cache = new LinkedHashMap<String, KVBean>();
+            int nextLevel = 1;
             for (String dataCode : dataCodeArray) {
+                final int curlLevel = nextLevel ++;
                 ResultData dictionary = dictionary(dataCode, dataCondition);
                 List<KVBean> kvBeans = (List<KVBean>) dictionary.getData();
                 cache.putAll(CollectionUtils.convert(kvBeans, new Mapper<String, KVBean>() {
                     public <K> K getKey(KVBean kvBean) {
-                        return (K) kvBean.getValue();
+                        return (K)(curlLevel + "_" +  kvBean.getValue());
                     }
                 }));
                 if(treeData.isEmpty()) {
@@ -210,9 +212,11 @@ public class DictionaryController extends AbstractController{
                             if(kvBean.getValue().equals(dataValue)) {
                                 dataDisplayValue = kvBean.getText();
                                 String parentId = kvBean.getExtInfo();
-                                while (cache.containsKey(parentId)) {
-                                    dataDisplayValue = cache.get(parentId).getText() + "/" + dataDisplayValue;
-                                    parentId = cache.get(parentId).getExtInfo();
+                                int parentLevel = 1;
+                                while (cache.containsKey((curlLevel - parentLevel) + "_" + parentId)) {
+                                    dataDisplayValue = cache.get((curlLevel - parentLevel) + "_" +parentId).getText() + "/" + dataDisplayValue;
+                                    parentId = cache.get((curlLevel - parentLevel) + "_" +parentId).getExtInfo();
+                                    parentLevel++;
                                 }
                             }
                             recode.put(kvBean.getValue(), kvBean.getText());

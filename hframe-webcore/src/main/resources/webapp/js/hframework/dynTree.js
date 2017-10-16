@@ -78,8 +78,17 @@ DataSource.prototype.data = function(options, callback) {
 //    }
 //]
 
+
+
+function initJson(json){
+    if("" == json) {
+        return "{}";
+    }
+    return json;
+}
+
 var treeDataSource = new DataSource({
-    data: transferDataToIceTreeData(JSON.parse($("#dyn-tree-data").text())),
+    data: transferDataToIceTreeData(JSON.parse(initJson($("#dyn-tree-data").text()))),
     delay: 0
 });
 

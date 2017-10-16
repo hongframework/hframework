@@ -12,8 +12,16 @@
         //    ]
         //};
         //alert(jsonDs4);
+
+        function initJson(json){
+            if("" == json) {
+                return "{}";
+            }
+            return json;
+        }
+
         $('#chart-edit').orgchart({
-            'data' : JSON.parse($("#org-chart-data").text()),
+            'data' : JSON.parse(initJson($("#org-chart-data").text())),
             'direction': 'l2r',
             'draggable': true,
             'exportButton': true,

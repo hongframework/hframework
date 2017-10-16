@@ -10,7 +10,7 @@
     <name>${project.groupId}:${project.artifactId}</name>
     <description>a configurable MVC framework</description>
     <url>https://github.com/hongframework/hframework</url>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0.1</version>
     <modules>
         <module>hframe-common</module>
         <module>hframe-beans</module>

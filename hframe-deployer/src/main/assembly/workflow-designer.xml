@@ -3,7 +3,7 @@
 
     <!-- Include classes and resources -->
     <fileSet>
-      <directory>../hframe-workflow-designer/target/hframe-workflow-designer-${version}/WEB-INF/classes</directory>
+      <directory>../hframe-workflow/target/hframe-workflow-${version}/WEB-INF/classes</directory>
       <outputDirectory></outputDirectory>
       <excludes>
         <exclude>rebel.xml</exclude>
@@ -14,7 +14,7 @@
     </fileSet>
     <!-- Include UI app context -->
     <fileSet>
-      <directory>../hframe-workflow-designer/src/main/resources/WEB-INF</directory>
+      <directory>../hframe-workflow/src/main/resources/WEB-INF</directory>
       <outputDirectory></outputDirectory>
       <includes>
         <include>activiti-ui-context.xml</include>
@@ -22,14 +22,14 @@
     </fileSet>
 
     <fileSet>
-      <directory>../hframe-workflow-designer/src/main/resources/webapp</directory>
+      <directory>../hframe-workflow/src/main/resources/webapp</directory>
       <outputDirectory>webapp</outputDirectory>
       <includes>
         <include>**/*</include>
       </includes>
     </fileSet>
     <!--<fileSet>-->
-      <!--<directory>../hframe-workflow-designer/src/main/resources/webapp</directory>-->
+      <!--<directory>../hframe-workflow/src/main/resources/webapp</directory>-->
       <!--<outputDirectory>webapp</outputDirectory>-->
       <!--<includes>-->
         <!--<include>**/*</include>-->
@@ -37,7 +37,7 @@
     <!--</fileSet>-->
     <!-- Include VAADIN static resources -->
     <!--<fileSet>-->
-      <!--<directory>../hframe-workflow-designer/src/main/resources/webapp/VAADIN</directory>-->
+      <!--<directory>../hframe-workflow/src/main/resources/webapp/VAADIN</directory>-->
       <!--<outputDirectory>VAADIN</outputDirectory>-->
     <!--</fileSet>-->
   </fileSets>
@@ -45,7 +45,7 @@
   <files>
     <!-- Include ui.properties for alfresco -->
     <file>
-      <source>../hframe-workflow-designer/target/classes/ui.properties.alfresco</source>
+      <source>../hframe-workflow/target/classes/ui.properties.alfresco</source>
       <outputDirectory></outputDirectory>
       <destName>ui.properties</destName>
     </file>
