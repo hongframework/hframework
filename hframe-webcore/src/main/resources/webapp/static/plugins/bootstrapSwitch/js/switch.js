@@ -16,9 +16,9 @@ $(function () {
     //        $window.scrollTop($target.offset().top - sectionTop)
     //    }
     //})
-    $('input[type="checkbox"], input[type="radio"]')
-        .not('[data-switch-no-init]')
-        .bootstrapSwitch()
+    //$('input[type="checkbox"], input[type="radio"]')
+    //    .not('[data-switch-no-init]')
+    //    .bootstrapSwitch()
 
     $('[data-switch-get]').on('click', function () {
         var type = $(this).data('switch-get')
