@@ -270,7 +270,7 @@ require(['layer','ajax','js/hframework/errormsg'], function () {
                     }
                 });
 
-                if(hasInput && $firstRow.find("select option:checked[value!='']").size() == 0) {
+                if(!hasInput && $firstRow.find("select option:checked[value!='']").size() == 0) {
                     $firstRow.remove();
                 }
             }
