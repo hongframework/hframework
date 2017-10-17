@@ -1,14 +1,12 @@
 package com.hframework.base.service;
 
+import com.google.common.collect.Lists;
 import com.hframework.base.bean.KVBean;
 import com.hframework.base.dao.CommonDataMapper;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * User: zhangqh6
@@ -117,12 +115,13 @@ public class CommonDataService {
         Map tableName1 = commonDataMapper.showCreateTable(new HashMap() {{
             put("tableName", "`" + tableName + "`");
         }});
-        if(tableName1 != null && tableName1.size() > 0) {
-            Iterator iterator = tableName1.values().iterator();
-            iterator.next();
-            return String.valueOf(iterator.next());
-        }
 
+        if(tableName1 != null && tableName1.size() > 0 && tableName1.containsKey("Create Table")) {
+            return String.valueOf(tableName1.get("Create Table"));
+        }else if(tableName1 != null && tableName1.size() > 0) {
+            ArrayList list = Lists.newArrayList(tableName1.values().iterator());
+            return String.valueOf(list.get(list.size() - 1));
+        }
         return null;
     }
 }
