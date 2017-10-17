@@ -9,7 +9,7 @@
         PUBLIC "-//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN"
         "http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd">
 <generatorConfiguration>
-    <properties url="file:///D:/my_workspace/hframe-trunk/hframe-core/src/main/resources/properties/dataSource.properties"></properties>
+    <!-- <properties url="file:///D:/my_workspace/hframe-trunk/hframe-core/src/main/resources/properties/dataSource.properties"></properties> -->
     <!-- <classPathEntry location="E:\\Users\\zhangqh6\\.m2\\repository\\mysql\\mysql-connector-java\\5.1.21\\mysql-connector-java-5.1.21.jar"/> -->
     <context id="default" targetRuntime="MyBatis3">
         <!-- 自动识别数据库关键字，默认false，如果设置为true，根据SqlReservedWords中定义的关键字列表；
