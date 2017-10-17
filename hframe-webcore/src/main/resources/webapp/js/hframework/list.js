@@ -262,9 +262,15 @@ require(['layer','ajax','js/hframework/errormsg'], function () {
 
             if($(".hflist-data").children().length > 1) {
                 var $firstRow = $(".hflist-data").children(":first");
-                if(($firstRow.find("input[value !='']").size() == 0 ||
-                    $firstRow.find("input[value !='']").val().length == 0 )
-                    && $firstRow.find("select option:checked[value!='']").size() == 0) {
+
+                var hasInput = false;
+                $firstRow.find("input[type!=checkbox][value !='']").each(function () {
+                    if($(this).val() && $(this).val().length > 0) {
+                        hasInput  = true;
+                    }
+                });
+
+                if(hasInput && $firstRow.find("select option:checked[value!='']").size() == 0) {
                     $firstRow.remove();
                 }
             }
