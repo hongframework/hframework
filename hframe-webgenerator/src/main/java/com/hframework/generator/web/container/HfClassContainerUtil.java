@@ -29,7 +29,7 @@ public class HfClassContainerUtil {
 				new URL[] { new URL("file:" + classRootPath) },Thread.currentThread().getContextClassLoader());
 
 		for (String classPackage : classPackages) {
-			File[] fileList = FileUtils.getFileList(new File(classRootPath + classPackage.replace(".", "\\")));
+			File[] fileList = FileUtils.getFileList(new File(classRootPath + classPackage.replace(".", "/")));
 			if(fileList == null) continue;
 			for (File file : fileList) {
 				if(!file.getName().contains("_Example")) {
