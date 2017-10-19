@@ -36,7 +36,7 @@
             <property name="suppressAllComments" value="true" />
             <property name="suppressDate" value="false" />
         </commentGenerator>
-        <jdbcConnection driverClass="$!{jdbc.driverClass}" connectionURL="${jdbc.url}" userId="${jdbc.user}" password="${jdbc.password}">
+        <jdbcConnection driverClass="$!{jdbc.driverClass}" connectionURL="${jdbc.url}" userId="${jdbc.user}" password="$!{jdbc.password}">
         </jdbcConnection>
         <javaTypeResolver >
             <property name="forceBigDecimals" value="false" />
