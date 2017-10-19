@@ -264,7 +264,7 @@ require(['layer','ajax','js/hframework/errormsg'], function () {
                 var $firstRow = $(".hflist-data").children(":first");
 
                 var hasInput = false;
-                $firstRow.find("input[type!=checkbox][value !='']").each(function () {
+                $firstRow.find("input[type!=checkbox][type!=hidden][value !='']").each(function () {
                     if($(this).val() && $(this).val().length > 0) {
                         hasInput  = true;
                     }
