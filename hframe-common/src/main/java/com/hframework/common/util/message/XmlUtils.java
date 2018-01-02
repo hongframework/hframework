@@ -1,5 +1,7 @@
 package com.hframework.common.util.message;
 
+import com.google.common.collect.Lists;
+import com.hframework.common.util.RegexUtils;
 import com.hframework.common.util.file.FileUtils;
 import com.hframework.common.util.StringUtils;
 import com.thoughtworks.xstream.XStream;
@@ -8,8 +10,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
+import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 /**
@@ -22,6 +26,7 @@ public class XmlUtils {
     public static <T> T readValue(String content, Class<T> valueType) {
         XStream xstream = new XStream(new DomDriver());
         xstream.processAnnotations(valueType);
+        xstream.aliasSystemAttribute("BEAN_CLASS", "class");
         return (T) xstream.fromXML(content);
     }
 
@@ -119,6 +124,17 @@ public class XmlUtils {
         for (File file : fileList) {
             if(StringUtils.isBlank(format) || file.getName().endsWith(format)) {
                 String xmlString = FileUtils.readFile(file.getAbsolutePath());
+                try {
+                    xmlString = invokeEmbedPart(xmlString);
+                } catch (ClassNotFoundException e) {
+                    e.printStackTrace();
+                } catch (NoSuchMethodException e) {
+                    e.printStackTrace();
+                } catch (InvocationTargetException e) {
+                    e.printStackTrace();
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                }
                 logger.debug("报文：{}", xmlString);
                 T t = readValue(xmlString, valueType);
                 result.add(t);
@@ -127,7 +143,26 @@ public class XmlUtils {
         }
         return result;
     }
+    private static String invokeEmbedPart(String xmlContent) throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+        String[] xmlEmbeds = RegexUtils.find(xmlContent, "<\b*XML_EMBED [^<>]*\b*>\b*<\b*/\b*XML_EMBED\b*>");
+        for (String xmlEmbed : new HashSet<String>(Lists.newArrayList(xmlEmbeds))) {
+            String[] classParts = RegexUtils.find(xmlEmbed, " class\b*=\b*\"[^\"]+\"");
+            String[] methodParts = RegexUtils.find(xmlEmbed, " method\b*=\b*\"[^\"]+\"");
+            String className = null, methodName = null;
+            if(classParts != null && classParts.length > 0) {
+                className = classParts[0].substring(0, classParts[0].length() - 1).replaceAll("class\b*=\b*\"","").trim();
+            }
+            if(methodParts != null && methodParts.length > 0) {
+                methodName = methodParts[0].substring(0, methodParts[0].length() - 1).replaceAll("method\b*=\b*\"","").trim();
+            }
 
+            if(StringUtils.isNotBlank(className) && StringUtils.isNotBlank(methodName)) {
+                String replaceString = String.valueOf(java.lang.Class.forName(className).getMethod(methodName, new java.lang.Class[0]).invoke(null, null));
+                xmlContent = xmlContent.replace(xmlEmbed, replaceString);
+            }
+        }
+        return xmlContent;
+    }
 
 
     public static  <T> String writeValueAsString(T t) throws IOException {

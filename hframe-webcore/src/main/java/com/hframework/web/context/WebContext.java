@@ -8,16 +8,17 @@ import com.hframework.common.util.EnumUtils;
 import com.hframework.common.util.file.FileUtils;
 import com.hframework.common.util.ReflectUtils;
 import com.hframework.common.util.StringUtils;
+import com.hframework.common.util.message.Dom4jUtils;
 import com.hframework.common.util.message.XmlUtils;
 import com.hframework.web.CreatorUtil;
 import com.hframework.web.config.bean.*;
+import com.hframework.web.config.bean.Component;
 import com.hframework.web.config.bean.component.Event;
 import com.hframework.web.config.bean.component.PreHandle;
+import com.hframework.web.config.bean.dataset.*;
 import com.hframework.web.config.bean.dataset.Entity;
-import com.hframework.web.config.bean.dataset.Field;
-import com.hframework.web.config.bean.dataset.Fields;
 import com.hframework.web.config.bean.dataset.Node;
-import com.hframework.web.config.bean.module.Page;
+import com.hframework.web.config.bean.module.*;
 import com.hframework.web.config.bean.pagetemplates.Element;
 import com.hframework.web.config.bean.pagetemplates.Pagetemplate;
 import com.hframework.web.context.enums.ElementType;
@@ -30,8 +31,12 @@ import org.activiti.engine.ProcessEngines;
 import org.activiti.engine.repository.Deployment;
 import org.activiti.engine.repository.ProcessDefinition;
 import org.apache.commons.beanutils.BeanUtils;
+import org.dom4j.DocumentException;
+import org.dom4j.DocumentHelper;
+import org.dom4j.dom.DOMElement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.w3c.dom.*;
 
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
@@ -47,6 +52,8 @@ public class WebContext {
     private static Logger logger = LoggerFactory.getLogger(WebContext.class);
 
     private static WebContext context = new WebContext();
+
+    private Map<String, List<Page>> descriptorSubPages = new HashMap<String, List<Page>>();
 
     private static  Map<String, String> chineseAndButtonMapping;
     {
@@ -86,7 +93,21 @@ public class WebContext {
 
     private Map<String, Map<String, PageDescriptor>> pageSetting = new HashMap<String, Map<String, PageDescriptor>>();
 
-    private Map<String, DataSetDescriptor> dataSets = new HashMap<String, DataSetDescriptor>();
+    private static DataSetDescriptor SYSTEM_EMPTY_DATASET = null;
+    {
+        DataSet dataSet = new DataSet();
+        dataSet.setCode("SYSTEM_EMPTY_DATASET");
+        dataSet.setName("");
+        dataSet.setModule("");
+        Fields fields = new Fields();
+        fields.setFieldList(new ArrayList<Field>());
+        dataSet.setFields(fields);
+        SYSTEM_EMPTY_DATASET = new DataSetDescriptor(dataSet);
+    }
+
+    private Map<String, DataSetDescriptor> dataSets = new HashMap<String, DataSetDescriptor>(){{
+        put("SYSTEM_EMPTY_DATASET", SYSTEM_EMPTY_DATASET);
+    }};
 
     private Map<Class, DataSetDescriptor> dataSetCache = new HashMap<Class, DataSetDescriptor>();
 
@@ -146,7 +167,7 @@ public class WebContext {
         pageSettingInitial();
 
         WebContextMonitor webContextMonitor = new WebContextMonitor(this);
-        webContextMonitor.addRootConfMap(DataSet.class, contextHelper.programConfigRootDir + "/" + contextHelper.programConfigDataSetDir);
+        webContextMonitor.addRootConfMap(DataSet.class, XmlUtils.class.getResource("/" + contextHelper.programConfigDataSetDir).getPath());
         webContextMonitor.start();
 
     }
@@ -241,6 +262,24 @@ public class WebContext {
                 Map<String, DataSetDescriptor> dataSetCodeMap = new HashMap<String, DataSetDescriptor>();
                 if(dataSet.getDescriptor().getFieldsList() != null) {
                     for (Fields fields :  dataSet.getDescriptor().getFieldsList()) {
+                        if(StringUtils.isNotBlank(fields.getExtend())) {
+                            boolean extendExists = false;
+                            for (Fields otherFields :  dataSet.getDescriptor().getFieldsList()) {
+                                if(fields.getExtend().equals(otherFields.getCode())) {
+                                    extendExists = true;
+                                    if(fields.getFieldList() != null) {
+                                        fields.getFieldList().addAll(otherFields.getFieldList());
+                                    }else {
+                                        fields.setFieldList(Lists.newArrayList(otherFields.getFieldList()));
+                                    }
+                                    if(StringUtils.isBlank(fields.getName())) fields.setName(otherFields.getName());
+                                    break;
+                                }
+                            }
+                            if(!extendExists) throw new RuntimeException(fields.getCode() + "extend " + fields.getExtend() + "is not exists !");
+                        }
+                    }
+                    for (Fields fields :  dataSet.getDescriptor().getFieldsList()) {
                         DataSet tmpDataSet = new DataSet();
                         tmpDataSet.setCode(dataSet.getCode() + "#" + fields.getCode());
                         tmpDataSet.setName(fields.getName());
@@ -252,11 +291,68 @@ public class WebContext {
                         dataSetCodeMap.put(fields.getCode(), tempDataSetDescriptor);
                     }
                 }
+
+                HelperDatas helperDatas = dataSet.getDescriptor().getHelperDatas();
+
+                if(helperDatas != null && helperDatas.getHelperDatas() != null) {
+                    boolean isRuntime = false;
+                    for (HelperData helpData : helperDatas.getHelperDatas()) {
+                        if(StringUtils.isNotBlank(helpData.getEmbedClass())
+                                && StringUtils.isNotBlank(helpData.getEmbedMethod())
+                                && "runtime".equals(helpData.getEmbedType())) {
+                            isRuntime |= true;
+                        }
+                        if(isRuntime) {
+                            dataSetDescriptor.setHelperRuntime(true);
+                        }else{
+                            dataSetDescriptor.resetHelperInfo();
+                        }
+                    }
+//                    JSONObject helpTags = new JSONObject(true);
+//                    DOMElement root = null;
+//                    for (HelperData helpData : helperDatas.getHelperDatas()) {
+//                        String targetId = helpData.getTargetId();
+//                        String[] nodes = StringUtils.split(targetId, ".");
+//                        if(root == null) {
+//                            Map blankMap = new HashMap();
+//                            root = Dom4jUtils.createElement(nodes[0], blankMap);
+//                        }
+//                        addElementToDomElement(root, Arrays.copyOfRange(nodes, 0, nodes.length - 1), helpData.getHelpLabels());
+//                        String xml = root.asXML();
+//                        dataSetDescriptor.setHelperDataXml(xml);
+//
+//                        JSONObject helpTag = new JSONObject(true);
+//                        helpTags.put(dataSet.getCode() + "#" + targetId, helpTag);
+//                        int count = 0;
+//                        for (HelperLabel helperLabel : helpData.getHelpLabels()) {
+//                            JSONObject helpLabel = new JSONObject(true);
+//                            helpTag.put(helperLabel.getName(), helpLabel);
+//                            for (int i = 0; i < helperLabel.getHelpItems().size(); i++) {
+//                                helpLabel.put(helperLabel.getHelpItems().get(i).getName(), count ++);
+//                            }
+//                        }
+//                        dataSetDescriptor.setHelperTags(helpTags);
+//                    }
+                }
+
                if(dataSet.getDescriptor().getNode() != null) {
                    Node rootNode = dataSet.getDescriptor().getNode();
+                   Set<String> virtualContainerSubNodePath = new HashSet<String>();
                    rootNode.calcPath();
-                   IDataSet iDataSet = calculateNodeGrid(rootNode, dataSetCodeMap);
+                   IDataSet iDataSet = calculateNodeGrid(rootNode, dataSetCodeMap, virtualContainerSubNodePath);
                    dataSetDescriptor.setDateSetStruct(iDataSet);
+
+                   dataSetDescriptor.setVirtualContainerSubNodePath(virtualContainerSubNodePath);
+                   List<Event> events = new ArrayList<Event>();
+                   Page page = initFileStructPage(events, dataSet.getModule(), dataSet.getCode() + "#", rootNode, dataSet.getModule() + "/" + dataSet.getCode(), true);
+
+                   com.hframework.web.config.bean.module.Component component = new com.hframework.web.config.bean.module.Component();
+                   component.setId("qList");
+                   component.setDataSet("SYSTEM_EMPTY_DATASET");
+                   component.setShowTitle("false");
+                   component.setEventList(events);
+                   page.getComponentList().add(0, component);
+                   logger.info("init File Struct Page: {} => {}", dataSet.getModule() + "/" + dataSet.getCode(), descriptorSubPages.get(dataSet.getModule() + "/" + dataSet.getCode()));;
 //                   System.out.println(iDataSet);
                }
             }
@@ -295,6 +391,100 @@ public class WebContext {
         }
     }
 
+
+
+    private Page initFileStructPage(List<Event> events, String module, String pageId, Node rootNode, String parentDataSetCode, boolean addFirstTime) {
+        Page page = new Page();
+        page.setId(pageId.endsWith("#") ? pageId : (pageId + "#"));
+        page.setPageTemplate("dynamic");
+        List<com.hframework.web.config.bean.module.Component> componentList = new ArrayList<com.hframework.web.config.bean.module.Component>();
+        List<Node> nodeList = rootNode.getNodeList();
+        if(nodeList == null) return page;
+        page.setComponentList(componentList);
+
+        if(addFirstTime) {
+            pageId = pageId +  (pageId.endsWith("#") ? "" : ".") +
+                    (rootNode.getCode().endsWith("[]") ? rootNode.getCode().substring(0, rootNode.getCode().length() - 2) : rootNode.getCode());
+        }
+
+        for (Node node : nodeList) {
+            addNode(componentList,events, node, module, pageId, parentDataSetCode);
+        }
+        if(!descriptorSubPages.containsKey(parentDataSetCode)) {
+            descriptorSubPages.put(parentDataSetCode, new ArrayList<Page>());
+        }
+        descriptorSubPages.get(parentDataSetCode).add(page);
+        return page;
+
+
+    }
+
+    private void addNode(List<com.hframework.web.config.bean.module.Component> componentList, List<Event> events, Node node, String module, String pageId, String parentDataSetCode) {
+        String componentId = node.getEditor();
+        String subComponentId = null;
+        if(node.getEditor().contains(",")) {
+            componentId = node.getEditor().split(",")[0];
+            subComponentId = node.getEditor().split(",")[1];
+        }
+        String dataSetCode = pageId +  (pageId.endsWith("#") ? "" : ".") +
+                (node.getCode().endsWith("[]") ? node.getCode().substring(0, node.getCode().length() - 2) : node.getCode());
+
+        com.hframework.web.config.bean.module.Component component = new com.hframework.web.config.bean.module.Component();
+        component.setId(componentId);
+        component.setTitle(node.getName());
+        component.setDataSet(module + "/" + dataSetCode);
+        componentList.add(component);
+        List<Node> subNodeList = node.getNodeList();
+        if(subNodeList == null) return ;
+
+        String eventKeys = node.getEvents();
+        if(StringUtils.isNotBlank(eventKeys)) {
+            String[] eventKeyArray = StringUtils.split(eventKeys, ",");
+            for (String eventKey : eventKeyArray) {
+                events.add(getEventByEventKey(eventKey, node.getName(), dataSetCode));
+            }
+        }
+        if(StringUtils.isBlank(subComponentId)) {
+            for (Node subNode : subNodeList) {
+                addNode(componentList, events, subNode, module, dataSetCode, parentDataSetCode);
+            }
+        }else {
+            events = new ArrayList<Event>();
+            Page page = initFileStructPage(events, module, dataSetCode, node, parentDataSetCode, false);
+            com.hframework.web.config.bean.module.Component component2 = new com.hframework.web.config.bean.module.Component();
+            component2.setId(subComponentId);
+            component2.setTitle(node.getName());
+            component2.setDataSet(module + "/" + dataSetCode);
+            component2.setEventList(events);
+            page.getComponentList().add(0, component2);
+        }
+
+    }
+
+    private Event getEventByEventKey(String eventKey, String name, String path) {
+
+        String visible = eventKey.toUpperCase().endsWith(".SHOW") ? "show": "auto";
+        String string = null;
+        if(eventKey.startsWith("TOGGLE")) {
+            string = "<event name=\""+ path +"\">\n" +
+        "                <attach anchor=\"BOFC\">\n" +
+        "                    <appendElement type=\"button\" param='{btnclass:\"btn-primary switch-button\",btnText:\"" + name + "\"}'></appendElement>\n" +
+        "                </attach>\n" +
+        "                <effect type=\"componentControl\" target-id=\""+ path  +"\" param='{visible:\"" + visible + "\", event:\"toggle\", show_condition:\"IS_NOT_EMPTY\"}'></effect>\n" +
+        "                <effect type=\"scrollIntoView\"  target-id=\""+ path  +"\"></effect>\n" +
+        "            </event>";
+        }else if(eventKey.startsWith("ADD_ROW")) {
+            string = "<event name=\"" + path + "\">\n" +
+        "                <attach anchor=\"BOFC\">\n" +
+        "                    <appendElement type=\"button\" param='{btnclass:\"btn-primary switch-button\",btnText:\"添加" + name + "\"}'></appendElement>\n" +
+        "                </attach>\n" +
+        "                <effect type=\"componentControl\" target-id=\"" + path + "\"  param='{visible:\"" + visible + "\", event:\"component.row.add\", show_condition:\"IS_NOT_EMPTY\"}'></effect>\n" +
+        "                <effect type=\"scrollIntoView\"  target-id=\"" + path + "\"></effect>\n" +
+        "            </event>";
+        }
+        return XmlUtils.readValue(string, Event.class);
+    }
+
     public static boolean isList(Node node) {
         if(node.getName().endsWith("[]")) {
             return true;
@@ -309,7 +499,7 @@ public class WebContext {
         return node.getName();
     }
 
-    private IDataSet calculateNodeGrid(Node node, Map<String, DataSetDescriptor> dataSetCodes) {
+    private IDataSet calculateNodeGrid(Node node, Map<String, DataSetDescriptor> dataSetCodes, Set<String> virtualContainerSubNodePath) {
 
         DataSetInstance curDataSetInstance = null;
         List<DataSetInstance> subDataSetInstances = new ArrayList<DataSetInstance>();
@@ -328,7 +518,7 @@ public class WebContext {
 
         if(nodeList != null && nodeList.size() > 0) {
             for (Node subNode : nodeList) {
-                IDataSet result = calculateNodeGrid(subNode, dataSetCodes);
+                IDataSet result = calculateNodeGrid(subNode, dataSetCodes, virtualContainerSubNodePath);
                 sortedDataSetObjects.add(result);
                 if (result instanceof DataSetInstance) {
                     subDataSetInstances.add((DataSetInstance) result);
@@ -342,12 +532,21 @@ public class WebContext {
 
         if(dataSetContainers.size() == 0) {
             if(dataSetInstances.size() == 0) {//该场景原则上不会出现
-                return null;
+                throw new RuntimeException(node.getPath() + " or children data set not exists ");
             }else if(dataSetInstances.size() == 1) {//该场景原则上出现为叶子节点
                 return dataSetInstances.get(0);
             }else {//该场景为：① 1个父节点+>= 1的子节点；② >= 2的子节点;涉及多个数据集，原则上是需要合并，所以先合并
                 DataSetContainer dataSetContainer = DataSetContainer.valueOf(node, dataSetInstances);
                 dataSetContainer.setElementList(sortedDataSetObjects);
+                for (IDataSet sortedDataSetObject : sortedDataSetObjects) {
+                    if(sortedDataSetObject.getNode().getEditor().startsWith("virtualContainer,")){
+                        dataSetContainer.setVirtualContainer(true);
+                        for (int i = 0; i < node.getNodeList().size(); i++) {
+                            virtualContainerSubNodePath.add("/" + node.getNodeList().get(i).getPath().replaceAll("\\.", "/"));
+                        }
+
+                    }
+                }
                 return dataSetContainer;
 //                boolean islist = false;
 //                for (DataSetInstance subDataSetInstance : subDataSetInstances) {
@@ -409,22 +608,22 @@ public class WebContext {
 
     }
 
-    private DataSetInstance mergeDataSet(List result1) {
-        List<Map<String, String>> data = new ArrayList<Map<String, String>>();
-        Iterator iterator = result1.iterator();
-        while (iterator.hasNext()) {
-            Object o = iterator.next();
-            if (o instanceof DataSetInstance) {
-                DataSetInstance dataSetInst = (DataSetInstance) o;
-                if(dataSetInst.isOne()) {
-                    data.add(dataSetInst.getOne());
-                    iterator.remove();
-                }
-            }
-        }
-
-        return data.size() > 0 ? DataSetInstance.valueOf(data) : null;
-    }
+//    private DataSetInstance mergeDataSet(List result1) {
+//        List<Map<String, String>> data = new ArrayList<Map<String, String>>();
+//        Iterator iterator = result1.iterator();
+//        while (iterator.hasNext()) {
+//            Object o = iterator.next();
+//            if (o instanceof DataSetInstance) {
+//                DataSetInstance dataSetInst = (DataSetInstance) o;
+//                if(dataSetInst.isOne()) {
+//                    data.add(dataSetInst.getOne());
+//                    iterator.remove();
+//                }
+//            }
+//        }
+//
+//        return data.size() > 0 ? DataSetInstance.valueOf(data) : null;
+//    }
 
 
 
@@ -462,6 +661,23 @@ public class WebContext {
             if(pageList == null) {
                 continue;
             }
+
+            boolean useDescriptorSubPages = false;
+            for (Page page : pageList) {
+                for (com.hframework.web.config.bean.module.Component component : page.getComponentList()) {
+                    if(descriptorSubPages.containsKey(component.getDataSet())) {
+                        useDescriptorSubPages = true;
+                        break;
+                    }
+                }
+            }
+            if(useDescriptorSubPages) {
+                for (List<Page> pages : descriptorSubPages.values()) {
+                    pageList.addAll(0, pages);
+                }
+
+            }
+
             for (Page page : pageList) {
                 if(StringUtils.isNotBlank(page.getDataSet()) && page.getDataSet().startsWith("#")  && page.getDataSet().endsWith("#")) {
                     page.setDataSet(getValueByVar(page.getDataSet()));
@@ -518,8 +734,10 @@ public class WebContext {
                     targetComponent.getEventList().addAll((List<Event>)objects[4]);
                 }
 
-                pageSetting.get(moduleCode).put(page.getId(), parsePageDescriptor(page, moduleCode));
+                PageDescriptor pageDescriptor = parsePageDescriptor(page, moduleCode);
+                pageSetting.get(moduleCode).put(page.getId(), pageDescriptor);
             }
+
         }
     }
 
@@ -641,6 +859,7 @@ public class WebContext {
                 componentDescriptor.setEventList(component.getEventList());
                 componentDescriptor.setDataId(component.getDataid());
                 componentDescriptor.setTitle(component.getTitle());
+                componentDescriptor.setShowTitle("false".equals(component.getShowTitle()) ? false : true);
                 componentDescriptor.setEventExtend(component.getEventExtend());
                 componentDescriptor.setPath(component.getPath());
                 componentDescriptor.setMapper(mapper);

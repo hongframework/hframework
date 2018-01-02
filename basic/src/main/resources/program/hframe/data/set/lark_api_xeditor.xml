@@ -1,0 +1,204 @@
+<dataset>
+  <module>hffile</module>
+  <code>lark_api_xeditor</code>
+  <entity>cfg_runtime_api</entity>
+  <name>larkapi配置</name>
+  <source>file</source>
+  <descriptor>
+    <node code="api" name="api信息" editor="eForm">
+      <node code="parameters.parameter[]" name="请求参数"  editor="virtualContainer,eList" events="ADD_ROW.SHOW">
+        <node code="checker[]" name="校验信息" editor="eList" events="TOGGLE"/>
+        <node code="option[]" name="取值范围" editor="eList" events="TOGGLE"/>
+      </node>
+      <node code="prehandler[]" name="前置处理器"  editor="flatContainer,eForm" events="ADD_ROW">
+          <node code="precheck[]" name="条件" editor="eList" events="TOGGLE"/>
+          <node code="parameter[]" name="参数" editor="eList" events="TOGGLE"/>
+          <node code="result[]" name="结果" editor="eList" events="TOGGLE"/>
+      </node>
+      <!--<node code="precheck[]" name="前置检查" editor="eList"  events="TOGGLE"/>-->
+      <node code="handlers.handler[]" name="处理器"  editor="flatContainer,eForm" events="ADD_ROW.SHOW">
+          <node code="precheck[]" name="条件" editor="eList" events="TOGGLE"/>
+          <node code="parameter[]" name="参数" editor="eList" events="TOGGLE"/>
+          <node code="result[]" name="结果" editor="eList" events="TOGGLE"/>
+      </node>
+      <!--<node code="precheck[]" name="后置检查"  editor="eList" events="TOGGLE"/>-->
+      <!--<node code="result[]" name="结果" editor="eList" events="TOGGLE.SHOW"/>-->
+      <node code="result-view" name="结果预览" editor="eForm" events="TOGGLE.SHOW"/>
+  </node>
+
+    <helper-datas>
+      <helper-data target-id="api.parameters.parameter">
+        <helper-label name="认证类">
+          <helper-item  name="TOKEN"><![CDATA[
+				<parameter name="token" type="string" required="true" description="TOKEN，登录口令"/>
+			]]></helper-item>
+          <helper-item  name="客户端ID"><![CDATA[
+				<parameter name="clientId" type="int" required="true" description="客户端ID"/>
+			]]></helper-item>
+          <helper-item  name="时间戳"><![CDATA[
+				<parameter name="timestamp" type="int" required="true" description="时间戳"/>
+			]]></helper-item>
+          <helper-item  name="签名"><![CDATA[
+				<parameter name="sign" type="string" required="true" description="签名"/>
+			]]></helper-item>
+        </helper-label>
+        <helper-label name="其他">
+          <helper-item  name="页编号"><![CDATA[
+				<parameter name="pageNo" type="int" default="1" min="1" required="false"  description="页编号"/>
+			]]></helper-item>
+          <helper-item  name="页大小"><![CDATA[
+				<parameter name="pageSize" type="int" default="20" min="1" max="1000" required="false"   description="页大小"/>
+			]]></helper-item>
+          <helper-item  name="开始时间"><![CDATA[
+				<parameter name="startTime" type="date" required="true"   description="开始时间">
+                    <parser class="com.hframework.smartweb.bean.parser.DateSmartParser" pattern="YYYYMMDD"/>
+                    <checker class="com.hframework.smartweb.bean.checker.DateChecker" pattern="LessNow"/>
+                </parameter>
+			]]></helper-item>
+
+
+        </helper-label>
+      </helper-data>
+      <helper-data target-id="api.prehandler">
+        <helper-label name="认证类">
+          <helper-item  name="验签认证"><![CDATA[
+                <prehandler id="P2pIdSmartParser" class="com.hframework.smartweb.examples.CommonSignHandler"  version="auto" returnType="Object">
+                </prehandler>
+			]]></helper-item>
+          <helper-item  name="TOKEN解析"><![CDATA[
+                <prehandler id="P2pIdSmartParser" class="com.hframework.smartweb.examples.UserTokenParseHandler" version="auto" returnType="Object">
+                    <parameter name="token" scope="parameter" ref="token"/>
+                    <result name="p2pId"></result>
+                </prehandler>
+			]]></helper-item>
+        </helper-label>
+      </helper-data>
+      <helper-data target-id="api.handlers.handler">
+        <helper-label name="认证类">
+          <helper-item  name="获取用户基本信息"><![CDATA[
+                <handler id="P2pIdSmartParser" class="com.hframework.smartweb.examples.UserSecretHandler" returnType="Object"/>
+			]]></helper-item>
+          <helper-item  name="获取用户统计信息"><![CDATA[
+                <handler id="P2pIdSmartParser" class="com.hframework.smartweb.examples.UserSecretHandler" returnType="Object">
+                    <result name="p2pId"></result>
+                </handler>
+			]]></helper-item>
+          <helper-item  name="获取用户投资列表"><![CDATA[
+                <handler id="P2pIdSmartParser" class="com.hframework.smartweb.examples.UserSecretHandler" returnType="Array">
+                    <result name="p2pId"></result>
+                </handler>
+			]]></helper-item>
+        </helper-label>
+      </helper-data>
+    </helper-datas>
+
+    <fields code="api" name="api信息">
+      <field code="#module" name="模块" edit-type="input" />
+      <field code="#name" name="名称" edit-type="input" />
+      <field code="#version" name="版本" edit-type="disable" />
+      <field code="#title" name="标题" edit-type="input" />
+      <field code="#description" name="描述" edit-type="input" />
+    </fields>
+    <fields code="api.parameters.parameter" name="请求参数">
+      <field code="#name" name="名称" edit-type="input" />
+      <field code="#description" name="描述" edit-type="input" />
+      <field code="#type" name="类型" edit-type="select">
+        <enum value="string" name="字符串"></enum>
+        <enum value="int" name="整数"></enum>
+        <enum value="date" name="日期"></enum>
+      </field>
+      <field code="#required" name="是否必须" edit-type="select">
+        <enum value="true" name="是"></enum>
+        <enum value="false" name="否"></enum>
+      </field>
+      <field code="parser#class" name="解释器" edit-type="select">
+        <enum value="com.hframework.smartweb.bean.parser.DateSmartParser" name="日期"></enum>
+      </field>
+      <field code="parser#pattern" name="解析格式" edit-type="select">
+        <enum value="YYYYMMDD" name="YYYYMMDD"></enum>
+      </field>
+      <field code="#min" name="最小值" edit-type="input" />
+      <field code="#max" name="最大值" edit-type="input" />
+      <field code="#default" name="默认值" edit-type="input" />
+      <field code="checker" name="校验信息" edit-type="component-panel" >
+        <rel entity-code="lark_api_xeditor#api.parameters.parameter.checker"/>
+      </field>
+      <field code="option" name="取值范围" edit-type="component-panel" >
+        <rel entity-code="lark_api_xeditor#api.parameters.parameter.option"/>
+      </field>
+    </fields>
+
+    <fields code="api.parameters.parameter.checker" name="校验信息">
+      <field code="#class" name="校验器" edit-type="select">
+        <enum value="com.hframework.smartweb.bean.checker.MoneyChecker" name="金额"></enum>
+        <enum value="com.hframework.smartweb.bean.checker.DateChecker" name="日期"></enum>
+      </field>
+      <field code="#pattern" name="校验格式" edit-type="select">
+        <enum value="IsNormalMoney" name="IsNormalMoney"></enum>
+        <enum value="LessNow" name="LessNow"></enum>
+      </field>
+    </fields>
+
+    <fields code="api.parameters.parameter.option" name="取值范围">
+      <field code="#value" name="值" edit-type="input" />
+      <field code="#" name="描述" edit-type="input" />
+      <field code="#default" name="是否默认" edit-type="select">
+        <enum value="true" name="是"></enum>
+        <enum value="false" name="否"></enum>
+      </field>
+    </fields>
+
+
+    <fields code="api.precheck" name="校验">
+      <field code="#scope" name="类型" edit-type="select">
+        <enum value="global" name="上下文"></enum>
+        <enum value="parameter" name="请求"></enum>
+        <enum value="result" name="响应"></enum>
+      </field>
+      <field code="express" name="表达式" edit-type="input" />
+    </fields>
+
+    <fields code="api.prehandler" extend="api.handlers.handler"  name="前置处理器"/>
+    <fields code="api.prehandler.parameter" extend="api.handlers.handler.parameter" />
+    <fields code="api.prehandler.precheck" extend="api.precheck" />
+    <fields code="api.prehandler.result" extend="api.result" />
+
+    <fields code="api.handlers.handler" name="处理器">
+      <field code="#class" name="实现类" edit-type="text" />
+      <field code="#version" name="版本" edit-type="text" />
+      <field code="#returnType" name="返回类型" edit-type="text" />
+      <field code="#parentPath" name="上级路径" edit-type="input" />
+    </fields>
+
+
+    <fields code="api.handlers.handler.precheck" extend="api.precheck" />
+    <fields code="api.handlers.handler.result" extend="api.result" />
+    <fields code="api.handlers.handler.parameter"  name="请求参数">
+      <field code="#name" name="名称" edit-type="input" />
+      <field code="#scope" name="类型" edit-type="select">
+        <enum value="global" name="上下文"></enum>
+        <enum value="parameter" name="请求"></enum>
+        <enum value="result" name="响应"></enum>
+      </field>
+      <field code="#ref" name="关联属性" edit-type="input" />
+      <field code="value" name="值" edit-type="input" />
+    </fields>
+
+
+    <fields code="api.result"  name="响应结果">
+      <field code="#name" name="名称" edit-type="input" />
+      <field code="#alias" name="别名" edit-type="input" />
+      <field code="#default" name="默认值" edit-type="input" />
+      <field code="#formatter" name="格式化器" edit-type="select">
+        <enum value="com.hframework.smartweb.bean.formatter.MoneyDisplayFormatter" name="金额格式化"></enum>
+      </field>
+      <field code="#pattern" name="格式" edit-type="select">
+        <enum value="FormatMoney" name="FormatMoney"></enum>
+      </field>
+    </fields>
+    <fields code="api.result-view"  name="响应结果预览">
+      <field code="value" name="JSON" edit-type="textarea" />
+    </fields>
+
+  </descriptor>
+</dataset>

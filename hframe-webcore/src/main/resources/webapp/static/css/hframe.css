@@ -1,3 +1,7 @@
 .hflist .radio.inline+.radio.inline, .checkbox.inline+.checkbox.inline {
     margin-left : 0;
 }
+
+.switch-hidden {
+    opacity: 0.3;
+}

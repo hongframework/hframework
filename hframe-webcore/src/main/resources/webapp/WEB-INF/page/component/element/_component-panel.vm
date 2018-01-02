@@ -1,0 +1,35 @@
+<div style="position: relative;">
+    <input class="input-small"  id="$column.code"  name="$column.code"  value='$!value' data-value='$!value' not-null="$!column.notNull" readonly type="text" data-code="$column.dataCode"  data-toggle="component-picker">
+##    <div style="display: none">
+##        <div class="row-fluid" dc="lark_api_xeditor#api.parameters.parameter.checker" style="">
+##            <div class="box span12 hflist" id="lark_api_xeditor#api.parameters.parameter.checker_list" module="hframe" page="test" param="" component="eList" style="margin-bottom:5px;;overflow:inherit">
+##                <span class="ruler" style="display: none;">{}</span>
+##                <span class="helper" style="display: none;">{}</span>
+##                <h2 class="span12 hflist-tools" style="line-height:1.6;margin-right: 5px;;float: left;display:  none "> </h2>
+##                <div class="box-content">
+##                    <table class="">
+##                        <tbody class="hflist-fast-data" style="display:none ;">
+##                        </tbody>
+##                    </table>
+##                    <table class="table table-bordered table-striped table-condensed">
+##                        <thead>
+##                        <tr>
+##                            <th width="29.411764%"> 校验器 </th>
+##                            <th width="29.411764%"> 校验格式 </th>
+##                            <th width="20%;">操作</th>
+##                        </tr>
+##                        </thead>
+##                        <tbody class="hflist-data">
+##                        <tr>
+##                            <td> <select id="clazz" name="clazz" class="input-mini span12  " data-value="" style="width:$column.ShowType.Width;" data-code="JSON:{'com.hframework.smartweb.bean.checker.DateChecker':'日期','com.hframework.smartweb.bean.checker.MoneyChecker':'金额'}" data-condition="1=1" relat-element="" params="" action="" not-null="" last-value="com.hframework.smartweb.bean.checker.MoneyChecker"><option value=""> - 请选择 - </option><option value="com.hframework.smartweb.bean.checker.DateChecker" data-hide="null">日期</option><option value="com.hframework.smartweb.bean.checker.MoneyChecker" data-hide="null">金额</option></select> </td>
+##                            <td> <select id="pattern" name="pattern" class="input-mini span12  " data-value="" style="width:$column.ShowType.Width;" data-code="JSON:{'comLessNow':'LessNow','IsNormalMoney':'IsNormalMoney'}" data-condition="1=1" relat-element="" params="" action="" not-null="" last-value="IsNormalMoney"><option value=""> - 请选择 - </option><option value="comLessNow" data-hide="null">LessNow</option><option value="IsNormalMoney" data-hide="null">IsNormalMoney</option></select> </td>
+##                            <td class="center" width="250px;"> <input name="EOFR_EDIT_FLAG" type="hidden" /> <a class="btn btn-success hfhref" href="javascript:void(0)" params="" action="{&quot;component.row.add&quot;:{&quot;param&quot;:&quot;{}&quot;}}"> <i class=" icon-file-alt"></i> </a> <a class="btn btn-danger hfhref" href="javascript:void(0)" params="larkApiXeditor#apiParametersParameterCheckerId={larkApiXeditor#apiParametersParameterCheckerId}" action="{&quot;confirm&quot;:{&quot;content&quot;:&quot;是否删除 &lt;span style=\&quot;color:red\&quot;&gt;{larkApiXeditor#apiParametersParameterCheckerName}&lt;/span&gt; ?&quot;,&quot;param&quot;:&quot;{}&quot;},&quot;ajaxSubmit&quot;:{&quot;param&quot;:&quot;{}&quot;,&quot;action&quot;:&quot;larkApiXeditor#apiParametersParameterChecker/deleteByAjax.json&quot;}}"> <i class="icon-trash"></i> </a> </td>
+##                        </tr>
+##                        </tbody>
+##                    </table>
+##                </div>
+##            </div>
+##        </div>
+##    </div>
+
+</div>

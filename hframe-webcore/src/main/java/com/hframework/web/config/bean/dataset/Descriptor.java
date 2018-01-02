@@ -13,6 +13,12 @@ public class Descriptor {
     @XStreamAlias("node")
     private Node node;
 
+    @XStreamAlias("helper-datas")
+    private HelperDatas helperDatas;
+
+    @XStreamAlias("helper-script")
+    private String helperScript;
+
     @XStreamImplicit
     @XStreamAlias("fields")
     private List<Fields> fieldsList;
@@ -31,5 +37,21 @@ public class Descriptor {
 
     public void setFieldsList(List<Fields> fieldsList) {
         this.fieldsList = fieldsList;
+    }
+
+    public HelperDatas getHelperDatas() {
+        return helperDatas;
+    }
+
+    public void setHelperDatas(HelperDatas helperDatas) {
+        this.helperDatas = helperDatas;
+    }
+
+    public String getHelperScript() {
+        return helperScript;
+    }
+
+    public void setHelperScript(String helperScript) {
+        this.helperScript = helperScript;
     }
 }

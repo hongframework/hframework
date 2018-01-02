@@ -8,14 +8,21 @@ import com.hframework.common.util.JavaUtil;
 import com.hframework.common.util.ReflectUtils;
 import com.hframework.common.util.StringUtils;
 import com.hframework.common.util.UrlHelper;
+import com.hframework.common.util.message.Dom4jUtils;
+import com.hframework.common.util.message.XmlUtils;
 import com.hframework.web.CreatorUtil;
 import com.hframework.web.config.bean.DataSet;
 import com.hframework.web.config.bean.DataSetHelper;
 import com.hframework.web.config.bean.DataSetRuler;
-import com.hframework.web.config.bean.dataset.Field;
+import com.hframework.web.config.bean.dataset.*;
 import com.hframework.web.config.bean.datasethelper.Mapping;
 import com.hframework.web.config.bean.datasetruler.Rule;
+import org.dom4j.DocumentException;
+import org.dom4j.DocumentHelper;
+import org.dom4j.dom.DOMElement;
+import org.w3c.dom.NodeList;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 
 /**
@@ -28,6 +35,11 @@ public class DataSetDescriptor {
     private Field keyField;
 
     private Field nameField;
+
+
+    private String helperDataXml;
+    private JSONObject helperTags;
+    private boolean helperRuntime = false;
 
     private static final String[] orderdEditType = {"input","select","checkbox","hidden"};
 
@@ -63,6 +75,7 @@ public class DataSetDescriptor {
     private IDataSet dateSetStruct;
 
     private Map<String, Field> fields = null;
+    private Set<String> virtualContainerSubNodePath;
 
     public void addRelDataSet(String fieldName, String key, DataSetDescriptor descriptor) {
         relDataSetMap.put(key,descriptor);
@@ -332,6 +345,8 @@ public class DataSetDescriptor {
         return dateSetStruct;
     }
 
+
+
     public void setDateSetStruct(IDataSet dateSetStruct) {
         this.dateSetStruct = dateSetStruct;
     }
@@ -369,5 +384,118 @@ public class DataSetDescriptor {
 
     public void setFields(Map<String, Field> fields) {
         this.fields = fields;
+    }
+
+    public String getHelperDataXml() {
+        return helperDataXml;
+    }
+
+    public void setHelperDataXml(String helperDataXml) {
+        this.helperDataXml = helperDataXml;
+    }
+
+    public JSONObject getHelperTags() {
+        return helperTags;
+    }
+
+    public void setHelperTags(JSONObject helperTags) {
+        this.helperTags = helperTags;
+    }
+
+    public void setVirtualContainerSubNodePath(Set<String> virtualContainerSubNodePath) {
+        this.virtualContainerSubNodePath = virtualContainerSubNodePath;
+    }
+
+    public Set<String> getVirtualContainerSubNodePath() {
+        return virtualContainerSubNodePath;
+    }
+
+    public boolean isHelperRuntime() {
+        return helperRuntime;
+    }
+
+    public void setHelperRuntime(boolean helperRuntime) {
+        this.helperRuntime = helperRuntime;
+    }
+
+    public void resetHelperInfo() throws DocumentException, ClassNotFoundException, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+        if(dataSet == null || dataSet.getDescriptor() == null || dataSet.getDescriptor().getHelperDatas() == null){
+            return;
+        }
+        HelperDatas helperDatas = dataSet.getDescriptor().getHelperDatas();
+        if(helperDatas != null && helperDatas.getHelperDatas() != null) {
+            JSONObject helpTags = new JSONObject(true);
+            DOMElement root = null;
+            for (HelperData helpData : helperDatas.getHelperDatas()) {
+                String embedClass = helpData.getEmbedClass();
+                String embedMethod = helpData.getEmbedMethod();
+                if(StringUtils.isNotBlank(embedClass) && StringUtils.isNotBlank(embedMethod)){
+                    String replaceString = String.valueOf(java.lang.Class.forName(embedClass).getMethod(embedMethod, new java.lang.Class[0]).invoke(null, null));
+                    helpData.setHelpLabels(XmlUtils.readValue("<helper-data>" + replaceString + "</helper-data>", HelperData.class).getHelpLabels());
+                }
+                String targetId = helpData.getTargetId();
+                String[] nodes = StringUtils.split(targetId, ".");
+                if(root == null) {
+                    Map blankMap = new HashMap();
+                    root = Dom4jUtils.createElement(nodes[0], blankMap);
+                }
+                addElementToDomElement(root, Arrays.copyOfRange(nodes, 0, nodes.length - 1), helpData.getHelpLabels());
+                String xml = root.asXML();
+                this.helperDataXml = xml;
+
+                JSONObject helpTag = new JSONObject(true);
+                helpTags.put(dataSet.getCode() + "#" + targetId, helpTag);
+                int count = 0;
+                for (HelperLabel helperLabel : helpData.getHelpLabels()) {
+                    JSONObject helpLabel = new JSONObject(true);
+                    helpTag.put(helperLabel.getName(), helpLabel);
+                    for (int i = 0; i < helperLabel.getHelpItems().size(); i++) {
+                        helpLabel.put(helperLabel.getHelpItems().get(i).getName(), count ++);
+                    }
+                }
+                this.helperTags = helpTags;
+            }
+        }
+    }
+
+    private void addElementToDomElement(DOMElement root, String[] nodes, List<HelperLabel> helpLabels) throws DocumentException {
+
+        DOMElement parentElement = getCurrentElement(root, nodes);
+        for (HelperLabel helpLabel : helpLabels) {
+            List<HelperItem> helpItems = helpLabel.getHelpItems();
+            for (HelperItem helpItem : helpItems) {
+                parentElement.add(DocumentHelper.parseText(helpItem.getText()).getRootElement());
+            }
+        }
+        ;
+    }
+
+    private DOMElement getCurrentElement(DOMElement root, String[] nodes) {
+        org.w3c.dom.Node result = root;
+        for (String node : nodes) {
+            if(result.getNodeName().equals(node)) {
+            }else {
+                boolean createNew = true;
+                NodeList childNodes = result.getChildNodes();
+                for (int i = 0; i < childNodes.getLength(); i++) {
+                    try{
+                        org.w3c.dom.Node item = childNodes.item(i);
+                        if(item.getNodeName().equals(node)){
+                            result = item;
+                            createNew = false;
+                            break;
+                        }
+                    }catch (Exception e) {
+
+                    }
+                }
+                if(createNew) {
+                    DOMElement leaf = new DOMElement(node);
+                    result.appendChild(leaf);
+                    result = leaf;
+                }
+            }
+        }
+        return (DOMElement) result;
     }
 }

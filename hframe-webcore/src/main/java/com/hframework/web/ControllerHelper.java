@@ -65,12 +65,14 @@ public class ControllerHelper {
         switch (operateType) {
             case CREATE:
                 setDefaultValue(object, CustomProperty.createTime.name(), new Date());
+                setDefaultValue(object, CustomProperty.ctime.name(), System.currentTimeMillis()/1000);
                 setDefaultValue(object, CustomProperty.opId.name(), sessionUserId);
                 setDefaultValue(object, CustomProperty.creatorId.name(), sessionUserId);
                 setDefaultValue(object, CustomProperty.delFlag.name(), 0);
                 break;
             default:
                 setDefaultValue(object, CustomProperty.modifyTime.name(), new Date());
+                setDefaultValue(object, CustomProperty.mtime.name(), System.currentTimeMillis()/1000);
                 setDefaultValue(object, CustomProperty.modifyOpId.name(), sessionUserId);
                 setDefaultValue(object, CustomProperty.modifierId.name(), sessionUserId);
                 break;
@@ -176,7 +178,11 @@ public class ControllerHelper {
             Class<?> clazz = BeanUtils.findPropertyType(propertyName, object.getClass());
             if(clazz != Object.class) {
                 if(clazz == Date.class) {
-                    ReflectUtils.setFieldValue(object,propertyName, propertyValue);
+                    ReflectUtils.setFieldValue(object, propertyName, propertyValue);
+                }else if(clazz == Integer.class) {
+                    ReflectUtils.setFieldValue(object,propertyName, Integer.valueOf(String.valueOf(propertyValue)));
+                }else if(clazz == Long.class) {
+                    ReflectUtils.setFieldValue(object,propertyName, Long.valueOf(String.valueOf(propertyValue)));
                 }else {
                     ReflectUtils.setFieldValue(object,propertyName, propertyValue);
                 }
@@ -185,7 +191,7 @@ public class ControllerHelper {
     }
 
     public enum CustomProperty {
-        createTime,modifyTime,opId,modifyOpId,delFlag,creatorId,modifierId
+        createTime,modifyTime,opId,modifyOpId,delFlag,creatorId,modifierId,ctime,mtime;
     }
 
     public enum OperateType{

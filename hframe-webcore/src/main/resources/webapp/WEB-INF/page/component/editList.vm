@@ -81,7 +81,7 @@
                     #end
                 </tr>
                 </thead>
-                <tbody class='hflist-data'>
+                <tbody class='hflist-data'  data-is-empty = "$!list.dataIsEmpty">
                     #foreach($row in $list.data)
                     <tr>
                         #if($list.BOFR)

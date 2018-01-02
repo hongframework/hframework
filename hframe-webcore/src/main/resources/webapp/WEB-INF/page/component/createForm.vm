@@ -37,6 +37,13 @@
                         </div>
                     #end
                 #end
+                #if($form.BOF)
+                    <div style="float: right;margin-right:40px;margin-bottom:15px;">
+                        #foreach($item in $form.BOF)
+                            $item.component
+                        #end
+                    </div>
+                #end
 
                 #if($form.EOF)
                     <div class="form-actions">

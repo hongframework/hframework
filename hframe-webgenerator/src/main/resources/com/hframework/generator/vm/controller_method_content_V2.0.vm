@@ -4,6 +4,7 @@
 #set($varName = $map.get("VarName"))
 #set($entityName = $map.get("EntityName"))
 #set($keyProperty = $map.get("KeyProperty"))
+#set($keyPropertyVar = $map.get("KeyPropertyVar"))
 #set($parentIdPropertyClassName = $map.get("ParentIdPropertyClassName"))
 
 
@@ -158,7 +159,7 @@
     public ResultData create(@ModelAttribute("${varName}") ${className} ${varName}) {
         logger.debug("request : {}", ${varName});
         try {
-            ControllerHelper.setDefaultValue(${varName}, "${varName}Id");
+            ControllerHelper.setDefaultValue(${varName}, "${keyPropertyVar}");
             int result = ${seviceVarName}.create(${varName});
             if(result > 0) {
                 return ResultData.success(${varName});
@@ -184,7 +185,7 @@
         logger.debug("request : {}", ${varName}s);
 
         try {
-            ControllerHelper.setDefaultValue(${varName}s, "${varName}Id");
+            ControllerHelper.setDefaultValue(${varName}s, "${keyPropertyVar}");
             ControllerHelper.reorderProperty(${varName}s);
 
             int result = ${seviceVarName}.batchOperate(${varName}s);
@@ -211,7 +212,7 @@
     public ResultData update(@ModelAttribute("${varName}") ${className} ${varName}) {
         logger.debug("request : {}", ${varName});
         try {
-            ControllerHelper.setDefaultValue(${varName}, "${varName}Id");
+            ControllerHelper.setDefaultValue(${varName}, "${keyPropertyVar}");
             int result = ${seviceVarName}.update(${varName});
             if(result > 0) {
                 return ResultData.success(${varName});
@@ -236,7 +237,7 @@
     public ResultData saveOrUpdate(@ModelAttribute("${varName}") ${className} ${varName}) {
         logger.debug("request : {}", ${varName});
         try {
-            ControllerHelper.setDefaultValue(${varName}, "${varName}Id");
+            ControllerHelper.setDefaultValue(${varName}, "${keyPropertyVar}");
             int result = ${seviceVarName}.batchOperate(new ${className}[]{${varName}});
             if(result > 0) {
                 return ResultData.success(${varName});
@@ -262,7 +263,7 @@
         logger.debug("request : {}", ${varName});
 
         try {
-            ControllerHelper.setDefaultValue(${varName}, "${varName}Id");
+            ControllerHelper.setDefaultValue(${varName}, "${keyPropertyVar}");
             int result = ${seviceVarName}.delete(${varName});
             if(result > 0) {
                 return ResultData.success(${varName});

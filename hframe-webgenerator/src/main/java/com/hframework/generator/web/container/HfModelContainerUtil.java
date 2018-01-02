@@ -650,10 +650,12 @@ public class HfModelContainerUtil {
         if(hfmdEntityAttr.getHfmdEntityAttrCode().toLowerCase().endsWith("_id") && hfmdEntityAttr.getIspk() != null && hfmdEntityAttr.getIspk() == 1) {
             return "011";
         }else if("create_time".equals(hfmdEntityAttr.getHfmdEntityAttrCode().toLowerCase())
+                || "ctime".equals(hfmdEntityAttr.getHfmdEntityAttrCode().toLowerCase())
                 || "op_id".equals(hfmdEntityAttr.getHfmdEntityAttrCode().toLowerCase())
                 || "creator_id".equals(hfmdEntityAttr.getHfmdEntityAttrCode().toLowerCase())) {
             return "011";
         }else if("modify_op_id".equals(hfmdEntityAttr.getHfmdEntityAttrCode().toLowerCase())
+                || "mtime".equals(hfmdEntityAttr.getHfmdEntityAttrCode().toLowerCase())
                 || "modify_time".equals(hfmdEntityAttr.getHfmdEntityAttrCode().toLowerCase())
                 || "modifier_id".equals(hfmdEntityAttr.getHfmdEntityAttrCode().toLowerCase())) {
             return "001";

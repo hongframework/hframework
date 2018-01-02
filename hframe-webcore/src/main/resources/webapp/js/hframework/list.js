@@ -305,6 +305,9 @@ require(['layer','ajax','js/hframework/errormsg'], function () {
         $(".hflist-fast-data").each(function(i){
             var $helper = $(this).parents(".hflist").find(".helper");
             if($helper) {
+                if($helper.text() == "{}") {
+                    $(".hflist-tools").hide();
+                }
                 var $allRules = JSON.parse($helper.text());
                 for(var key in $allRules) {
                     var compareKey = $allRules[key]["compareKey"];

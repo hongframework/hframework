@@ -6,6 +6,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.parser.Feature;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.Lists;
 import com.hframework.base.service.CommonDataService;
 import com.hframework.beans.class0.Class;
 import com.hframework.beans.controller.Pagination;
@@ -14,6 +15,7 @@ import com.hframework.beans.controller.ResultData;
 import com.hframework.common.frame.ServiceFactory;
 import com.hframework.common.springext.datasource.DataSourceContextHolder;
 import com.hframework.common.util.*;
+import com.hframework.common.util.StringUtils;
 import com.hframework.common.util.collect.CollectionUtils;
 import com.hframework.common.util.collect.bean.Fetcher;
 import com.hframework.common.util.collect.bean.Grouper;
@@ -27,6 +29,7 @@ import com.hframework.web.auth.AuthContext;
 import com.hframework.web.auth.AuthServiceProxy;
 import com.hframework.web.config.bean.DataSetHelper;
 import com.hframework.web.config.bean.dataset.Field;
+import com.hframework.web.config.bean.dataset.Node;
 import com.hframework.web.config.bean.datasethelper.Mappings;
 import com.hframework.web.config.bean.module.Component;
 import com.hframework.web.context.*;
@@ -43,10 +46,14 @@ import org.activiti.explorer.ExplorerApp;
 import org.activiti.explorer.ui.Images;
 import org.activiti.explorer.ui.custom.PrettyTimeLabel;
 import org.activiti.explorer.ui.custom.UserProfileLink;
+import org.apache.commons.lang3.*;
 import org.dom4j.Attribute;
 import org.dom4j.Document;
 import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
+import org.dom4j.io.OutputFormat;
+import org.dom4j.io.XMLWriter;
+import org.dom4j.tree.DefaultElement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -77,10 +84,7 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.beans.PropertyDescriptor;
-import java.io.File;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
+import java.io.*;
 import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -524,22 +528,61 @@ public class DefaultController {
         String pageCode = refererUrlInfo[1].substring(0, refererUrlInfo[1].indexOf(".html"));
         logger.debug("request referer : {},{},{}", refererUrl, module, pageCode);
         try{
-
             PageDescriptor pageInfo = WebContext.get().getPageInfo(module, pageCode);
             Map<String, ComponentDescriptor> components = pageInfo.getComponents();
 
-            String filePath = request.getParameter("path");
-            if(StringUtils.isBlank(filePath)) {
-                filePath = request.getParameter("filePath");
-            }
-            if(StringUtils.isBlank(filePath)) {
-                filePath = request.getParameter("id");
-            }
             String dataJson = getRequestPostStr(request);
-            logger.debug("request : {}|{}", dataJson, filePath);
-            if(StringUtils.isNotBlank(filePath)) {
-                return saveFile(components.get("container").getDataId(), filePath, dataJson);
+
+            String id = request.getParameter("path");
+            if(StringUtils.isBlank(id)) {
+                id = request.getParameter("filePath");
             }
+            if(StringUtils.isBlank(id)) {
+                id = request.getParameter("id");
+            }
+
+            logger.debug("request : {}|{}", dataJson, id);
+
+            if(components.containsKey("container") && StringUtils.isNotBlank(id)) {
+                DataSetDescriptor descriptor = components.get("container").getDataSetDescriptor();
+                if("file".equals(descriptor.getDataSet().getSource())) {
+                    String dataIdStr = components.get("container").getDataId();
+
+                    JSONObject jsonObject = JSONObject.parseObject(dataJson, Feature.OrderedField);
+                    Document document = DocumentHelper.createDocument();
+                    Element root = document.addElement(descriptor.getDataSet().getDescriptor().getNode().getCode());
+
+                    getXml(root, jsonObject, descriptor.getVirtualContainerSubNodePath());
+//                    String xml = document.asXML();
+                    OutputFormat formater = OutputFormat.createPrettyPrint();
+                    StringWriter out = new StringWriter();
+                    // 注释：创建输出流
+                    XMLWriter writer = new XMLWriter(out, formater);
+                    // 注释：输出格式化的串到目标中，执行后。格式化后的串保存在out中。
+                    writer.write(document);
+
+                    writer.close();
+                    String xml = out.toString();
+
+                    JSONArray tmpArray = new JSONArray();
+                    tmpArray.add(xml);
+                    String tmpJson = tmpArray.toJSONString();
+                    xml = tmpJson.substring(1, tmpJson.length() - 1);
+                    if(dataIdStr.startsWith("DATA-SET-REL://")) {
+                        String[] tableInfo = dataIdStr.substring("DATA-SET-REL://".length()).split("/");
+                        final String tableName = tableInfo[0];
+                        String xmlField = tableInfo[1];
+                        final String keyField = tableInfo[2];
+                        commonDataService.executeDBStructChange("update " + tableName + " set " + xmlField + " = " + xml + " where " + keyField + " = " + id);
+                        return ResultData.success();
+                    }else{
+                        logger.info("write file : {} | {}", dataIdStr + "/" + id, xml);
+                        FileUtils.writeFile(dataIdStr + "/" + id, xml);
+                        return ResultData.success();
+                    }
+                }
+            }
+
 
             JSONObject jsonObject = JSONObject.parseObject(dataJson, Feature.OrderedField);
             Set<String> componentIds = jsonObject.keySet();
@@ -622,20 +665,8 @@ public class DefaultController {
 //        return ResultData.error(ResultCode.UNKNOW);
     }
 
-    private ResultData saveFile(String rootPath, String filePath, String dataJson) {
 
-        JSONObject jsonObject = JSONObject.parseObject(dataJson, Feature.OrderedField);
-
-        Document document = DocumentHelper.createDocument();
-        Element root = document.addElement("config");
-
-        getXml(root, jsonObject);
-        logger.info("write file : {} | {}", rootPath + "/" + filePath, document.asXML());
-        FileUtils.writeFile(rootPath + "/" + filePath, document.asXML());
-        return ResultData.success();
-    }
-
-    private void getXml(Element root, JSONObject jsonObject) {
+    private void getXml(Element root, JSONObject jsonObject, Set<String> virtualContainerSubNodePath) {
         for (String key : jsonObject.keySet()) {
             Object valueObject = jsonObject.get(key);
 
@@ -654,42 +685,11 @@ public class DefaultController {
 
             Element parentElement = isCurElement ? null : getOrCreateElementIfNotExist(root, parentPath);
 
+
             if (valueObject instanceof String) {//为组件数据
                 valueObject = JSON.parse((String) valueObject, Feature.OrderedField);
                 if (valueObject instanceof JSONArray) {
-
-                    JSONArray array = (JSONArray) valueObject;
-                    for (Object o : array) {
-                        if (o instanceof JSONObject) {
-                            JSONObject object = (JSONObject) o;
-
-                            if(isSubNodesEmpty(object)) {
-                                continue;
-                            }
-                            Element curElement = isCurElement ? root : parentElement.addElement(curNodeName);
-                            for (Map.Entry<String, Object> entry : object.entrySet()) {
-                                String entryKey = entry.getKey();
-                                String entryValue = (String) entry.getValue();
-                                if(StringUtils.isBlank(entryValue)) {
-                                    continue;
-                                }
-                                if (entryKey.trim().equals("#")) {//表明为内容文本
-                                    curElement.setText(entryValue);
-                                } else if (entryKey.startsWith("#")) {//表明为属性
-                                    curElement.addAttribute(entryKey.substring(1), entryValue);
-                                } else {//表明为子对象
-                                    String subPath = entryKey.contains("#") ? entryKey.substring(0, entryKey.indexOf("#")) : entryKey;
-                                    Element tempElement = getOrCreateElementIfNotExist(curElement, subPath);
-                                    if (entryKey.contains("#")) {
-                                        String attrName = entryKey.substring(entryKey.indexOf("#") + 1);
-                                        tempElement.addAttribute(attrName, entryValue);
-                                    } else {
-                                        tempElement.setText(entryValue);
-                                    }
-                                }
-                            }
-                        }
-                    }
+                    dealArrayValue((JSONArray) valueObject, parentElement, curNodeName,isCurElement , root, virtualContainerSubNodePath);
                 }
             }else {//为容器数据
                 if (valueObject instanceof JSONArray) {
@@ -697,13 +697,56 @@ public class DefaultController {
                     JSONArray array = (JSONArray) valueObject;
                     for (Object o : array) {
                         Element curElement =isCurElement ? root : parentElement.addElement(curNodeName);
-                        getXml(curElement, (JSONObject) o);
+                        getXml(curElement, (JSONObject) o, virtualContainerSubNodePath);
                     }
                 }
             }
+        }
+    }
 
+    private void dealArrayValue(JSONArray valueObject, Element parentElement, String curNodeName, boolean isCurElement, Element root, Set<String> virtualContainerSubNodePath) {
+        for (Object o : valueObject) {
+            if (o instanceof JSONObject) {
+                JSONObject object = (JSONObject) o;
 
+                if(isSubNodesEmpty(object)) {
+                    continue;
+                }
+                Element curElement = isCurElement ? root : parentElement.addElement(curNodeName);
+                for (Map.Entry<String, Object> entry : object.entrySet()) {
+                    String entryKey = entry.getKey();
+                    String entryValue = (String) entry.getValue();
+                    if(StringUtils.isBlank(entryValue)) {
+                        continue;
+                    }
+                    if (entryKey.trim().equals("#")) {//表明为内容文本
+                        curElement.setText(entryValue);
+                    } else if (entryKey.startsWith("#")) {//表明为属性
+                        curElement.addAttribute(entryKey.substring(1), entryValue);
+                    } else {//表明为子对象
+                        String subPath = entryKey.contains("#") ? entryKey.substring(0, entryKey.indexOf("#")) : entryKey;
 
+                        if(virtualContainerSubNodePath.contains(curElement.getPath() + "/" + subPath.replaceAll("\\.","/"))) {//表明内容为json需要解析为xml的节点
+                            if(StringUtils.isNotBlank(entryValue)) {
+                                Object parse = JSONObject.parse(entryValue);
+                                if(parse instanceof  JSONArray) {
+                                    dealArrayValue((JSONArray) parse, curElement, subPath, false, root, virtualContainerSubNodePath);
+                                }
+                            }
+                        }else {
+                            Element tempElement = getOrCreateElementIfNotExist(curElement, subPath);
+                            if (entryKey.contains("#")) {
+                                String attrName = entryKey.substring(entryKey.indexOf("#") + 1);
+                                tempElement.addAttribute(attrName, entryValue);
+                            } else {
+                                tempElement.setText(entryValue);
+
+                            }
+                        }
+
+                    }
+                }
+            }
         }
     }
 
@@ -919,8 +962,8 @@ public class DefaultController {
      * @return
      * @throws Throwable
      */
-    @RequestMapping(value = "/{page}.html")
-    public ModelAndView gotoPage(@PathVariable("page") String pageCode,
+    @RequestMapping(value = "/{pageX}.html")
+    public ModelAndView gotoPage(@PathVariable("pageX") String pageCode,
                                  @ModelAttribute("component") String componentId,
                                  @ModelAttribute("pagination") Pagination pagination,
                                  @ModelAttribute("isPop") String isPop,
@@ -933,8 +976,8 @@ public class DefaultController {
      * @return
      * @throws Throwable
      */
-    @RequestMapping(value = "/{module}/{page}.html")
-    public ModelAndView gotoPage(@PathVariable("module") String module,@PathVariable("page") String pageCode,
+    @RequestMapping(value = "/{moduleX}/{pageX}.html")
+    public ModelAndView gotoPage(@PathVariable("moduleX") String module,@PathVariable("pageX") String pageCode,
                                  @ModelAttribute("component") String componentId,
                                  @ModelAttribute("pagination") Pagination pagination,
                                  @ModelAttribute("isPop") String isPop,
@@ -983,6 +1026,10 @@ public class DefaultController {
                     logger.warn("component {} is not set data set",componentDescriptor.getId());
                     continue;
                 }
+                if(componentDescriptor.getDataSetDescriptor().isHelperRuntime()){
+                    componentDescriptor.getDataSetDescriptor().resetHelperInfo();
+                }
+
                 String moduleCode = componentDescriptor.getDataSetDescriptor().getDataSet().getModule();
                 String eventObjectCode = componentDescriptor.getDataSetDescriptor().getDataSet().getEventObjectCode();
                 String dataSetCode = componentDescriptor.getDataSetDescriptor().getDataSet().getCode();
@@ -1013,6 +1060,8 @@ public class DefaultController {
                     jsonObject.put("data", pageContextParams2);
                 }else if("file".equals(componentDescriptor.getDataSetDescriptor().getDataSet().getSource())) {
                     jsonObject = parseFileComponent(type, request,response, dataSetCode, module, componentDescriptor, mav);
+                }else if("SYSTEM_EMPTY_DATASET".equals(dataSetCode)) {
+                    jsonObject = componentDescriptor.getJson();
                 }else if (extendData != null && extendData.containsKey(componentDescriptor.getDataId())) {
                     ResultData resultData = ResultData.success(extendData.get(componentDescriptor.getDataId()));
                     resetResultMessage(resultData, WebContext.get().getProgram().getCode(), moduleCode, dataSetCode, action);
@@ -1284,8 +1333,7 @@ public class DefaultController {
                 if(StringUtils.isNotBlank(componentDescriptor.getTitle())) {
                     jsonObject.put("title",componentDescriptor.getTitle());
                 }
-
-
+                jsonObject.put("showTitle",componentDescriptor.isShowTitle());
 
                 mergeGlobalRuler(globalDataSetRulerJsonObject, componentDescriptor.getDataSetDescriptor().getDataSetRulerJsonObject());
 //                jsonObject.put("icon","icon-edit");
@@ -1336,6 +1384,8 @@ public class DefaultController {
             mav.addObject("loginFowardUrl","/index.html");
 
         }
+        mav.addObject("module",module);
+        mav.addObject("page",pageCode);
         mav.addObject("globalRuler", globalDataSetRulerJsonObject.toJSONString());
         mav.addObject("ExtMap",extendData);
         mav.addObject("elements", result);
@@ -1358,28 +1408,69 @@ public class DefaultController {
 
     }
 
-    private JSONObject parseFileComponent(String type, HttpServletRequest request, HttpServletResponse response,
+    private JSONObject parseFileComponent(String type, final HttpServletRequest request, HttpServletResponse response,
                                     String dataSetCode, String module, ComponentDescriptor componentDescriptor,
                                     ModelAndView mav) throws Throwable {
         JSONObject jsonObject = null;
         if("container".equals(type)) {
-            if(StringUtils.isNotBlank(request.getParameter("id")) && StringUtils.isNotBlank(componentDescriptor.getDataId())) {
-                String filePath = componentDescriptor.getDataId() + "/" + request.getParameter("id");
+            String dataIdStr = componentDescriptor.getDataId();
+            if(StringUtils.isNotBlank(dataIdStr)) {
+                Element rootElement = null;
+                String xmlContent = null;
+                if(StringUtils.isNotBlank(request.getParameter("id"))) {
+                    if(dataIdStr.startsWith("DATA-SET-REL://")){
+                        String[]  tableInfo = dataIdStr.substring("DATA-SET-REL://".length()).split("/");
+                        final String tableName = tableInfo[0];
+                        String xmlField = tableInfo[1];
+                        final String keyField = tableInfo[2];
+                        Map<String, Object> map = commonDataService.selectDynamicTableDataOne(new HashMap() {{
+                            put("tableName", tableName);
+                            put("condition", keyField + " =" + request.getParameter("id"));
+                        }});
 
-                DataSetContainer rootContainer = (DataSetContainer) org.apache.commons.beanutils.BeanUtils.cloneBean(
-                        (DataSetContainer) componentDescriptor.getDataSetDescriptor().getDateSetStruct());
-                DataSetGroup rootDataSetGroup = new DataSetGroup();
-                rootContainer.addDataGroup(rootDataSetGroup);
-                rootDataSetGroup.setNode(rootContainer.getNode());
-                rootDataSetGroup.setElementList(CollectionUtils.copy(rootContainer.getElementList()));
+                        if(map.get(xmlField) != null) {
+                            if(map.get(xmlField).getClass().isArray()){
+                                xmlContent = new String((byte[])map.get(xmlField));
+                            }else {
+                                xmlContent = String.valueOf(map.get(xmlField));
+                            }
+                        }
 
-                Element rootElement = Dom4jUtils.getDocumentByContent(FileUtils.readFile(filePath)).getRootElement();
-                setDataSetContainerValue(rootDataSetGroup, rootElement);
+                    }else {
+                        String filePath = dataIdStr + "/" + request.getParameter("id");
+                        xmlContent =  FileUtils.readFile(filePath);
+                    }
 
-                setDataSetInstanceComponentData(rootContainer, module, componentDescriptor.getDataSetDescriptor().getDataSet().getCode(), "");
+                    xmlContent = invokeEmbedPart(xmlContent);
 
+                    if(StringUtils.isNotBlank(xmlContent)) {
+                        rootElement = Dom4jUtils.getDocumentByContent(xmlContent).getRootElement();
+                    }
+                }
+                if(rootElement == null) {
+                    rootElement = new DefaultElement("a");
+                }
+
+                DataSetContainer rootContainer = createRootContainer(componentDescriptor, rootElement, module);
+
+                String helperDataXml = componentDescriptor.getDataSetDescriptor().getHelperDataXml();
+                if(StringUtils.isBlank(helperDataXml)) helperDataXml = "<xml></xml>";
+                Element helperElement = Dom4jUtils.getDocumentByContent(helperDataXml).getRootElement();
+                DataSetContainer helperContainer = createRootContainer(componentDescriptor, helperElement, module);
+
+                for (IDataSet iDataSet : rootContainer.getElementList()) {
+                    if (iDataSet instanceof DataSetInstance) {
+                        DataSetInstance dataSet = (DataSetInstance) iDataSet;
+
+                    }
+                }
+
+                mav.addObject("helperTags", componentDescriptor.getDataSetDescriptor().getHelperTags());
+                mav.addObject("helperScript",componentDescriptor.getHelperScript());
                 mav.addObject("filePath", request.getParameter("id"));
                 mav.addObject("fileContainer", rootContainer);
+                mav.addObject("helperFileContainer", helperContainer);
+
 //                            WebContext.put("fileContent", rootContainer);
 //                            WebContext.put("subContext", true);
                 System.out.println(rootContainer);
@@ -1434,6 +1525,45 @@ public class DefaultController {
         return jsonObject;
     }
 
+    private String invokeEmbedPart(String xmlContent) throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+        if(xmlContent == null) return null;
+        String[] xmlEmbeds = RegexUtils.find(xmlContent, "<\bXML_EMBED [^<>]*\b>\b<\b/\bXML_EMBED\b>");
+        for (String xmlEmbed : new HashSet<String>(Lists.newArrayList(xmlEmbeds))) {
+            String[] classParts = RegexUtils.find(xmlEmbed, " class\b*=\b*\"[^\"]+\"");
+            String[] methodParts = RegexUtils.find(xmlEmbed, " method\b*=\b*\"[^\"]+\"");
+            String className = null, methodName = null;
+            if(classParts != null && classParts.length > 0) {
+                className = classParts[0].substring(0, classParts[0].length() - 1).replaceAll("class\b*=\b*\"","").trim();
+            }
+            if(methodParts != null && methodParts.length > 0) {
+                methodName = methodParts[0].substring(0, methodParts[0].length() - 1).replaceAll("method\b*=\b*\"","").trim();
+            }
+
+            if(org.apache.commons.lang3.StringUtils.isNoneBlank(className) && org.apache.commons.lang3.StringUtils.isNoneBlank(methodName)) {
+                String replaceString = String.valueOf(java.lang.Class.forName(className).getMethod(methodName, new java.lang.Class[0]).invoke(null, null));
+                xmlContent = xmlContent.replace(xmlEmbed, replaceString);
+            }
+        }
+        return xmlContent;
+    }
+
+    private DataSetContainer createRootContainer(ComponentDescriptor componentDescriptor, Element rootElement, String module) throws NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {
+//        DataSetContainer rootContainer = (DataSetContainer) org.apache.commons.beanutils.BeanUtils.cloneBean(
+//                componentDescriptor.getDataSetDescriptor().getDateSetStruct());
+        //TODO 需要确认深度拷贝是否完整
+        DataSetContainer rootContainer = (DataSetContainer) componentDescriptor.getDataSetDescriptor().getDateSetStruct().cloneBean();
+        DataSetGroup rootDataSetGroup = new DataSetGroup();
+        rootContainer.addDataGroup(rootDataSetGroup);
+        rootDataSetGroup.setNode(rootContainer.getNode());
+        rootDataSetGroup.setElementList(CollectionUtils.copy(rootContainer.getElementList()));
+
+
+        setDataSetContainerValue(rootDataSetGroup, rootElement);
+
+        setDataSetInstanceComponentData(rootContainer, module, componentDescriptor.getDataSetDescriptor().getDataSet().getCode(), "");
+        return rootContainer;
+    }
+
     private void removeNonAuthEvent(Map<AuthContext.AuthDataUnit, String> authDataUnitStringMap, JSONObject jsonObject, String eventType) {
         JSONArray events = jsonObject.getJSONArray(eventType);
         JSONArray newArray = new JSONArray();
@@ -1472,33 +1602,47 @@ public class DefaultController {
     private void setDataSetInstanceComponentData(DataSetContainer rootContainer, String module,String parentDataSetCode, String subPageCode) {
         PageDescriptor subPageInfo = WebContext.get().getPageInfo(module, parentDataSetCode + "#" + (StringUtils.isNotBlank(subPageCode) ? (subPageCode + "#") : ""));
 
-        for (DataSetGroup dataGroup : rootContainer.getDataGroups()) {
-            for (IDataSet tmpDataSet : dataGroup.getElementList()){
-                if (tmpDataSet instanceof DataSetContainer) {
-                    DataSetContainer dataSet = (DataSetContainer) tmpDataSet;
-                    setDataSetInstanceComponentData(dataSet, module, parentDataSetCode, dataSet.getNode().getPath());
-                }else if (tmpDataSet instanceof DataSetInstance) {
-                    final DataSetInstance dataSet = (DataSetInstance) tmpDataSet;
-                    for (ComponentDescriptor descriptor : subPageInfo.getComponents().values()) {
-                        if(descriptor.getDataSetDescriptor() != null) {
-                            String tempDataSetCode = descriptor.getDataSetDescriptor().getDataSet().getCode();
-                            tempDataSetCode = tempDataSetCode.contains("#") ? tempDataSetCode.substring(tempDataSetCode.indexOf("#") + 1) : tempDataSetCode;
-                            if(tempDataSetCode.equals( dataSet.getNode().getPath())) {
-                                if(dataSet.isOne() || dataSet.getOne() != null) {
-                                    dataSet.setComponentData(descriptor.getJson(ResultData.success(dataSet.getOne())));
-                                }else {
-                                    dataSet.setComponentData(descriptor.getJson(ResultData.success(new HashMap() {{
-                                        put("list", dataSet.getList());
-                                    }})));
-                                }
-                            }
+        if(rootContainer.isVirtualContainer()) {
+            IDataSet tmpDataSet = rootContainer.getElementList().get(0);
+            setDataSetInstanceComponentData(subPageInfo, (DataSetInstance) tmpDataSet);
+        }else {
+            if(rootContainer.getDataGroups() == null) return;
+            for (DataSetGroup dataGroup : rootContainer.getDataGroups()) {
+                for (IDataSet tmpDataSet : dataGroup.getElementList()){
+                    if (tmpDataSet instanceof DataSetContainer) {
+                        DataSetContainer dataSet = (DataSetContainer) tmpDataSet;
+                        setDataSetInstanceComponentData(dataSet, module, parentDataSetCode, dataSet.getNode().getPath());
+                    }else if (tmpDataSet instanceof DataSetInstance) {
+                        final DataSetInstance dataSet = (DataSetInstance) tmpDataSet;
+
+                        if(subPageInfo == null) {//为空表明节点虽然有子节点数据，但节点并不存在
+
                         }
+                        setDataSetInstanceComponentData(subPageInfo, dataSet);
                     }
                 }
             }
         }
+    }
 
-
+    private void setDataSetInstanceComponentData(PageDescriptor subPageInfo, final DataSetInstance dataSet) {
+        for (ComponentDescriptor descriptor : subPageInfo.getComponents().values()) {
+            if(descriptor.isDefaultComponent()) continue;
+            if(descriptor.getDataSetDescriptor() != null) {
+                String tempDataSetCode = descriptor.getDataSetDescriptor().getDataSet().getCode();
+                tempDataSetCode = tempDataSetCode.contains("#") ? tempDataSetCode.substring(tempDataSetCode.indexOf("#") + 1) : tempDataSetCode;
+                if(tempDataSetCode.equals( dataSet.getNode().getPath())) {
+                    if(dataSet.isOne() || dataSet.getOne() != null) {
+                        dataSet.setComponentData(descriptor.getJson(ResultData.success(dataSet.getOne())));
+                    }else {
+                        dataSet.setComponentData(descriptor.getJson(ResultData.success(new HashMap() {{
+                            put("list", dataSet.getList());
+                        }})));
+                        dataSet.getComponentData().put("dataIsEmpty", dataSet.getList().size()==1 &&  dataSet.getList().get(0).isEmpty());
+                    }
+                }
+            }
+        }
     }
 
     private void setDataSetContainerValue(DataSetGroup parentDataSetGroup, Element parentElement)
@@ -1514,33 +1658,54 @@ public class DefaultController {
             }
             if (iDataSet instanceof DataSetContainer) {
                 DataSetContainer dataSetContainer = (DataSetContainer) iDataSet;
-                for (Element  tarElement : eleList) {
-                    DataSetGroup dataSetGroup = new DataSetGroup();
-                    dataSetGroup.setNode(dataSetContainer.getNode());
-                    dataSetContainer.addDataGroup(dataSetGroup);
-                    dataSetGroup.setElementList(CollectionUtils.copy(dataSetContainer.getElementList()));
-                    setDataSetContainerValue(dataSetGroup, tarElement);
+                if(eleList == null || eleList.size() == 0) {
+                    eleList.add(new DefaultElement(iDataSet.getNode().getCode()));
                 }
 
-            }else if (iDataSet instanceof DataSetInstance) {
+                if(dataSetContainer.isVirtualContainer()) {
+                    iDataSet = dataSetContainer.getElementList().get(0);
+                }else {
+                    for (Element  tarElement : eleList) {
+                        DataSetGroup dataSetGroup = new DataSetGroup();
+                        dataSetGroup.setNode(dataSetContainer.getNode());
+                        dataSetContainer.addDataGroup(dataSetGroup);
+                        dataSetGroup.setElementList(CollectionUtils.copy(dataSetContainer.getElementList()));
+                        setDataSetContainerValue(dataSetGroup, tarElement);
+                    }
+                    continue;
+                }
+            }
+
+            if (iDataSet instanceof DataSetInstance) {
                 //如果是数据节点，表明下面必定没有重复的行信息，因为如果有重复行信息，会自动识别为一个数据集，就不会走该分支
                 DataSetInstance dataSetInstance = (DataSetInstance) iDataSet;
 
+                Set<String> includeCode = new HashSet<String>();
+                List<Node> nodeList = dataSetInstance.getNode().getNodeList();
+                if(nodeList != null && nodeList.size() > 0){//组件上级为VirtualContainer
+                    for (Node node : nodeList) {
+                        includeCode.add(node.getPath());
+                    }
+                }
+
+
                 if(dataSetInstance.isOne() || parentDataSetGroup.getNode().getPath().equals(dataSetInstance.getNode().getPath())) {
                     Map<String, String> oneRowData = new LinkedHashMap<String, String>();
-                    addRowData(oneRowData, eleList.get(0), "", excludeCode);
+                    if(!eleList.isEmpty()) {
+                        addRowData(oneRowData, eleList.get(0), "", excludeCode, includeCode);
+                    }
 
                     if(oneRowData.size() > 0) {
                         parentDataSetGroup.setName(oneRowData.values().iterator().next());
                     }
 
-
                     dataSetInstance.setOne(oneRowData);
                 }else {
+                    if(dataSetInstance.getList() != null) dataSetInstance.getList().clear();
                     if(eleList != null && eleList.size() > 0) {
                         for (Element element : eleList) {
                             Map<String, String> oneRowData = new HashMap<String, String>();
-                            addRowData(oneRowData,element, "", excludeCode);
+                            addRowData(oneRowData, element, "", excludeCode, includeCode);
                             dataSetInstance.add(oneRowData);
                         }
                     }else {
@@ -1566,19 +1731,42 @@ public class DefaultController {
         return set;
     }
 
-    private void addRowData(Map<String, String> oneRowData, Element element, String parentPath, Set<String> excludeCode) {
+    private void addRowData(Map<String, String> oneRowData, Element element, String parentPath, Set<String> excludeCode, Set<String> includeCode) {
         Map<String, String> attrMap = getAttrMap(element);
         for (String attrCode : attrMap.keySet()) {
             oneRowData.put(parentPath + "#" + attrCode, attrMap.get(attrCode));
         }
+
+        Map<String, Set<Element>> subElements = new HashMap<String, Set<Element>>();
         for (Object o : element.elements()) {
             Element tempElement = (Element) o;
+            String tempName = tempElement.getName();
             if(excludeCode.contains(tempElement.getPath().replaceAll("/",".").substring(1))) {
                 continue;
             }
-            String tempName = tempElement.getName();
-            addRowData(oneRowData,tempElement, StringUtils.isNotBlank(parentPath)?"." + tempName : tempName, excludeCode);
+
+            if(includeCode.contains(tempElement.getPath().replaceAll("/",".").substring(1))) {
+                if(!subElements.containsKey(tempName)) subElements.put(tempName, new LinkedHashSet<Element>());
+                subElements.get(tempName).add(tempElement);
+                continue;
+            }
+
+            addRowData(oneRowData,tempElement, StringUtils.isNotBlank(parentPath)?"." + tempName : tempName, excludeCode, includeCode);
         }
+
+        for (String subElementName : subElements.keySet()) {
+            Set<Element> elements = subElements.get(subElementName);
+
+            JSONArray subLines = new JSONArray();
+            for (Element element1 : elements) {
+                Map<String, String> newSubLine = new HashMap<String, String>();
+                addRowData(newSubLine, element1, "", excludeCode, includeCode);
+                subLines.add(newSubLine);
+            }
+            oneRowData.put(subElementName, subLines.toJSONString());
+        }
+
+
         if(element.isTextOnly()) {
             oneRowData.put(StringUtils.isNotBlank(parentPath) ? parentPath: "#", element.getText());
         }

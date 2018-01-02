@@ -46,6 +46,9 @@
 <script src="/static/plugins/cityPicker/js/city-picker.js"></script>
 <script src="/static/plugins/cityPicker/js/main.js"></script>
 
+<script src="/static/plugins/cityPicker/js/component-picker.js"></script>
+<script src="/static/plugins/cityPicker/js/helper-picker.js"></script>
+
 <script type="text/javascript" src="/static/plugins/timepicker/jquery-ui-timepicker-addon.min.js"></script>
 <script type="text/javascript" src="/static/plugins/timepicker/i18n/jquery-ui-timepicker-zh-CN.js"></script>
 <script type="text/javascript" src="$staticResourcePath/plugins/echarts/echarts.common.min.js"></script>
@@ -79,3 +82,7 @@
 
 <script src="/js/hframework/dynTree.js"></script>
 <script src="/js/hframework/componentinit.js"></script>
+
+<script type="text/javascript">
+$!helperScript
+</script>

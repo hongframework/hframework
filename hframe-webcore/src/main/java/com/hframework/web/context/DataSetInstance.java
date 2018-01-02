@@ -12,11 +12,11 @@ import java.util.Map;
  */
 public class DataSetInstance implements IDataSet{
 
-    private Node node ;
+    private transient Node node ;
     private List<Map<String, String>> list;
     private Map<String, String> one;
 
-    private JSONObject componentData;
+    private transient JSONObject componentData;
 
     public static DataSetInstance valueOf(Object data) {
         DataSetInstance instance = new DataSetInstance();
@@ -58,6 +58,12 @@ public class DataSetInstance implements IDataSet{
 
     public Node getNode() {
         return node;
+    }
+
+    public IDataSet cloneBean() {
+        DataSetInstance newObject = new DataSetInstance();
+        newObject.setNode(node);
+        return newObject;
     }
 
     public void setNode(Node node) {

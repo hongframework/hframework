@@ -5,6 +5,7 @@ import org.apache.commons.beanutils.converters.DateConverter;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import java.io.*;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.*;
@@ -211,7 +212,27 @@ public class BeanUtils {
         }
         return map;
     }
+    public static Object deepCopy(Object from) {
+        Object obj = null;
+        try {
+            // 将对象写成 Byte Array
+            ByteArrayOutputStream bos = new ByteArrayOutputStream();
+            ObjectOutputStream out = new ObjectOutputStream(bos);
+            out.writeObject(from);
+            out.flush();
+            out.close();
 
+            // 从流中读出 byte array，调用readObject函数反序列化出对象
+            ObjectInputStream in = new ObjectInputStream(
+                    new ByteArrayInputStream(bos.toByteArray()));
+            obj = in.readObject();
+        } catch(IOException e) {
+            e.printStackTrace();
+        } catch(ClassNotFoundException e2) {
+            e2.printStackTrace();
+        }
+        return obj;
+    }
     /**
      * 将对象的属性转换成为对象相应方法的名称(转换在get方法名，类型)
      */

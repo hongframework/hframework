@@ -27,6 +27,10 @@ public class Component   {
     @XStreamAlias("title")
     private String title;
     @XStreamAsAttribute
+    @XStreamAlias("show-title")
+    private String showTitle;
+
+    @XStreamAsAttribute
     @XStreamAlias("event-extend")
     private String eventExtend;
 
@@ -92,5 +96,13 @@ public class Component   {
 
     public void setPath(String path) {
         this.path = path;
+    }
+
+    public String getShowTitle() {
+        return showTitle;
+    }
+
+    public void setShowTitle(String showTitle) {
+        this.showTitle = showTitle;
     }
 }

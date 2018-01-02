@@ -1,6 +1,24 @@
 
 
 function componentinit(){
+    $("[component=flatContainer]").find(".box").removeClass("box");
+    $(".hfcontainer[component='flatContainer']").each(function(){
+        $(this).find(".box-content").removeClass("box-content");
+        $(this).find(".box-header  .box-icon").html("");
+        $(this).find(".box-header").removeClass("box-header");
+
+        $(this).find("div:first form fieldset .control-group ").css("margin-bottom", 0);
+        $(this).find("div:first form fieldset .control-group ").addClass("span1");
+        $(this).find("div:first form fieldset .control-group:first ").removeClass("span1").addClass("span4");
+        $(this).find("div:first form").css("margin-bottom", 0);
+        $(this).find("div:first form fieldset ").css("margin-top", "15px");
+        $(this).find("div:first .form-horizontal .controls").css("margin-left", "100px");
+        $(this).find("div:first .form-horizontal .control-label").css("width", "80px");
+        $(this).find("div:first .hfform h2").remove();
+    });
+
+
+
     $(".hfmutexcont .box-content .box-header .box-icon").html("");
     $(".hfmutexcont .box-content .box-header").removeClass("box-header");
 
@@ -15,6 +33,7 @@ function componentinit(){
         b.preventDefault();
         $(this).tab("show");
     });
+    $(".hfcontainer .pagination ").remove();
 
     $(".hflist  .box-content .hflist-data a[when][when!='{}']").each(function(){
         $(this).hide();
@@ -28,6 +47,54 @@ function componentinit(){
                 $(this).show();
             }
 
+        }
+    });
+
+    $(".switch-button").each(function(){
+       var $this = $(this);
+
+        var config = JSON.parse($this.attr("action"))["componentControl"];
+        var targetId = config["targetId"];
+        var $targetComponent = $this.parents(".hfcontainer:first").find("div[dc='" + targetId + "']:first");
+        if($targetComponent == null) {
+            var seq = 0;
+            if(targetId.endsWith("]")){
+                seq = targetId .substring(targetId.length - 2,targetId.length - 1) - 1;
+                targetId = targetId.substring(0,targetId.length - 3);
+
+            }
+            $targetComponent = $($("[component= '" + targetId + "']").get(seq));
+        }
+        var isShow = true;
+        if(config["param"]) {
+            var visible = JSON.parse(config["param"])["visible"];
+            var showCondition = JSON.parse(config["param"])["show_condition"];
+            var event = JSON.parse(config["param"])["event"];
+            var showWhenIsNotEmpty = showCondition == "IS_NOT_EMPTY";
+
+            if(visible == "auto" && showWhenIsNotEmpty) {
+                if($targetComponent.children().is("[component=flatContainer]")){
+                    isShow = false;
+                    var input = $targetComponent.find("div[dc='" + targetId + "']:first form").serialize()
+                    var items = input.split("&")
+                    for(var i in items){
+                        var value = items[i].split("=")[1];
+                        if(value){
+                            isShow = true;
+                        }
+                    }
+                }else if($targetComponent.find(".form-horizontal table:first tbody tr").size() == 1 && $targetComponent.find(".form-horizontal table:first tbody").is("[data-is-empty=true]")){
+                    isShow = false;
+                }
+            }
+        }
+        if(isShow){
+            if(event == "toggle"){
+                $this.addClass("switch-hidden");
+            }
+
+        }else {
+            $targetComponent.hide();
         }
     });
 

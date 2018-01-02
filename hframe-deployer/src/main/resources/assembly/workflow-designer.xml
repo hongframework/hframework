@@ -41,13 +41,13 @@
       <!--<outputDirectory>VAADIN</outputDirectory>-->
     <!--</fileSet>-->
   </fileSets>
-
-  <files>
-    <!-- Include ui.properties for alfresco -->
-    <file>
-      <source>../hframe-workflow/target/classes/ui.properties.alfresco</source>
-      <outputDirectory></outputDirectory>
-      <destName>ui.properties</destName>
-    </file>
-  </files>
+  <!-- TODO -->
+  <!--<files>-->
+    <!--&lt;!&ndash; Include ui.properties for alfresco &ndash;&gt;-->
+    <!--<file>-->
+      <!--<source>../hframe-workflow/target/classes/ui.properties.alfresco</source>-->
+      <!--<outputDirectory></outputDirectory>-->
+      <!--<destName>ui.properties</destName>-->
+    <!--</file>-->
+  <!--</files>-->
 </component>

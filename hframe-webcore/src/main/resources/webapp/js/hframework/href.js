@@ -267,7 +267,8 @@ require(['layer','ajax','js/hframework/errormsg'], function () {
                 _data = JSON.stringify(json);
             }else if($param.endsWith("thisForm")) {
                 if($this.parents("form").length == 0) {
-                    var $rootNodes = $this.parents("div .hfspan").children(".hfcontainer").children("div").children("div .box");
+                    //var $rootNodes = $this.parents("div .hfspan").children(".hfcontainer").children("div").children("div .box");
+                    var $rootNodes = $this.parents("div.hfspan").find(".hfcontainer:first > div > div > div.box:first, .hfcontainer:first > div > div.box")
                     var filePath = $this.parents("div .hfspan").find("div[path]").attr("path");
                     $param = $param + "&path=" + filePath;
                     //alert(filePath);
@@ -410,8 +411,68 @@ require(['layer','ajax','js/hframework/errormsg'], function () {
 
 
         }else if($type == "scrollIntoView") {
-            var id = $param.substring($param.indexOf("&_treeItemId=")+"&_treeItemId=".length);
-            $("div[id='" + id + "']")[0].scrollIntoView(true);
+            if(targetId != null) {
+                var json = {};
+
+                var $targetComponent = $this.parents(".hfcontainer:first").find("div[dc='" + targetId + "']:first");
+                if($targetComponent == null) {
+                    var seq = 0;
+                    if (targetId.endsWith("]")) {
+                        seq = targetId.substring(targetId.length - 2, targetId.length - 1) - 1;
+                        targetId = targetId.substring(0, targetId.length - 3);
+
+                    }
+                    $targetComponent = $($("[component= '" + targetId + "']").get(seq));
+                }
+                $targetComponent[0].scrollIntoView(true);
+            }else {
+                var id = $param.substring($param.indexOf("&_treeItemId=")+"&_treeItemId=".length);
+                $("div[id='" + id + "']")[0].scrollIntoView(true);
+            }
+            delete $action[$type];
+
+
+        }else if($type == "componentControl") {
+            var targetId =$action[$type].targetId;
+            var param = $action[$type].param;
+            if(param == null) param = "{}";
+            var paramJsonObject = JSON.parse( param);
+            if(targetId != null) {
+                var json = {};
+
+                var $targetComponent = $this.parents(".hfcontainer:first").find("div[dc='" + targetId + "']:first");
+                if($targetComponent == null) {
+                    var seq = 0;
+                    if(targetId.endsWith("]")){
+                        seq = targetId .substring(targetId.length - 2,targetId.length - 1) - 1;
+                        targetId = targetId.substring(0,targetId.length - 3);
+
+                    }
+                    $targetComponent = $($("[component= '" + targetId + "']").get(seq));
+                }
+                if(paramJsonObject.event == "toggle") {
+                    $targetComponent.toggle(500,function(){
+                        if($targetComponent.is(":hidden")) {
+                            $this.removeClass("switch-hidden")
+                        }else{
+                            $this.addClass("switch-hidden")
+                        }
+                    });
+                }else {
+
+                    var $targetHelperComponent = $this.parents(".hfcontainer:first").find("div[dc='" + targetId + "_helpTag']:first");
+                    if($targetHelperComponent != null){
+                        $this.helperpicker();
+                    }else {
+                        if($targetComponent.is(":hidden")) {
+                            $targetComponent.show();
+                        }
+
+                    }
+
+                }
+            }
+
             delete $action[$type];
 
 
@@ -437,6 +498,8 @@ require(['layer','ajax','js/hframework/errormsg'], function () {
             showProcessBar();
             delete $action[$type];
             location.reload();
+        }else if($type == "component.row.delete") {
+            $this.parents("tr:first").remove();
         }else if($type == "component.row.add") {
             $curRow = $this.parents("tr")[0];
             $newRow = $($curRow).clone();
@@ -523,9 +586,18 @@ require(['layer','ajax','js/hframework/errormsg'], function () {
             if(componentId != null) {
                 if(componentId =="mutexContainer") {
                     var data = [];
-                    var $subInst = $(this).children(".box-content").children(".tab-content").children(".tab-pane").children("div .hfcontainer");
+                    var $subInst = $(this).children(".box-content").children(".tab-content").children(".tab-pane").not(".helper-div").children("div .hfcontainer");
                     $($subInst).each(function(){
                         var $subNodes = $(this).children("div").children("div .box");
+                        var subJson = getNodesJson($subNodes);
+                        data.push(subJson);
+                    });
+                    json[id] =data;
+                }else if(componentId =="flatContainer") {
+                    var data = [];
+                    var $subInst = $(this).children(".box-content").children("div").not(".helper-div").children("div .hfcontainer");
+                    $($subInst).each(function(){
+                        var $subNodes = $(this).children("div").children("div");
                         var subJson = getNodesJson($subNodes);
                         data.push(subJson);
                     });

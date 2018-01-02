@@ -21,6 +21,10 @@ public class Fields   {
     @XStreamAsAttribute
     @XStreamAlias("name")
     private String name;
+    @XStreamAsAttribute
+    @XStreamAlias("extend")
+    private String extend;
+
 
     public Fields() {
     }
@@ -48,5 +52,13 @@ public class Fields   {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getExtend() {
+        return extend;
+    }
+
+    public void setExtend(String extend) {
+        this.extend = extend;
     }
 }

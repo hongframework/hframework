@@ -12,7 +12,7 @@ import java.util.Map;
  */
 public class DataSetGroup implements IDataSet{
 
-    private Node node;
+    private transient Node node;
 
     private String name;
 
@@ -24,10 +24,10 @@ public class DataSetGroup implements IDataSet{
         return elementList;
     }
 
-    public void addElement(IDataSet dataSet) {
-        if(elementList == null) elementList = new ArrayList<IDataSet>();
-        elementList.add(dataSet);
-    }
+//    public void addElement(IDataSet dataSet) {
+//        if(elementList == null) elementList = new ArrayList<IDataSet>();
+//        elementList.add(dataSet);
+//    }
 
     public void setElementList(List<IDataSet> elementList) {
         this.elementList = elementList;
@@ -42,6 +42,18 @@ public class DataSetGroup implements IDataSet{
 
     public Node getNode() {
         return node;
+    }
+
+    public IDataSet cloneBean() {
+        DataSetGroup dataSetGroup = new DataSetGroup();
+        dataSetGroup.setNode(node);
+        dataSetGroup.setName(name);
+        List<IDataSet> newElementList = new ArrayList<IDataSet>();
+        for (IDataSet iDataSet : elementList) {
+            newElementList.add(iDataSet.cloneBean());
+        }
+        dataSetGroup.setElementList(newElementList);
+        return dataSetGroup;
     }
 
     public void setNode(Node node) {

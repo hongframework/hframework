@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component id="virtualContainer" init="true" type="container" data-set="${dataSet}" data-auth="${dataAuth}" path="component/mutexContainer.vm">
+    <element id="id" type="characters" default-value=""></element>
+    <!--<element id="data" type="object"  default-value=""></element>-->
+    <events>
+        <event name="submit">
+            <attach anchor="EOFC">
+                <appendElement type="button" param='{btnclass:"btn-primary",btnText:" 提 交 "}'></appendElement>
+            </attach>
+            <source scope="EOC" param="thisForm"></source>
+            <effect type="ajaxSubmit" action="${updateByAjax}"></effect>
+            <effect type="confirm" content='修改，是否返回列表页？'></effect>
+            <effect type="component.reload" target-id="list"></effect>
+        </event>
+    </events>
+</component>

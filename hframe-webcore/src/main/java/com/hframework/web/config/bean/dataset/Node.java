@@ -20,10 +20,15 @@ public class Node {
 	@XStreamAsAttribute
 	@XStreamAlias("name")
 	private String name;
+	@XStreamAsAttribute
+	@XStreamAlias("editor")
+	private String editor;
+	@XStreamAsAttribute
+	@XStreamAlias("events")
+	private String events;
 
 	private String path;
-    public Node() {
-    	}
+    public Node() {}
    
  
  	
@@ -79,4 +84,19 @@ public class Node {
 		return path;
 	}
 
+	public String getEditor() {
+		return editor;
+	}
+
+	public void setEditor(String editor) {
+		this.editor = editor;
+	}
+
+	public String getEvents() {
+		return events;
+	}
+
+	public void setEvents(String events) {
+		this.events = events;
+	}
 }

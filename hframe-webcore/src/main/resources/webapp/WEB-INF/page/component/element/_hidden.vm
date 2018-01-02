@@ -8,4 +8,4 @@
 
 
 
-<input class="input-xlarge focused" id="$column.code" name="$column.code" type="hidden" value="$!value">
+<input class="input-xlarge focused" id="$column.code" name="$column.code" type="hidden" value='$!value'>

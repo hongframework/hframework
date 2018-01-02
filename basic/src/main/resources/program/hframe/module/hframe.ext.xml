@@ -12,6 +12,39 @@
             </event>
         </component>
     </page>
+    <page id="test" name="test" page-template="container">
+        <!--<component id="qList" data-set="SYSTEM_EMPTY_DATASET"  show-title="false">-->
+            <!--<event name="save">-->
+                <!--<attach anchor="BOFC">-->
+                    <!--<appendElement type="button" param='{btnclass:"btn-primary switch-button",btnText:"前置检查"}'></appendElement>-->
+                <!--</attach>-->
+                <!--<effect type="componentControl" target-id="eList[2]" param='{visible:"auto", event:"toggle", show_condition:"IS_NOT_EMPTY"}'></effect>-->
+                <!--<effect type="scrollIntoView"  target-id="eList[2]"></effect>-->
+            <!--</event>-->
+            <!--<event name="save">-->
+                <!--<attach anchor="BOFC">-->
+                    <!--<appendElement type="button" param='{btnclass:"btn-primary switch-button",btnText:"添加前置处理器"}'></appendElement>-->
+                <!--</attach>-->
+                <!--<effect type="componentControl" target-id="eList[3]"  param='{visible:"auto", event:"component.row.add", show_condition:"IS_NOT_EMPTY"}'></effect>-->
+                <!--<effect type="scrollIntoView"  target-id="eList[3]"></effect>-->
+            <!--</event>-->
+            <!--<event name="save">-->
+                <!--<attach anchor="BOFC">-->
+                    <!--<appendElement type="button" param='{btnclass:"btn-primary switch-button",btnText:"添加处理器"}'></appendElement>-->
+                <!--</attach>-->
+                <!--<effect type="componentControl" target-id="eList[4]"  param='{visible:"show", show_condition:"IS_NOT_EMPTY"}'></effect>-->
+                <!--<effect type="scrollIntoView"  target-id="eList[4]"></effect>-->
+            <!--</event>-->
+            <!--<event name="save">-->
+                <!--<attach anchor="BOFC">-->
+                    <!--<appendElement type="button" param='{btnclass:"btn-primary switch-button",btnText:"返回信息处理"}'></appendElement>-->
+                <!--</attach>-->
+                <!--<effect type="componentControl" target-id="eList[5]"  param='{visible:"auto", show_condition:"IS_NOT_EMPTY"}'></effect>-->
+                <!--<effect type="scrollIntoView"  target-id="eList[5]"></effect>-->
+            <!--</event>-->
+        <!--</component>-->
+        <component id="container" data-set="hffile/lark_api_xeditor"  dataid="DATA-SET-REL://cfg_runtime_api/content/id" />
+    </page>
     <page id="general_entity_add" name="常用实体添加" page-template="dynamic" >
         <component id="qList" data-set="hframe/hfpm_program_cfg_auth_part" dataid="hfpmProgramCfgAuthPart" title="设置权限模型">
             <event name="save">
@@ -173,25 +206,25 @@
         <component id="container" data-set="hffile/compare.feditor"  dataid="D:/my_workspace/hframe-trunk/hframe-reconciliation/src/main/resources" />
     </page>
 
-    <page id="compare.feditor#"  page-template="dynamic">
-        <component id="eList" data-set="hffile/compare.feditor#config.global.host"/>
-        <component id="eForm" data-set="hffile/compare.feditor#config.services.service"/>
-        <!-- 容器默认为list，否则容器单元素已被智能计算在外面了，所以，容器在展现时，按照手风琴或者tab的形式展现 -->
-        <component id="mutexContainer" data-set="hffile/compare.feditor#config.services.service.importers.importer" title="数据导入"/>
-        <component id="mutexContainer" data-set="hffile/compare.feditor#config.services.service.ruleCenter.rule" title="比对规则"/>
-        <component id="eList" data-set="hffile/compare.feditor#config.services.service.exporters.exporter" title="数据导出"/>
-    </page>
+    <!--<page id="compare.feditor#"  page-template="dynamic">-->
+        <!--<component id="eList" data-set="hffile/compare.feditor#config.global.host"/>-->
+        <!--<component id="eForm" data-set="hffile/compare.feditor#config.services.service"/>-->
+        <!--&lt;!&ndash; 容器默认为list，否则容器单元素已被智能计算在外面了，所以，容器在展现时，按照手风琴或者tab的形式展现 &ndash;&gt;-->
+        <!--<component id="mutexContainer" data-set="hffile/compare.feditor#config.services.service.importers.importer" title="数据导入"/>-->
+        <!--<component id="mutexContainer" data-set="hffile/compare.feditor#config.services.service.ruleCenter.rule" title="比对规则"/>-->
+        <!--<component id="eList" data-set="hffile/compare.feditor#config.services.service.exporters.exporter" title="数据导出"/>-->
+    <!--</page>-->
 
-    <page id="compare.feditor#config.services.service.importers.importer#"  page-template="dynamic">
-        <component id="eForm" data-set="hffile/compare.feditor#config.services.service.importers.importer" title="基本信息"/>
-        <component id="eList" data-set="hffile/compare.feditor#config.services.service.importers.importer.file.row" title="数据行"/>
-        <component id="eList" data-set="hffile/compare.feditor#config.services.service.importers.importer.dataset.sql" title="SQL"/>
-    </page>
+    <!--<page id="compare.feditor#config.services.service.importers.importer#"  page-template="dynamic">-->
+        <!--<component id="eForm" data-set="hffile/compare.feditor#config.services.service.importers.importer" title="基本信息"/>-->
+        <!--<component id="eList" data-set="hffile/compare.feditor#config.services.service.importers.importer.file.row" title="数据行"/>-->
+        <!--<component id="eList" data-set="hffile/compare.feditor#config.services.service.importers.importer.dataset.sql" title="SQL"/>-->
+    <!--</page>-->
 
-    <page id="compare.feditor#config.services.service.ruleCenter.rule#"  page-template="dynamic">
-        <component id="eForm" data-set="hffile/compare.feditor#config.services.service.ruleCenter.rule" title="数据集"/>
-        <component id="eList" data-set="hffile/compare.feditor#config.services.service.ruleCenter.rule.datanode" title="节点"/>
-    </page>
+    <!--<page id="compare.feditor#config.services.service.ruleCenter.rule#"  page-template="dynamic">-->
+        <!--<component id="eForm" data-set="hffile/compare.feditor#config.services.service.ruleCenter.rule" title="数据集"/>-->
+        <!--<component id="eList" data-set="hffile/compare.feditor#config.services.service.ruleCenter.rule.datanode" title="节点"/>-->
+    <!--</page>-->
 
     <page id="chartDemo" name="图表"  page-template="dynamic">
         <component id="chart" data-set="hframe/manis_statistics_second" title="chartDemo"/>

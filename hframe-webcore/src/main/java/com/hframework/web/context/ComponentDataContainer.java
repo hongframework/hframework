@@ -4,6 +4,8 @@ package com.hframework.web.context;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import com.hframework.beans.controller.Pagination;
 import com.hframework.common.util.*;
 import com.hframework.web.config.bean.Component;
@@ -26,6 +28,158 @@ import java.util.*;
  * Date: 2016/5/26 23:40:40
  */
 public class ComponentDataContainer {
+
+    private static final List<String> iconPool = Lists.newArrayList("icon-adjust",
+            "icon-asterisk",
+            "icon-ban-circle",
+            "icon-bar-chart",
+            "icon-barcode",
+            "icon-beaker",
+            "icon-beer",
+            "icon-bell",
+            "icon-bell-alt",
+            "icon-bolt",
+            "icon-book",
+            "icon-bookmark",
+            "icon-bookmark-empty",
+            "icon-briefcase",
+            "icon-bullhorn",
+            "icon-calendar",
+            "icon-camera",
+            "icon-camera-retro",
+            "icon-certificate",
+            "icon-check",
+            "icon-check-empty",
+            "icon-circle",
+            "icon-circle-blank",
+            "icon-cloud",
+            "icon-cloud-download",
+            "icon-cloud-upload",
+            "icon-coffee",
+            "icon-cog",
+            "icon-cogs",
+            "icon-comment",
+            "icon-comment-alt",
+            "icon-comments",
+            "icon-comments-alt",
+            "icon-credit-card",
+            "icon-dashboard",
+            "icon-desktop",
+            "icon-download",
+            "icon-download-alt",
+            "icon-edit",
+            "icon-envelope",
+            "icon-envelope-alt",
+            "icon-exchange",
+            "icon-exclamation-sign",
+            "icon-external-link",
+            "icon-eye-close",
+            "icon-eye-open",
+            "icon-facetime-video",
+            "icon-fighter-jet",
+            "icon-film",
+            "icon-filter",
+            "icon-fire",
+            "icon-flag",
+            "icon-folder-close",
+            "icon-folder-open",
+            "icon-folder-close-alt",
+            "icon-folder-open-alt",
+            "icon-food",
+            "icon-gift",
+            "icon-glass",
+            "icon-globe",
+            "icon-group",
+            "icon-hdd",
+            "icon-headphones",
+            "icon-heart",
+            "icon-heart-empty",
+            "icon-home",
+            "icon-inbox",
+            "icon-info-sign",
+            "icon-key",
+            "icon-leaf",
+            "icon-laptop",
+            "icon-legal",
+            "icon-lemon",
+            "icon-lightbulb",
+            "icon-lock",
+            "icon-unlock",
+            "icon-magic",
+            "icon-magnet",
+            "icon-map-marker",
+            "icon-minus",
+            "icon-minus-sign",
+            "icon-mobile-phone",
+            "icon-money",
+            "icon-move",
+            "icon-music",
+            "icon-off",
+            "icon-ok",
+            "icon-ok-circle",
+            "icon-ok-sign",
+            "icon-pencil",
+            "icon-picture",
+            "icon-plane",
+            "icon-plus",
+            "icon-plus-sign",
+            "icon-print",
+            "icon-pushpin",
+            "icon-qrcode",
+            "icon-question-sign",
+            "icon-quote-left",
+            "icon-quote-right",
+            "icon-random",
+            "icon-refresh",
+            "icon-remove",
+            "icon-remove-circle",
+            "icon-remove-sign",
+            "icon-reorder",
+            "icon-reply",
+            "icon-resize-horizontal",
+            "icon-resize-vertical",
+            "icon-retweet",
+            "icon-road",
+            "icon-rss",
+            "icon-screenshot",
+            "icon-search",
+            "icon-share",
+            "icon-share-alt",
+            "icon-shopping-cart",
+            "icon-signal",
+            "icon-signin",
+            "icon-signout",
+            "icon-sitemap",
+            "icon-sort",
+            "icon-sort-down",
+            "icon-sort-up",
+            "icon-spinner",
+            "icon-star",
+            "icon-star-empty",
+            "icon-star-half",
+            "icon-tablet",
+            "icon-tag",
+            "icon-tags",
+            "icon-tasks",
+            "icon-thumbs-down",
+            "icon-thumbs-up",
+            "icon-time",
+            "icon-tint",
+            "icon-trash",
+            "icon-trophy",
+            "icon-truck",
+            "icon-umbrella",
+            "icon-upload",
+            "icon-upload-alt",
+            "icon-user",
+            "icon-user-md",
+            "icon-volume-off",
+            "icon-volume-down",
+            "icon-volume-up",
+            "icon-warning-sign",
+            "icon-wrench",
+            "icon-zoom-in",
+            "icon-zoom-out");
 
     private static final Logger logger = LoggerFactory.getLogger(ComponentDataContainer.class);
 
@@ -215,9 +369,9 @@ public class ComponentDataContainer {
                 for (String var : varList) {
                     DataSet dataSet = dataSetDescriptor.getDataSet();
                     if("id".equals(var)) {
-                        value = JavaUtil.getJavaVarName(value.replace("${" + var + "}",dataSet.getEventObjectCode() + "_" + var));
+                        value = JavaUtil.getJavaVarName(value.replace("${" + var + "}",dataSetDescriptor.getKeyField() != null ? dataSetDescriptor.getKeyField().getCode() : (dataSet.getEventObjectCode() + "_" + var)));
                     }else if("name".equals(var)) {
-                        value = JavaUtil.getJavaVarName(value.replace("${" + var + "}", dataSet.getEventObjectCode() + "_" + var));
+                        value = JavaUtil.getJavaVarName(value.replace("${" + var + "}", dataSetDescriptor.getNameField() != null ? dataSetDescriptor.getNameField().getCode() : (dataSet.getEventObjectCode() + "_" + var)));
                     }else if("DS".equals(var)) {
                         value = value.replace("${" + var + "}", dataSet.getEventObjectCode());
                     }else if(var != null && var.endsWith("ByAjax")) {//"createByAjax".equals(var) || "updateByAjax".equals(var)|| "deleteByAjax".equals(var)
@@ -488,10 +642,22 @@ public class ComponentDataContainer {
         protected Mapping mapping;
 
         protected DataSetDescriptor dataSetDescriptor;
+        protected Map<String, String> elementDefaultMap = new HashMap<String, String>();
 
         public AbstractJsonSegmentParser(Element element, String type){
             this.element =element;
             this.componentType = type;
+            if(com.hframework.common.util.StringUtils.isNotBlank(element.getDefaultValue())) {
+                elementDefaultMap.put(element.getId(), element.getDefaultValue());
+            }
+
+            if(element.getElementList() != null) {
+                for (Element element1 : element.getElementList()) {
+                    if(com.hframework.common.util.StringUtils.isNotBlank(element1.getDefaultValue())) {
+                        elementDefaultMap.put(element1.getId(), element1.getDefaultValue());
+                    }
+                }
+            }
         }
 
         public abstract boolean ok();
@@ -1097,6 +1263,15 @@ public class ComponentDataContainer {
                         try {
                             String stringVal = org.apache.commons.beanutils.BeanUtils.getProperty(object,propertyName);
                             if(code.equals("name")) stringVal += endOfRowHtml();
+
+                            if(StringUtils.isBlank(stringVal) && elementDefaultMap.containsKey(code)) {
+                                if("#{RANDOM_ICON}".equals(elementDefaultMap.get(code))){
+//                                    List<String> tmpIconPool = Lists.newArrayList(iconPool);
+                                    stringVal = iconPool.get(map.toString().hashCode() % iconPool.size());
+//                                    iconPool.remove(map.toString().hashCode() % iconPool.size());
+                                }
+                            }
+
                             map.put(code, stringVal);
                         } catch (Exception e) {
                             e.printStackTrace();
@@ -1298,7 +1473,12 @@ public class ComponentDataContainer {
                 JSONObject subJsonObject = new JSONObject();
                 subJsonObject.put("action",effect.getAction());
                 subJsonObject.put("isStack",effect.getIsStack());
-                subJsonObject.put("param",effect.getParam());
+                try{
+                    subJsonObject.put("param",JSONObject.parseObject(StringUtils.isBlank(effect.getParam()) ? "{}" : effect.getParam()).toJSONString());
+                }catch (Exception e) {
+                    e.printStackTrace();
+                }
+
                 subJsonObject.put("content",effect.getContent());
                 subJsonObject.put("targetId",effect.getTargetId());
                 actionJsonObject.put(effect.getType(),subJsonObject);
@@ -1373,19 +1553,24 @@ public class ComponentDataContainer {
                 return "<i class=\"${iconclass}\"></i>"
                         .replace("${iconclass}", (String) jsonObject.get("iconclass"));
             }else if("button".equals(appendElement.getType())) {
+                if(StringUtils.isBlank(action)) action = "";
                 JSONObject jsonObject = JSONObject.parseObject(appendElement.getParam());
                 String iconClass = StringUtils.isNotBlank(jsonObject.getString("iconclass")) ? "<i class=\"${iconclass}\"></i>"
                         .replace("${iconclass}", (String) jsonObject.get("iconclass")) : "";
-                return "<button  class=\"btn hfhref ${btnclass}\" onclick=\"javascript:void(0)\"  params=\"${params}\" action='${action}' title='${text}'>${btnText}</button>"
+
+                if( ((String) jsonObject.get("btnclass")).contains("switch-button")) {
+                    System.out.println(1);
+                }
+                String extAttr = ((String) jsonObject.get("btnclass")).contains("switch-button") && action.contains("component.row.add") ? "data-toggle=\"helper-picker\"" : "";
+
+                return ("<button  class=\"btn hfhref ${btnclass}\" onclick=\"javascript:void(0)\" " + extAttr  + " params=\"${params}\" action='${action}'  title='${text}'>${btnText}</button>")
                         .replace("${btnclass}", (String) jsonObject.get("btnclass"))
                         .replace("${text}",(String) jsonObject.get("btnText"))
                         .replace("${btnText}", iconClass + (String) jsonObject.get("btnText"))
                         .replace("${params}", StringUtils.isNotBlank(params) ? params : "")
-                        .replace("${action}", StringUtils.isNotBlank(action) ? action : "");
+                        .replace("${action}", action);
             }else if("checkbox".equals(appendElement.getType())) {
                 return "<input type=\"checkbox\" name=\"checkIds\", value=\"\" value-key=\"" + appendElement.getParam() + "\">";
-//                        .replace("${id}", (String) jsonObject.get("id"))
-//                        .replace("${value}", (String) jsonObject.get("${id}"));
             }
             return null;
         }

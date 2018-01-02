@@ -40,6 +40,8 @@
 	#parse("component/element/_text.vm")
 #elseif($column.editType=='select-panel')
 	#parse("component/element/_select-panel.vm")
+#elseif($column.editType=='component-panel')
+	#parse("component/element/_component-panel.vm")
 #else
 	UNKOWN
 #end

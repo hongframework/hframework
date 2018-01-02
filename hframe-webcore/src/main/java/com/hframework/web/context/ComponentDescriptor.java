@@ -27,6 +27,7 @@ public class ComponentDescriptor extends ElementDescriptor{
     private ComponentDataContainer dataContainer;
     private String dataId;//页面配置的信息
     private String title;//页面配置的信息
+    private boolean showTitle =true;//显示标题
     private boolean isDefaultComponent;
     private String path;
     private String eventExtend;
@@ -77,6 +78,14 @@ public class ComponentDescriptor extends ElementDescriptor{
 
     public DataSetDescriptor getDataSetDescriptor() {
         return dataSetDescriptor;
+    }
+
+    public String getHelperScript(){
+        if(dataSetDescriptor != null && dataSetDescriptor.getDataSet() != null
+                && dataSetDescriptor.getDataSet().getDescriptor() != null){
+            return dataSetDescriptor.getDataSet().getDescriptor().getHelperScript();
+        }
+        return null;
     }
 
     public void setDataSetDescriptor(DataSetDescriptor dataSetDescriptor) {
@@ -153,5 +162,13 @@ public class ComponentDescriptor extends ElementDescriptor{
 
     public void setPath(String path) {
         this.path = path;
+    }
+
+    public void setShowTitle(boolean showTitle) {
+        this.showTitle = showTitle;
+    }
+
+    public boolean isShowTitle() {
+        return showTitle;
     }
 }

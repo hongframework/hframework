@@ -10,11 +10,13 @@ import java.util.List;
  */
 public class DataSetContainer implements IDataSet{
 
-    public Node node ;
+    public transient  Node  node ;
 
     public List<DataSetContainer> subDataSetContainers;
     public List<DataSetInstance> datas;
     public List<IDataSet> elementList = new ArrayList<IDataSet>();
+
+    public boolean virtualContainer;
 
     //数据组
     public List<DataSetGroup> dataGroups ;
@@ -41,10 +43,10 @@ public class DataSetContainer implements IDataSet{
         return container;
     }
 
-    public void addContainer(DataSetContainer subContainer) {
-        if(subDataSetContainers == null) subDataSetContainers = new ArrayList<DataSetContainer>();
-        subDataSetContainers.add(subContainer);
-    }
+//    public void addContainer(DataSetContainer subContainer) {
+//        if(subDataSetContainers == null) subDataSetContainers = new ArrayList<DataSetContainer>();
+//        subDataSetContainers.add(subContainer);
+//    }
 
     public void addContainerAll(List<DataSetContainer> subContainers) {
         if(subDataSetContainers == null) subDataSetContainers = new ArrayList<DataSetContainer>();
@@ -52,10 +54,10 @@ public class DataSetContainer implements IDataSet{
 //        elementList.addAll(subContainers);
     }
 
-    public void addData(DataSetInstance data) {
-        if(datas == null) datas = new ArrayList<DataSetInstance>();
-        datas.add(data);
-    }
+//    public void addData(DataSetInstance data) {
+//        if(datas == null) datas = new ArrayList<DataSetInstance>();
+//        datas.add(data);
+//    }
 
     public void addDataAll(List<DataSetInstance> data) {
         if(datas == null) datas = new ArrayList<DataSetInstance>();
@@ -85,6 +87,18 @@ public class DataSetContainer implements IDataSet{
         return node;
     }
 
+    public IDataSet cloneBean() {
+        DataSetContainer dataSetContainer = new DataSetContainer();
+        dataSetContainer.setNode(node);
+        List<IDataSet> newElementList = new ArrayList<IDataSet>();
+        for (IDataSet iDataSet : this.elementList) {
+            newElementList.add(iDataSet.cloneBean());
+        }
+        dataSetContainer.setElementList(newElementList);
+        dataSetContainer.setVirtualContainer(virtualContainer);
+        return dataSetContainer;
+    }
+
     public void setNode(Node node) {
         this.node = node;
     }
@@ -103,5 +117,13 @@ public class DataSetContainer implements IDataSet{
 
     public void setDataGroups(List<DataSetGroup> dataGroups) {
         this.dataGroups = dataGroups;
+    }
+
+    public boolean isVirtualContainer() {
+        return virtualContainer;
+    }
+
+    public void setVirtualContainer(boolean virtualContainer) {
+        this.virtualContainer = virtualContainer;
     }
 }

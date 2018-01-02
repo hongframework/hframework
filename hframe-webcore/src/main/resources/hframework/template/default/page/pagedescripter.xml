@@ -106,6 +106,9 @@
             <!--</events>-->
         </element>
     </pagetemplate>
+    <pagetemplate id="container" path="container.vm" parent-id = "default" name="动态页面" type="forward">
+        <element id="container" type="component"  container="span12"/>
+    </pagetemplate>
     <pagetemplate id="apihome" path="container.vm" parent-id = "default" name="API接口文档" type="forward">
         <element id="dynTree" type="component" event-extend="false" container="span3">
             <events>

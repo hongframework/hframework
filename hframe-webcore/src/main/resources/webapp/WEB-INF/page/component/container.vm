@@ -1,16 +1,46 @@
+<form id="GLOBAL_TEMP_FORM" style="display:none;"></form>
 <div class="box span12 hfcontainer" id='$container.id'  module="$module" page="$page" param="$!container.param" path="$!filePath" component="$container.component" style="border: 1px solid #B1D2EC">
     #set($isPop = true)
     #set($elements = $container.modelMap.elements)
     #set($style ="margin-bottom:5px;")
 ##    $fileContainer.dataGroups.get(0).elementMap
 
+
+
+    #if($helperTags)
+        #foreach($tagEntry in $helperTags.entrySet())
+        <div class="row-fluid" dc="${tagEntry.key}_helpTag" style="display: none">
+            <div class="city-select-content">
+                <div class="city-select" style="display: block;">
+                    #foreach($labelEntry in ${tagEntry.value.entrySet()})
+                    <dl class="clearfix">
+                        <dt style="width: 5em"><b>$labelEntry.key</b></dt>
+                        <dd  style="margin-left: 5.5em">
+                            #foreach($itemEntry in ${labelEntry.value.entrySet()})
+                            <a title="${itemEntry.key}" helper-index="${itemEntry.value}" class="">${itemEntry.key}</a>
+                            #end
+                        </dd>
+                    </dl>
+                    #end
+                </div>
+            </div>
+        </div>
+        #end
+    #end
+
+
 ##    $container.dataSet
     #set($cnt = 0)
     #foreach($element in $elements.entrySet())
         #set($cnt = $cnt + 1)
         #set($compData = $fileContainer.dataGroups.get(0).elementMap.get($element.value.dataSet))
-        <div class="row-fluid" dc="$element.value.dc">
+        #set($helpCompData = $helperFileContainer.dataGroups.get(0).elementMap.get($element.value.dataSet))
 
+        <div class="row-fluid" dc="$element.value.dc"
+            #if($element.value.component == "mutexContainer"
+            || $element.value.component == "flatContainer"
+            || $element.value.component == "virtualContainer")  #end >
+            #set($jsonObject = $element.value)
             #if($element.value.component == "cForm")
                 #set($form = $element.value)
                 #set($form.data = $compData.one)
@@ -30,6 +60,8 @@
             #elseif($element.value.component == "eList")
                 #set($list = $element.value)
                 #set($list.data = $compData.componentData.data)
+                #set($list.helperData = $helperFileContainer.componentData.data)
+                #set($list.dataIsEmpty = $compData.componentData.dataIsEmpty)
                 #parse("component/editList.vm")
             #elseif($element.value.component == "qList")
                 #set($list = $element.value)
@@ -59,6 +91,11 @@
                                     #parse("component/mutexContainer.vm")
                                 </div>
                             #end
+                            #foreach($curDataGroup in $helpCompData.dataGroups)
+                                <div class="tab-pane helper-div" id="$curDataGroup.name" style="display: none">
+                                    #parse("component/mutexContainer.vm")
+                                </div>
+                            #end
 ##                            <div class="tab-pane" id="newnode$cnt">
 ##                                #set($curDataGroup ="")
 ##                                #parse("component/mutexContainer.vm")
@@ -73,6 +110,61 @@
                         </div>
                     #end
                 </div>
+            #elseif($element.value.component == "flatContainer")
+                #set($container = $element.value)
+                <div class="box span12" id='$container.id'  module="$module" page="$page" param="$!container.param" component="$container.component" style="$!style">
+                    <div class="box-header">
+                        <h2><i class="icon-th"></i>$container.title</h2>
+                        <div class="box-icon">
+                            <a href="#" class="btn-setting"><i class="icon-wrench"></i></a>
+                            <a href="#" class="btn-minimize"><i class="icon-chevron-up"></i></a>
+                            <a href="#" class="btn-close"><i class="icon-remove"></i></a>
+                        </div>
+                    </div>
+                    <div class="box-content">
+                    #foreach($curDataGroup in $compData.dataGroups)
+                        <div class="row-fluid" id="$curDataGroup.name" style="border: 1px solid #ACD6FF;padding-left: 10px;margin-bottom: 5px;">
+                            #parse("component/mutexContainer.vm")
+                        </div>
+                    #end
+                    #foreach($curDataGroup in $helpCompData.dataGroups)
+                        <div class="row-fluid helper-div" id="$curDataGroup.name" style="border: 1px solid #ACD6FF;padding-left: 10px;margin-bottom: 5px;display: none">
+                            #parse("component/mutexContainer.vm")
+                        </div>
+                    #end
+                    </div>
+                    #if($container.EOF)
+                        <div class="form-actions" align="center">
+                            #foreach($item in $container.EOF)
+                                $container.component
+                            #end
+                        </div>
+                    #end
+                </div>
+            #elseif($element.value.component == "virtualContainer")
+                #set($container = $element.value)
+                #set($elements = $container.modelMap.elements)
+                #set($isfirst = true)
+                #foreach($element in $elements.entrySet())
+                    #if(!$element.value.isDefaultComponent)
+                    <div class="row-fluid" dc="$element.value.dc">
+                        #if($element.value.component == "eList")
+                            #if($isfirst)
+                                #set($list = $element.value)
+                                #set($list.data =  $compData.elementList.get(0).componentData.data)
+                                #set($list.helperData = $helpCompData.elementList.get(0).componentData.data)
+                                #set($list.dataIsEmpty = $compData.elementList.get(0).componentData.dataIsEmpty)
+                            #end
+                            #set($jsonObject = $element.value)
+                            #parse("component/editList.vm")
+                        #else
+                            #set($jsonObject = $element.value)
+                            #parse("$element.value.vmpath")
+                        #end
+                    </div>
+                    #set($isfirst = false)
+                    #end
+                #end
             #end
         </div>
     #end
