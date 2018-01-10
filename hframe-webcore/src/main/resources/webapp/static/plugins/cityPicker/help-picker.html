@@ -9,7 +9,7 @@
           content="中国, 省份, 城市, 行政区, 省市区, 三级联动, 地址选择器, HTML, CSS, JS, JavaScript, jQuery plugin, province, city, district, pick, picker, picking, front-end, frontend, web development">
     <meta name="author" content="Tao Shi">
     <title>city-picker</title>
-    <link href="//cdn.bootcss.com/bootstrap/3.3.6/css/bootstrap.css" rel="stylesheet">
+    <link href="http://cdn.bootcss.com/bootstrap/3.3.6/css/bootstrap.css" rel="stylesheet">
     <link href="css/city-picker.css" rel="stylesheet">
     <link href="css/main.css" rel="stylesheet">
 
@@ -69,11 +69,55 @@
 
     <h5>Demo:</h5>
 
-    <form class="form-inline">
-        <div style="position: relative;">
-            <input class="form-control" readonly type="text" data-toggle="city-picker">
+    <div class="row-fluid" style="padding-bottom:10px;position: relative;">
+        <button class="btn hfhref btn-primary switch-button switch-hidden " onclick="javascript:void(0)" params="" action="{&quot;componentControl&quot;:{&quot;param&quot;:&quot;{\&quot;visible\&quot;:\&quot;auto\&quot;,\&quot;event\&quot;:\&quot;component.row.add\&quot;,\&quot;show_condition\&quot;:\&quot;IS_NOT_EMPTY\&quot;}&quot;,&quot;targetId&quot;:&quot;lark_api_xeditor#api.parameters.parameter&quot;},&quot;scrollIntoView&quot;:{&quot;param&quot;:&quot;{}&quot;,&quot;targetId&quot;:&quot;lark_api_xeditor#api.parameters.parameter&quot;}}" title="添加请求参数">添加请求参数</button>
+        <button class="btn hfhref btn-primary switch-button" data-toggle="helper-picker"  onclick="javascript:void(0)" params="" action="{&quot;componentControl&quot;:{&quot;param&quot;:&quot;{\&quot;visible\&quot;:\&quot;auto\&quot;,\&quot;event\&quot;:\&quot;component.row.add\&quot;,\&quot;show_condition\&quot;:\&quot;IS_NOT_EMPTY\&quot;}&quot;,&quot;targetId&quot;:&quot;lark_api_xeditor#api.prehandler&quot;},&quot;scrollIntoView&quot;:{&quot;param&quot;:&quot;{}&quot;,&quot;targetId&quot;:&quot;lark_api_xeditor#api.prehandler&quot;}}" title="添加前置处理器" value="[{}]">添加前置处理器</button>
+        <button class="btn hfhref btn-primary switch-button" onclick="javascript:void(0)" params="" action="{&quot;componentControl&quot;:{&quot;param&quot;:&quot;{\&quot;visible\&quot;:\&quot;auto\&quot;,\&quot;event\&quot;:\&quot;toggle\&quot;,\&quot;show_condition\&quot;:\&quot;IS_NOT_EMPTY\&quot;}&quot;,&quot;targetId&quot;:&quot;lark_api_xeditor#api.precheck&quot;},&quot;scrollIntoView&quot;:{&quot;param&quot;:&quot;{}&quot;,&quot;targetId&quot;:&quot;lark_api_xeditor#api.precheck&quot;}}" title="前置检查">前置检查</button>
+        <button class="btn hfhref btn-primary switch-button" onclick="javascript:void(0)" params="" action="{&quot;componentControl&quot;:{&quot;param&quot;:&quot;{\&quot;visible\&quot;:\&quot;auto\&quot;,\&quot;event\&quot;:\&quot;component.row.add\&quot;,\&quot;show_condition\&quot;:\&quot;IS_NOT_EMPTY\&quot;}&quot;,&quot;targetId&quot;:&quot;lark_api_xeditor#api.handlers.handler&quot;},&quot;scrollIntoView&quot;:{&quot;param&quot;:&quot;{}&quot;,&quot;targetId&quot;:&quot;lark_api_xeditor#api.handlers.handler&quot;}}" title="添加处理器">添加处理器</button>
+        <button class="btn hfhref btn-primary switch-button" onclick="javascript:void(0)" params="" action="{&quot;componentControl&quot;:{&quot;param&quot;:&quot;{\&quot;visible\&quot;:\&quot;auto\&quot;,\&quot;event\&quot;:\&quot;component.row.add\&quot;,\&quot;show_condition\&quot;:\&quot;IS_NOT_EMPTY\&quot;}&quot;,&quot;targetId&quot;:&quot;lark_api_xeditor#api.result&quot;},&quot;scrollIntoView&quot;:{&quot;param&quot;:&quot;{}&quot;,&quot;targetId&quot;:&quot;lark_api_xeditor#api.result&quot;}}" title="添加结果">添加结果</button>
+    </div>
+
+    <div class="row-fluid" dc="lark_api_xeditor#api.prehandler_helpTag" style="display: none;">
+        <div class="city-select-content">
+            <div class="city-select" style="display: block;">
+                <dl class="clearfix">
+                    <dt style="width: 5em"><b>认证类</b></dt>
+                    <dd style="margin-left: 5.5em">
+                        <a title="验签认证" data-code="0" class="">验签认证</a>
+                        <a title="TOKEN解析" data-code="1" class="">TOKEN解析</a>
+                    </dd>
+                </dl>
+            </div>
+            <div class="city-select" style="display: block;">
+                <dl class="clearfix">
+                    <dt style="width: 5em"><b>认证类</b></dt>
+                    <dd style="margin-left: 5.5em">
+                        <a title="验签认证" data-code="0" class="">验签认证</a>
+                        <a title="TOKEN解析" data-code="1" class="">TOKEN解析</a>
+                    </dd>
+                </dl>
+            </div>
+            <div class="city-select" style="display: block;">
+                <dl class="clearfix">
+                    <dt style="width: 5em"><b>认证类</b></dt>
+                    <dd style="margin-left: 5.5em">
+                        <a title="验签认证" data-code="0" class="">验签认证</a>
+                        <a title="TOKEN解析" data-code="1" class="">TOKEN解析</a>
+                    </dd>
+                </dl>
+            </div>
+            <div class="city-select" style="display: block;">
+                <dl class="clearfix">
+                    <dt style="width: 5em"><b>认证类</b></dt>
+                    <dd style="margin-left: 5.5em">
+                        <a title="验签认证" data-code="0" class="">验签认证</a>
+                        <a title="TOKEN解析" data-code="1" class="">TOKEN解析</a>
+                    </dd>
+                </dl>
+            </div>
         </div>
-    </form>
+    </div>
+
 
     <h3>Level</h3>
     <h5>HTML:</h5>
@@ -222,10 +266,10 @@
 </footer>
 
 <!-- Scripts -->
-<script src="//cdn.bootcss.com/jquery/1.11.3/jquery.js"></script>
-<script src="//cdn.bootcss.com/bootstrap/3.3.6/js/bootstrap.js"></script>
+<script src="http://cdn.bootcss.com/jquery/1.11.3/jquery.js"></script>
+<script src="http://cdn.bootcss.com/bootstrap/3.3.6/js/bootstrap.js"></script>
 <script src="js/city-picker.data.js"></script>
-<script src="js/city-picker.js"></script>
+<script src="js/helper-picker.js"></script>
 <script src="js/main.js"></script>
 </body>
 </html>

@@ -1,0 +1,125 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Chosen: A jQuery Plugin by Harvest to Tame Unwieldy Select Boxes</title>
+  <link rel="stylesheet" href="docsupport/style.css">
+  <link rel="stylesheet" href="docsupport/prism.css">
+  <link rel="stylesheet" href="chosen.css">
+  <style  type="text/css">
+    .chosen-container.chosen-container-multi{
+      margin-bottom:10px;
+    }
+    .cur-chosen-container .chosen-choices{
+      border: 3px solid darkgrey;
+    }
+  </style>
+</head>
+<body>
+  <div id="container">
+    <div id="content">
+      <a class="input-block-link-a" title="验签认证" data-code="0" class="">新手用户</a>
+    <h2><a name="multiple-select" class="anchor" href="#multiple-select">Multiple Select</a></h2>
+      <a ></a>
+      <div class="side-by-side clearfix">
+          <div class="chosen-container chosen-container-multi if-container cur-chosen-container" title="" style="width: 100%;">
+            <div id="first-if-label" style="float:left;width:5%;text-align: left;color: red;visibility: hidden"> 条件:</div>
+            <ul class="chosen-choices" style="float: left; width: 90%;">
+            <li class="search-field">
+              <input class="chosen-search-input default" type="text" autocomplete="off" value=" " style="width: 31.6667px;">
+            </li>
+          </ul><a class="input-block-add" style="padding-left: 10px;">@</a>
+          </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="add-if-template" style="display: none">
+    <div class="chosen-container chosen-container-multi then-container" title="" style="width: 100%;">
+      <div style="float:left;width:5%;text-align: left;color: red;"> 条件:</div>
+      <ul class="chosen-choices" style="float: left; width: 90%;">
+      <li class="search-field">
+        <input class="chosen-search-input default" type="text" autocomplete="off" value=" " style="width: 31.6667px;">
+      </li>
+    </ul><a class="input-block-add" style="padding-left: 10px;">＋</a>
+      <a class="input-block-add" style="padding-left: 10px;">-</a>
+    </div>
+  </div>
+  <div id="add-then-template" style="display: none">
+    <div class="chosen-container chosen-container-multi if-container" title="" style="width: 100%;">
+      <div style="float:left;width:10%;text-align: left;color: blueviolet;"> 结果:</div><ul class="chosen-choices" style="float: left; width: 85%;">
+        <li class="search-field">
+          <input class="chosen-search-input default" type="text" autocomplete="off" value=" " style="width: 31.6667px;">
+        </li>
+    </ul>
+      <!--<a class="input-block-add" style="padding-left: 10px;">＋</a>-->
+    </div>
+    <div id="add-else-template" style="display: none">
+      <div class="chosen-container chosen-container-multi then-container" title="" style="width: 100%;">
+        <div style="float:left;width:5%;text-align: left;color: red;"> 其他:</div>
+        <ul class="chosen-choices" style="float: left; width: 90%;" disabled="disabled">
+          <li class="search-field">
+            <input class="chosen-search-input default" type="text" autocomplete="off" value=" " style="width: 31.6667px;">
+          </li>
+        </ul>
+      </div>
+  </div>
+
+
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.js" type="text/javascript"></script>
+  <script src="chosen.jquery.js" type="text/javascript"></script>
+  <script src="docsupport/prism.js" type="text/javascript" charset="utf-8"></script>
+  <script src="docsupport/init.js" type="text/javascript" charset="utf-8"></script>
+
+  <div class="oss-bar">
+    <ul>
+      <li><a class="fork" href="https://github.com/harvesthq/chosen">Fork on Github</a></li>
+      <li><a class="harvest" href="http://www.getharvest.com/">Built by Harvest</a></li>
+    </ul>
+  </div>
+
+<script type="text/javascript">
+//  $(".chosen-select").chosen({width: "1200"});
+//  $(".chosen-container.chosen-container-multi").css("width","100%");
+//  $(".chosen-container.chosen-container-multi .chosen-drop").remove();
+//  $(".chosen-container.chosen-container-multi .chosen-choices").css("float", "left").css("width", "95%");
+//  $(".chosen-container.chosen-container-multi .chosen-choices").after("<a class='input-block-add' style='padding-left: 10px;'>＋</a>");
+  $(".input-block-link-a").click(function(){
+      var $search_container = $(".chosen-container.chosen-container-multi.cur-chosen-container .chosen-choices .search-field")
+      var $choice = $('<li class="search-choice"><span>Aland Islands</span></li>');
+      var $close_link = $('<a />', {
+        "class": 'search-choice-close',
+        'data-option-array-index': 6
+      });
+      $close_link.on('click.chosen', (function(evt) {
+        evt.preventDefault();
+        evt.stopPropagation();
+        $(evt.target).parents('li').first().remove();
+      }));
+      $choice.append($close_link);
+      $search_container.before($choice)
+  });
+
+  $(".chosen-container.chosen-container-multi").on("click", function(){
+    $(".chosen-container.chosen-container-multi.cur-chosen-container").removeClass("cur-chosen-container");
+    $(this).addClass("cur-chosen-container");
+  });
+  $(".input-block-add").on("click", function(){
+    var $ifInput = $("#add-if-template").children(":first").clone();
+    var $thenInput = $("#add-then-template").children(":first").clone();
+    var $elseInput = $("#add-else-template").children(":first").clone();
+    if($(".chosen-container.chosen-container-multi.if-container:visible").length == 1) {
+      $("#first-if-label").css("visibility", "visible");
+      $(".chosen-container.chosen-container-multi:visible:last").after($thenInput);
+      $(".chosen-container.chosen-container-multi:visible:last").after($elseInput);
+      $(".chosen-container.chosen-container-multi:visible:last").after($thenInput.clone());
+    }else{
+      $(".chosen-container.chosen-container-multi.else-container:visible:last").before($thenInput);
+      $(".chosen-container.chosen-container-multi.else-container:visible:last").before($ifInput);
+    }
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,173 @@
+#if($isPop)
+    #parse("blank_startpart.vm")
+#else
+    #parse("default_startpart.vm")
+#end
+<style  type="text/css">
+    .rule-edit-btn{
+        margin-left: 5px;
+    }
+    .rule-edit-title{
+        margin-left:5px;
+    }
+    .rule-edit-area select{
+        padding:5px;
+        text-align: center;
+        width: inherit;
+    }
+    .rule-edit-hidden{
+        display: none;
+    }
+    .rule-express-part{
+        margin-left: 5px;;
+    }
+
+    .chosen-container.chosen-container-multi{
+        margin-bottom:10px;
+    }
+    .cur-chosen-container .chosen-choices{
+        border: 3px solid darkgrey;
+    }
+
+    .city-select-wrap .city-select-content{
+        padding: 15px 0px 15px 0px;
+    }
+
+
+    .chosen-container-multi .chosen-choices{
+        height: 37px;
+    }
+
+    .chosen-container-multi .chosen-choices li.search-choice{
+        padding-top: 5px;
+        height: 27px;;
+    }
+
+
+    .chosen-container-multi .chosen-choices li.search-choice .search-choice-close {
+        top:7px;
+    }
+
+</style>
+
+
+<!-- Content -->
+<div class="container">
+    <h3>表达式预览：</h3>
+    <input type="hidden" id="objectId" value="$!{objectId}">
+    <pre id="express-readable"></pre>
+    <pre  id="express">$!{dynDataString}</pre>
+    <h3>规则编辑：</h3>
+    <div class="city-picker-dropdown" style="position: inherit; width: 100%; display: block;">
+        <div class="city-select-wrap">
+            <div class="city-select-content">
+                <div class="city-select" style="display: block;">
+                    <dl class="clearfix">
+                        <dt style="width: 5em"><b>当前</b></dt>
+                        <dd style="margin-left: 5.5em">
+                            <a title="验签认证" data-code="balance" class="" edit-json='{"var":["余额","$money"],"symbol":"BOOLEAN","value":["NUMBER", "MONEY_UNIT"]}'>余额</a>
+                            <a title="TOKEN解析" data-code="frezen" class="">冻结金额</a>
+                            <a title="TOKEN解析" data-code="1" class="">在投金额</a>
+                        </dd>
+                    </dl>
+                </div>
+                <div class="city-select" style="display: block;">
+                    <dl class="clearfix">
+                        <dt style="width: 5em"><b>历史</b></dt>
+                        <dd style="margin-left: 5.5em">
+                            <a title="验签认证" data-code="0" class="" edit-json='{"var":["累计投资次数","$investCount"],"symbol":"BOOLEAN","value":["NUMBER", "次"]}'>累计投资次数</a>
+                            <a title="TOKEN解析" data-code="1" class="" edit-json='{"var":["最后一次提现时间","$last_withdrawed_time"],"symbol":"PASS-DATE","value":["NUMBER", "DATE_UNIT"]}'>最后提现时间</a>
+                            <a title="TOKEN解析" data-code="1" class="">最佳投资金额</a>
+                            <a title="TOKEN解析" data-code="1" class="">最佳投资期限</a>
+                        </dd>
+                    </dl>
+                </div>
+                <div class="city-select" style="display: block;">
+                    <dl class="clearfix">
+                        <dt style="width: 5em"><b>未来</b></dt>
+                        <dd style="margin-left: 5.5em">
+                            <a title="TOKEN解析" data-code="1" class="" edit-json='{"var":["未来最近一笔回款时间","$last_withdraw_time"],"symbol":"FUTURE-DATE","value":["NUMBER", "DATE_UNIT"]}'>未来最近一笔回款时间</a>
+                        </dd>
+                    </dl>
+                </div>
+                <div class="city-select" style="display: block;">
+                    <dl class="clearfix">
+                        <dt style="width: 5em"><b>临时</b></dt>
+                        <dd style="margin-left: 5.5em">
+                            <a title="验签认证" data-code="0" class="">当前回款金额</a>
+                            <a title="TOKEN解析" data-code="1" class="">当前第几次回款</a>
+                        </dd>
+                    </dl>
+                </div>
+                <div class="city-select" style="display: block;">
+                    <dl class="clearfix">
+                        <dt style="width: 5em"><b>特征</b></dt>
+                        <dd style="margin-left: 5.5em">
+                            <a title="验签认证" data-code="0" class="">新手用户</a>
+                            <a title="TOKEN解析" data-code="1" class="">高危用户</a>
+                            <a title="TOKEN解析" data-code="1" class="">离网用户</a>
+                            <a title="TOKEN解析" data-code="1" class="">高净值用户</a>
+                            <a title="TOKEN解析" data-code="1" class="">羊毛党</a>
+                        </dd>
+                    </dl>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="side-by-side clearfix">
+        <div class="chosen-container chosen-container-multi if-container cur-chosen-container" title="" style="width: 100%;">
+            <a class="input-block-add" style="width: 1%; float:left;">@</a><div id="first-if-label" style="float:left;width:4%;text-align: left;color: red;visibility: hidden"> 条件:</div>
+            <ul class="chosen-choices" style="float: left; width: 95%;">
+                <li class="search-field">
+                    <input class="chosen-search-input default" type="text" autocomplete="off" value=" " style="width: 31.6667px;">
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <div id="add-if-template" style="display: none">
+        <div class="chosen-container chosen-container-multi if-container" title="" style="width: 100%;">
+            <a class="input-block-delete" style="width: 1%; float:left;">-</a><div style="float:left;width:4%;text-align: left;color: red;"> 条件:</div>
+            <ul class="chosen-choices" style="float: left; width: 95%;">
+                <li class="search-field">
+                    <input class="chosen-search-input default" type="text" autocomplete="off" value=" " style="width: 31.6667px;">
+                </li>
+            </ul>
+        </div>
+    </div>
+    <div id="add-then-template" style="display: none">
+        <div class="chosen-container chosen-container-multi then-container" title="" style="width: 100%;">
+            <div style="float:left;width:10%;text-align: left;color: blueviolet;"> 结果:</div><ul class="chosen-choices" style="float: left; width:90%;">
+            <li class="search-field">
+                <input class="chosen-search-input default" type="text" autocomplete="off" value=" " style="width: 31.6667px;">
+            </li>
+        </ul>
+            <!--<a class="input-block-add" style="padding-left: 10px;">＋</a>-->
+        </div>
+    </div>
+    <div id="add-else-template" style="display: none">
+        <div class="chosen-container chosen-container-multi else-container" title="" style="width: 100%;">
+            <div style="float:left;width:5%;text-align: left;color: red;"> 其他:</div>
+            <input  class="chosen-choices" style="float: left; width: 95%;" disabled="disabled">
+##                <ul class="chosen-choices" style="float: left; width: 95%;" disabled="disabled">
+##                    <li class="search-field">
+##                        <input class="chosen-search-input default" type="text" autocomplete="off" value=" " style="width: 31.6667px;">
+##                    </li>
+##                </ul>
+        </div>
+    </div>
+
+    <div class="row-fluid">
+        <div class="form-actions" align="center">
+            <button id="submitBtn" class="btn hfhref btn-primary" onclick="javascript:void(0)" >提交</button>
+        </div>
+    </div>
+</div>
+
+#if($isPop)
+    #parse("blank_endpart.vm")
+#else
+    #parse("default_endpart.vm")
+#end
+<script src="$staticResourcePath/app/js/rule-edit.js"></script>

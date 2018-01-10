@@ -32,6 +32,9 @@ public class Page   {
     @XStreamAlias("page-template")
 	private String pageTemplate;
     @XStreamAsAttribute
+    @XStreamAlias("vmpath")
+    private String vmPath;
+    @XStreamAsAttribute
     @XStreamAlias("data-set")
 	private String dataSet;
     @XStreamAsAttribute
@@ -116,5 +119,13 @@ public class Page   {
 
     public void setModule(Module module) {
         this.module = module;
+    }
+
+    public String getVmPath() {
+        return vmPath;
+    }
+
+    public void setVmPath(String vmPath) {
+        this.vmPath = vmPath;
     }
 }

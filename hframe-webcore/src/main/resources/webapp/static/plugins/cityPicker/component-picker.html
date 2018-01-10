@@ -9,7 +9,7 @@
           content="中国, 省份, 城市, 行政区, 省市区, 三级联动, 地址选择器, HTML, CSS, JS, JavaScript, jQuery plugin, province, city, district, pick, picker, picking, front-end, frontend, web development">
     <meta name="author" content="Tao Shi">
     <title>city-picker</title>
-    <link href="//cdn.bootcss.com/bootstrap/3.3.6/css/bootstrap.css" rel="stylesheet">
+    <link href="http://cdn.bootcss.com/bootstrap/3.3.6/css/bootstrap.css" rel="stylesheet">
     <link href="css/city-picker.css" rel="stylesheet">
     <link href="css/main.css" rel="stylesheet">
 
@@ -71,9 +71,49 @@
 
     <form class="form-inline">
         <div style="position: relative;">
-            <input class="form-control" readonly type="text" data-toggle="city-picker">
+            <button class="btn hfhref btn-primary switch-button switch-hidden"  data-toggle="component-picker" data-code="lark_api_xeditor#api.parameters.parameter.checker" onclick="javascript:void(0)" params="" action="{&quot;componentControl&quot;:{&quot;param&quot;:&quot;{\&quot;visible\&quot;:\&quot;auto\&quot;,\&quot;event\&quot;:\&quot;component.row.add\&quot;,\&quot;show_condition\&quot;:\&quot;IS_NOT_EMPTY\&quot;}&quot;,&quot;targetId&quot;:&quot;lark_api_xeditor#api.parameters.parameter&quot;},&quot;scrollIntoView&quot;:{&quot;param&quot;:&quot;{}&quot;,&quot;targetId&quot;:&quot;lark_api_xeditor#api.parameters.parameter&quot;}}" title="添加请求参数">添加请求参数</button>
+            <!--<input class="form-control" readonly type="text" data-toggle="component-picker" data-code="lark_api_xeditor#api.parameters.parameter.checker" >-->
         </div>
     </form>
+
+    <div class="row-fluid" dc="lark_api_xeditor#api.parameters.parameter.checker" style="">
+        <div class="city-select-content">
+            <div class="city-select" style="display: block;">
+                <dl class="clearfix">
+                    <dt style="width: 5em"><b>校验信息</b></dt>
+                    <dd  style="margin-left: 5.5em">
+                        <a title="用户" data-code="9" class="">用户</a>
+                        <a title="组织" data-code="10" class="">组织</a>
+                        <a title="角色" data-code="11" class="">角色</a>
+                        <a title="菜单" data-code="12" class="">菜单</a>
+                        <a title="用户授权" data-code="13" class="">用户授权</a>
+                        <a title="角色授权" data-code="14" class="">角色授权</a>
+                        <a title="字典" data-code="15" class="">字典</a>
+                        <a title="字典项" data-code="16" class="">字典项</a>
+                    </dd>
+                </dl>
+                <dl class="clearfix">
+                    <dt style="width: 5em"><b>校验信息</b></dt>
+                    <dd  style="margin-left: 5.5em">
+                        <a title="用户" data-code="9" class="">用户</a>
+                        <a title="组织" data-code="10" class="">组织</a>
+                        <a title="角色" data-code="11" class="">角色</a>
+                        <a title="菜单" data-code="12" class="">菜单</a>
+                        <a title="用户授权" data-code="13" class="">用户授权</a>
+                        <a title="角色授权" data-code="14" class="">角色授权</a>
+                        <a title="字典" data-code="15" class="">字典</a>
+                        <a title="字典项" data-code="16" class="">字典项</a>
+                    </dd>
+                </dl>
+            </div>
+            <div class="city-select city" data-count="city" style="display: none;">
+                <dl class="clearfix">
+                    <dd></dd>
+                </dl>
+            </div>
+        </div>
+    </div>
+
 
     <h3>Level</h3>
     <h5>HTML:</h5>
@@ -222,10 +262,10 @@
 </footer>
 
 <!-- Scripts -->
-<script src="//cdn.bootcss.com/jquery/1.11.3/jquery.js"></script>
-<script src="//cdn.bootcss.com/bootstrap/3.3.6/js/bootstrap.js"></script>
+<script src="http://cdn.bootcss.com/jquery/1.11.3/jquery.js"></script>
+<script src="http://cdn.bootcss.com/bootstrap/3.3.6/js/bootstrap.js"></script>
 <script src="js/city-picker.data.js"></script>
-<script src="js/city-picker.js"></script>
+<script src="js/component-picker.js"></script>
 <script src="js/main.js"></script>
 </body>
 </html>

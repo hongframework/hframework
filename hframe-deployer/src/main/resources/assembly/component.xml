@@ -17,6 +17,13 @@
 			<fileMode>0755</fileMode>
 		</fileSet>
 		<fileSet>
+			<directory>../extension/src/main/resources</directory>
+			<outputDirectory>/webapp</outputDirectory>
+			<includes>
+				<include>webapp/**</include>
+			</includes>
+		</fileSet>
+		<fileSet>
 			<directory>../basic/src/main/resources</directory>
 			<outputDirectory>conf</outputDirectory>
 			<includes>

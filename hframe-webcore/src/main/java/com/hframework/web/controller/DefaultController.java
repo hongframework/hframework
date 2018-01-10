@@ -81,6 +81,8 @@ import org.springframework.web.servlet.mvc.method.annotation.ServletRequestDataB
 import sun.misc.BASE64Encoder;
 
 import javax.annotation.Resource;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.beans.PropertyDescriptor;
@@ -514,6 +516,8 @@ public class DefaultController {
 //        return ResultData.error(ResultCode.UNKNOW);
 //    };
 
+
+
     /**
      * 数据保存
      * @return
@@ -568,12 +572,8 @@ public class DefaultController {
                     tmpArray.add(xml);
                     String tmpJson = tmpArray.toJSONString();
                     xml = tmpJson.substring(1, tmpJson.length() - 1);
-                    if(dataIdStr.startsWith("DATA-SET-REL://")) {
-                        String[] tableInfo = dataIdStr.substring("DATA-SET-REL://".length()).split("/");
-                        final String tableName = tableInfo[0];
-                        String xmlField = tableInfo[1];
-                        final String keyField = tableInfo[2];
-                        commonDataService.executeDBStructChange("update " + tableName + " set " + xmlField + " = " + xml + " where " + keyField + " = " + id);
+                    if(isDynDataInfo(dataIdStr)) {
+                        saveDynDataInfo(dataIdStr, id, xml);
                         return ResultData.success();
                     }else{
                         logger.info("write file : {} | {}", dataIdStr + "/" + id, xml);
@@ -663,6 +663,44 @@ public class DefaultController {
         }
 
 //        return ResultData.error(ResultCode.UNKNOW);
+    }
+
+    /**
+     * 数据保存
+     * @return
+     */
+    @RequestMapping(value = "/ajaxSubmit.json")
+    @ResponseBody
+    public ResultData saveOneData(HttpServletRequest request,
+                               HttpServletResponse response){
+        String refererUrl = request.getHeader("referer");
+        String[] refererUrlInfo = Arrays.copyOfRange(refererUrl.split("[/]+"), 2, refererUrl.split("[/]+").length);
+        String module = refererUrlInfo[0];
+        String pageCode = refererUrlInfo[1].substring(0, refererUrlInfo[1].indexOf(".html"));
+        logger.debug("request referer : {},{},{}", refererUrl, module, pageCode);
+        try{
+            PageDescriptor pageInfo = WebContext.get().getPageInfo(module, pageCode);
+            Map<String, ComponentDescriptor> components = pageInfo.getComponents();
+
+
+            String id = request.getParameter("id");
+            String value = request.getParameter("value");
+
+            if(StringUtils.isNotBlank(id)){
+                for (ComponentDescriptor componentDescriptor : components.values()) {
+                    if(!componentDescriptor.isDefaultComponent() && isDynDataInfo(componentDescriptor.getDataId())) {
+                        saveDynDataInfo(componentDescriptor.getDataId(), id, value);
+                        return ResultData.success();
+                    }
+                }
+            }
+
+        }catch (Exception e) {
+            logger.error("error : ", e);
+            return ResultData.error(ResultCode.ERROR);
+        }
+
+        return ResultData.error(ResultCode.UNKNOW);
     }
 
 
@@ -996,7 +1034,7 @@ public class DefaultController {
             return error404(request,response);
         }
 
-        Map<String, Object> extendData = getExtendData("/extend/" + pageCode + ".json", request);
+        Map<String, Object> extendData = getExtendData("/extend/" + pageCode + ".json", request, response, mav);
 
         Map<String, ElementDescriptor> elements = pageInfo.getElements();
         for (String key : elements.keySet()) {
@@ -1048,6 +1086,7 @@ public class DefaultController {
                      action = type;
                  }
 
+
                 JSONObject jsonObject = null;
                 String componentQueryString = null;
                 if("pageflow".equals(componentDescriptor.getMapper().getDataAuth())) {
@@ -1062,6 +1101,12 @@ public class DefaultController {
                     jsonObject = parseFileComponent(type, request,response, dataSetCode, module, componentDescriptor, mav);
                 }else if("SYSTEM_EMPTY_DATASET".equals(dataSetCode)) {
                     jsonObject = componentDescriptor.getJson();
+                    if(isDynDataInfo(componentDescriptor.getDataId())){
+                        String dynDataString = getDynDataInfo(componentDescriptor.getDataId(), request);
+                        jsonObject.put("dynDataString", dynDataString);
+                        mav.addObject("dynDataString", dynDataString);
+                        mav.addObject("objectId", request.getParameter("id"));
+                    }
                 }else if (extendData != null && extendData.containsKey(componentDescriptor.getDataId())) {
                     ResultData resultData = ResultData.success(extendData.get(componentDescriptor.getDataId()));
                     resetResultMessage(resultData, WebContext.get().getProgram().getCode(), moduleCode, dataSetCode, action);
@@ -1401,11 +1446,46 @@ public class DefaultController {
             mav.setViewName("component/editList");
 
         }else {
-            mav.setViewName(pageInfo.getPageTemplate().getPath().substring(0,pageInfo.getPageTemplate().getPath().indexOf(".vm")));
+            String vmPath = StringUtils.isNotBlank(pageInfo.getPage().getVmPath()) ? pageInfo.getPage().getVmPath() : pageInfo.getPageTemplate().getPath();
+            mav.setViewName(vmPath.substring(0, vmPath.indexOf(".vm")));
         }
 
         return mav;
 
+    }
+
+    public  boolean isDynDataInfo(String dataIdStr) throws Exception {
+        return dataIdStr !=  null && dataIdStr.startsWith("DATA-SET-REL://");
+    }
+
+    public  boolean saveDynDataInfo(String dataIdStr, String id, String content) throws Exception {
+        String[] tableInfo = dataIdStr.substring("DATA-SET-REL://".length()).split("/");
+        final String tableName = tableInfo[0];
+        String targetField = tableInfo[1];
+        final String keyField = tableInfo[2];
+        commonDataService.executeDBStructChange("update " + tableName + " set " + targetField + " = '" + content + "' where " + keyField + " = " + id);
+        return true;
+    }
+    public  String getDynDataInfo(String dataIdStr, final HttpServletRequest request) throws Exception {
+        if(dataIdStr.startsWith("DATA-SET-REL://")){
+            String[]  tableInfo = dataIdStr.substring("DATA-SET-REL://".length()).split("/");
+            final String tableName = tableInfo[0];
+            String targetField = tableInfo[1];
+            final String keyField = tableInfo[2];
+            Map<String, Object> map = commonDataService.selectDynamicTableDataOne(new HashMap() {{
+                put("tableName", tableName);
+                put("condition", keyField + " =" + request.getParameter("id"));
+            }});
+
+            if(map.get(targetField) != null) {
+                if(map.get(targetField).getClass().isArray()){
+                    return new String((byte[])map.get(targetField));
+                }else {
+                    return String.valueOf(map.get(targetField));
+                }
+            }
+        }
+        return null;
     }
 
     private JSONObject parseFileComponent(String type, final HttpServletRequest request, HttpServletResponse response,
@@ -1419,23 +1499,7 @@ public class DefaultController {
                 String xmlContent = null;
                 if(StringUtils.isNotBlank(request.getParameter("id"))) {
                     if(dataIdStr.startsWith("DATA-SET-REL://")){
-                        String[]  tableInfo = dataIdStr.substring("DATA-SET-REL://".length()).split("/");
-                        final String tableName = tableInfo[0];
-                        String xmlField = tableInfo[1];
-                        final String keyField = tableInfo[2];
-                        Map<String, Object> map = commonDataService.selectDynamicTableDataOne(new HashMap() {{
-                            put("tableName", tableName);
-                            put("condition", keyField + " =" + request.getParameter("id"));
-                        }});
-
-                        if(map.get(xmlField) != null) {
-                            if(map.get(xmlField).getClass().isArray()){
-                                xmlContent = new String((byte[])map.get(xmlField));
-                            }else {
-                                xmlContent = String.valueOf(map.get(xmlField));
-                            }
-                        }
-
+                        xmlContent = getDynDataInfo(dataIdStr, request);
                     }else {
                         String filePath = dataIdStr + "/" + request.getParameter("id");
                         xmlContent =  FileUtils.readFile(filePath);
@@ -2298,7 +2362,7 @@ public class DefaultController {
 
     }
 
-    private Map<String, Object> getExtendData(String url , HttpServletRequest request) {
+    private Map<String, Object> getExtendData(String url, HttpServletRequest request, HttpServletResponse response, ModelAndView mav) {
         HandlerExecutionChain handler = null;
         if(urlMapping.size() == 0) {
             synchronized (DefaultController.class){
@@ -2319,7 +2383,18 @@ public class DefaultController {
         try {
             Object bean = ServiceFactory.getService(String.valueOf(handlerMethod.getBean()));
             Method method = handlerMethod.getMethod();
-            Object result = method.invoke(bean, request);
+            java.lang.Class<?>[] parameterTypes = method.getParameterTypes();
+            Object[] parameters = new Object[parameterTypes.length];
+            for (int i = 0; i < parameterTypes.length; i++) {
+                if(ServletRequest.class.isAssignableFrom(parameterTypes[i])) {
+                    parameters[i] = request;
+                }else if(ServletResponse.class.isAssignableFrom(parameterTypes[i])) {
+                    parameters[i] = response;
+                }else if(ModelAndView.class.isAssignableFrom(parameterTypes[i])){
+                    parameters[i] = mav;
+                }
+            }
+            Object result = method.invoke(bean, parameters);
             return (Map<String, Object>)((ResultData)result).getData();
 //            String lookupPath = requestMappingHandlerMapping.getUrlPathHelper().getLookupPathForRequest(request);
 //            HandlerMethod handlerMethod = requestMappingHandlerMapping.lookupHandlerMethod(lookupPath, request);

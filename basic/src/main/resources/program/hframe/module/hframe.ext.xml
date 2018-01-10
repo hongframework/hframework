@@ -45,6 +45,9 @@
         <!--</component>-->
         <component id="container" data-set="hffile/lark_api_xeditor"  dataid="DATA-SET-REL://cfg_runtime_api/content/id" />
     </page>
+    <page  id="rule_edit" name="Lark规则编辑" page-template="dynamic" vmpath="component/rule-edit.vm">
+        <component  id="virtualComponent" data-set="SYSTEM_EMPTY_DATASET"   path="component/rule-edit.vm" dataid="DATA-SET-REL://cfg_runtime_rule/expresssion/id"></component>
+    </page>
     <page id="general_entity_add" name="常用实体添加" page-template="dynamic" >
         <component id="qList" data-set="hframe/hfpm_program_cfg_auth_part" dataid="hfpmProgramCfgAuthPart" title="设置权限模型">
             <event name="save">

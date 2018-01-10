@@ -1,0 +1,390 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="A simple jQuery plugin for picking provinces, cities and districts of China.">
+    <meta name="keywords"
+          content="中国, 省份, 城市, 行政区, 省市区, 三级联动, 地址选择器, HTML, CSS, JS, JavaScript, jQuery plugin, province, city, district, pick, picker, picking, front-end, frontend, web development">
+    <meta name="author" content="Tao Shi">
+    <title>city-picker</title>
+    <link href="http://cdn.bootcss.com/bootstrap/3.3.6/css/bootstrap.css" rel="stylesheet">
+    <link href="css/city-picker.css" rel="stylesheet">
+    <link href="css/main.css" rel="stylesheet">
+    <style  type="text/css">
+        .rule-edit-btn{
+            margin-left: 5px;
+        }
+        .rule-edit-span{
+            margin-left:5px;
+        }
+        .rule-edit-area select{
+            padding:5px;
+            text-align: center;
+        }
+        .rule-edit-hidden{
+            display: none;
+        }
+        .rule-express-part{
+            margin-left: 5px;;
+        }
+    </style>
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+    <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+
+    <![endif]-->
+</head>
+<body>
+
+
+<!-- Content -->
+<div class="container">
+    <h3>表达式预览：</h3>
+    <!--
+    if($repayId > 0 && $getCurrentRepayTimes <= 3):
+            ($balance + $bonusBalance) * 1.2, 3, 'newUser'
+        elseif($repayId > 0 && $totalInvestCount >= 3 && $getFutureRepayCount == 0 && $getCurrentRepayTimes == $getHistRepayCount && $isLossWarningUser):
+            $getHistLowInvestMoney, $getHistShortInvestPeriod, 'lossWarningUser'
+        elseif($repayId <= 0 && $totalInvestCount >= 3 && $lastWithdrawTime != null && $lastWithdrawTime <= now() -day()*15 && $investingAmount == 0 && $frozen == 0 && $balance < 100):
+            $getHistLowInvestMoney, $getHistShortInvestPeriod, 'lossUser'
+        else:
+            0,0,'unknown'
+    -->
+    <pre id="express-readable"></pre>
+    <pre  id="express">if($investCount  == 1 && $last_withdrawed_time  < now() - 1 * hour() && $last_withdraw_time  > now() - 1 * hour()):
+     [$last_withdraw_time  > now() - 1 * hour()]
+else:
+     [$last_withdraw_time  > now() - 1 * hour()]</pre>
+    <h3>规则编辑：</h3>
+    <div class="city-picker-dropdown" style="position: inherit; width: 100%; display: block;">
+        <div class="city-select-wrap">
+            <div class="city-select-content">
+                <div class="city-select" style="display: block;">
+                    <dl class="clearfix">
+                        <dt style="width: 5em"><b>当前</b></dt>
+                        <dd style="margin-left: 5.5em">
+                            <a title="验签认证" data-code="balance" class="" edit-json='{"var":["余额","$money"],"symbol":"BOOLEAN","value":["NUMBER", "MONEY_UNIT"]}'>余额</a>
+                            <a title="TOKEN解析" data-code="frezen" class="">冻结金额</a>
+                            <a title="TOKEN解析" data-code="1" class="">在投金额</a>
+                        </dd>
+                    </dl>
+                </div>
+                <div class="city-select" style="display: block;">
+                    <dl class="clearfix">
+                        <dt style="width: 5em"><b>历史</b></dt>
+                        <dd style="margin-left: 5.5em">
+                            <a title="验签认证" data-code="0" class="" edit-json='{"var":["累计投资次数","$investCount"],"symbol":"BOOLEAN","value":["NUMBER", "次"]}'>累计投资次数</a>
+                            <a title="TOKEN解析" data-code="1" class="" edit-json='{"var":["最后一次提现时间","$last_withdrawed_time"],"symbol":"PASS-DATE","value":["NUMBER", "DATE_UNIT"]}'>最后提现时间</a>
+                            <a title="TOKEN解析" data-code="1" class="">最佳投资金额</a>
+                            <a title="TOKEN解析" data-code="1" class="">最佳投资期限</a>
+                        </dd>
+                    </dl>
+                </div>
+                <div class="city-select" style="display: block;">
+                    <dl class="clearfix">
+                        <dt style="width: 5em"><b>未来</b></dt>
+                        <dd style="margin-left: 5.5em">
+                            <a title="TOKEN解析" data-code="1" class="" edit-json='{"var":["未来最近一笔回款时间","$last_withdraw_time"],"symbol":"FUTURE-DATE","value":["NUMBER", "DATE_UNIT"]}'>未来最近一笔回款时间</a>
+                        </dd>
+                    </dl>
+                </div>
+                <div class="city-select" style="display: block;">
+                    <dl class="clearfix">
+                        <dt style="width: 5em"><b>临时</b></dt>
+                        <dd style="margin-left: 5.5em">
+                            <a title="验签认证" data-code="0" class="">当前回款金额</a>
+                            <a title="TOKEN解析" data-code="1" class="">当前第几次回款</a>
+                        </dd>
+                    </dl>
+                </div>
+                <div class="city-select" style="display: block;">
+                    <dl class="clearfix">
+                        <dt style="width: 5em"><b>特征</b></dt>
+                        <dd style="margin-left: 5.5em">
+                            <a title="验签认证" data-code="0" class="">新手用户</a>
+                            <a title="TOKEN解析" data-code="1" class="">高危用户</a>
+                            <a title="TOKEN解析" data-code="1" class="">离网用户</a>
+                            <a title="TOKEN解析" data-code="1" class="">高净值用户</a>
+                            <a title="TOKEN解析" data-code="1" class="">羊毛党</a>
+                        </dd>
+                    </dl>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<!-- Scripts -->
+<script src="http://cdn.bootcss.com/jquery/1.11.3/jquery.js"></script>
+<script src="http://cdn.bootcss.com/bootstrap/3.3.6/js/bootstrap.js"></script>
+<script src="js/city-picker.data.js"></script>
+<script src="js/helper-picker.js"></script>
+<script src="js/main.js"></script>
+
+<script type="text/javascript">
+
+    var unit = {"MONEY_UNIT": {"" : "元","* 1000":"千","* 10000":"万"},
+        "DATE_UNIT":  {"* hour()": "小时","* day()": "天","* week()":"星期","* month()":"个月"},
+    };
+
+    var compare_symbol = {
+        "BOOLEAN":{"==":"等于",">":"大于","<":"小于","!=":"不等于",">=":"大于等于","<=":"小于等于"},
+        "FUTURE-DATE":  {"> now() +":"在{}之后","> now() -":"在{}之内"},
+        "PASS-DATE":  {"< now() -" : "在{}之前","> now() -":"在{}之内"}
+    }
+
+    $("a[edit-json]").each(function(){
+        var $this = $(this);
+        var editJson = $this.attr("edit-json");
+        var editJsonObject = JSON.parse(editJson);
+        var varInfo = editJsonObject["var"];
+        var valueInfo = editJsonObject["value"];
+        var varTitle = varInfo[0];
+        var varName = varInfo[1];
+        var symbol = editJsonObject["symbol"];
+        var valueType = valueInfo[0];
+        var valueUnit = valueInfo[1];
+
+        var $parentDiv = $(
+                '<div style="position: relative;display: inline">' +
+                     '<div class="city-picker-dropdown" style="position: absolute;display: none;left: 0;top: 100%;z-index: 9999;background-color: #fff;width: 500px">' +
+                        '<div class="city-select-wrap">' +
+                            '<div style="padding: 10px;" class = "rule-edit-area">' +
+                             '</div>' +
+                        '</div>' +
+                     '</div>' +
+                '</div>');
+        $this.after($parentDiv);
+        $parentDiv.find(".city-picker-dropdown").before($this);
+        var $editArea = $parentDiv.find(".rule-edit-area");
+        $('<span class="rule-edit-span rule-express-desc-part">' + varTitle + '</span>').appendTo($editArea);
+        $('<span class="rule-edit-hidden rule-express-part" var-name="' + varName+ '">' + varName + '</span>：').appendTo($editArea);
+
+        var compareSymbol = compare_symbol[symbol];
+
+        var $compare = $('<select class=" rule-express-part rule-express-desc-part rule-compare-symbol"></select>');
+        var preChars = null;
+        for(var key in compareSymbol){
+            var title = compareSymbol[key];
+            if(title.indexOf("{}") > -1) {
+                preChars = title.substring(0, title.indexOf("{}"));
+                $('<option value="' + key + '">' + title.substring(title.indexOf("{}") + 2) + '</option>').appendTo($compare);
+            }else {
+                $('<option value="' + key + '">' + title + '</option>').appendTo($compare);
+            }
+        }
+        if(preChars){
+            $('<span class="rule-edit-span rule-express-desc-part">' + preChars + '</span>').appendTo($editArea);
+        }else {
+            $compare.appendTo($editArea);
+        }
+
+        if(valueType == "NUMBER"){
+            $('<input type="number" class=" rule-express-part rule-express-desc-part" style="min-width:50px; width:50px;text-align: center" value="1"/>').appendTo($editArea);
+        }else{
+            $('<input class=" rule-express-part rule-express-desc-part" style="min-width:50px; width:50px;text-align: center"/>').appendTo($editArea);
+        }
+
+        if(unit[valueUnit]) {
+            var $unit = $('<select class=" rule-express-part rule-express-desc-part"></select>');
+            for(var key in unit[valueUnit]){
+                $('<option value="' + key + '">' + unit[valueUnit][key] + '</option>').appendTo($unit);
+            }
+            $unit.appendTo($editArea);
+        }else {
+            $('<span  class="rule-edit-span rule-express-desc-part">' + valueUnit + '</span>').appendTo($editArea);
+            $('<span class="rule-edit-hidden rule-express-part"></span>').appendTo($editArea);
+        }
+
+        if(preChars){
+            $compare.appendTo($editArea);
+        }
+
+        $('<button  class="rule-edit-btn rule-edit-ok">确定</button>').appendTo($editArea);
+        $('<button  class="rule-edit-btn  rule-edit-cancel  rule-express-part">取消</button>').appendTo($editArea);
+//        alert(varTitle + varName + symbol + valueType + valueUnit)
+    });
+
+    $(".city-picker-dropdown .city-select-wrap a").on("click", function(){
+        if($(this).next().is("div")){
+            if($(this).next().is(":hidden")){
+                $(".city-picker-dropdown .city-select-wrap dd .city-picker-dropdown").hide();
+            }
+            $(this).next().toggle();
+        }
+    });
+
+    $(".rule-edit-cancel").on("click", function () {
+        $(this).parents(".city-picker-dropdown:first").hide();
+    });
+
+    var expressDescArray = [];
+    var expressArray = [];
+
+    $(".rule-edit-ok").on("click", function () {
+        var $ruleEditDiv = $(this).parents(":first");
+        var expressParts = [];
+        var expressDescParts = [];
+        var lastIsCompareSymbol = false;
+
+        $ruleEditDiv.find(".rule-express-part").each(function(){
+            var $this = $(this);
+            if($this.is("SELECT")) {
+                expressParts.push($this.val());
+                lastIsCompareSymbol = $this.is(".rule-compare-symbol");
+            }else if($this.is("INPUT")) {
+                expressParts.push($this.val());
+            }else  if($this.is("span")){
+                expressParts.push($this.html());
+            }
+        });
+
+        if(lastIsCompareSymbol) {
+            expressParts = [expressParts[0], expressParts[expressParts.length - 1]].concat(expressParts.slice(1,expressParts.length-1))
+        }
+
+        $ruleEditDiv.find(".rule-express-desc-part").each(function(){
+            var $this = $(this);
+            if($this.is("SELECT")) {
+                expressDescParts.push($this.children("option:checked").html())
+            }else if($this.is("INPUT")) {
+                expressDescParts.push($this.val())
+            }else  if($this.is("span")){
+                expressDescParts.push($this.html())
+            }
+        });
+//        alert(expressDescParts.join(" ") + "\n" + expressParts.join(" "));
+        $(this).parents(".city-picker-dropdown:first").hide();
+
+        var expressDesc = expressDescParts.join(" ");
+        var express = expressParts.join(" ");
+
+
+        if(expressDescArray.length == 0){
+            expressDescArray.push([expressDesc]);
+            expressArray.push([express]);
+        }else {
+            expressDescArray[0].push(expressDesc);
+            expressArray[0].push(express);
+        }
+//        var originExpressReadable = $expressReadable.html();
+//        var originExpress = $express.html();
+//        if(originExpressReadable) {
+//            originExpressReadable = originExpressReadable + "<code><span style='color: red'> AND </span></code>" + expressDesc;
+//            originExpress = originExpress + " <code><span style='color: red'>&&</span></code> " + express;
+//        }else {
+//            originExpressReadable = expressDesc;
+//            originExpress = express;
+//        }
+
+
+        var _desc = "";
+        var _express = ""
+        for(var index in expressDescArray) {
+            var tmpExpressDesc = expressDescArray[index].join("<code><span style='color: red'> AND </span></code>");
+            var tmpExpress = expressArray[index].join("<code><span style='color: red'> && </span></code>");
+            if(index == 0) {
+                _desc += ("<span style='color: red'>当 ：</span>" + tmpExpressDesc + "<span style='color: red'> ：</span>");
+                _express += ("if(" + tmpExpress + "):");
+            }else if(index == expressDescArray.length - 1) {
+                _desc +="<span style='color: red'>其他 ：</span>";
+                _express += "else:";
+            }else if(index / 2 == 0) {
+                _desc +=("<span style='color: red'>当 ：</span>"+ tmpExpressDesc + "<span style='color: red'> ：</span>");
+                _express += ("elseif(" + tmpExpress + "):");
+            }else {
+                _desc +="     "+ tmpExpressDesc;
+                _express = "     "+ tmpExpress;
+            }
+            _desc +="\n";
+            _express += "\n";
+
+        }
+
+        $("#express-readable").html(_desc);
+        $("#express").html(_express);
+    });
+
+    var express = $("#express").html().replace(/<code><span style="color: red"> &amp;&amp; <\/span><\/code>/g," && ").replace(/&lt;/g," <").replace(/&gt;/g," >").replace(/&amp;/g,"&");
+    var expressRows = express.split("\n");
+    for(var i in expressRows){
+
+        var expressRow = expressRows[i].trim();
+        if(expressRow.startsWith("if(")) {
+            expressRow = expressRow.substring(3,expressRow.length - 2);
+        }else if(expressRow.startsWith("elseif(")){
+            expressRow = expressRow.substring(7,expressRow.length - 2);
+        }else if(expressRow.startsWith("else:")){
+            continue;
+        }else{
+            expressRow = expressRow.substring(1,expressRow.length - 1);
+        }
+
+        var expresses = expressRow.split("&&");
+        for(var j in expresses) {
+            var aExpress = expresses[j].trim();
+            var expressDesc = getDescription(aExpress);
+            console.info(expressDesc);
+        }
+
+    }
+
+    function getDescription(aExpress){
+        var varName = aExpress.match(/\$[a-zA-Z0-9_]*/g)
+        var $varNameSpan = $("div.city-picker-dropdown div.city-select dd div .rule-edit-area span[var-name = '" + varName + "']")
+        var editJson = $varNameSpan.parents("div.city-picker-dropdown:first").prev("a[edit-json]").attr("edit-json");
+        var editJsonObject = JSON.parse(editJson);
+        var varInfo = editJsonObject["var"];
+        var valueInfo = editJsonObject["value"];
+        var varTitle = varInfo[0];
+        var varName = varInfo[1];
+        var symbol = editJsonObject["symbol"];
+        var valueType = valueInfo[0];
+        var valueUnit = valueInfo[1];
+        var compareSymbol = compare_symbol[symbol];
+        var unitOptions = unit[valueUnit];
+
+        var unKnownExpress =  aExpress.substring(varName.length).trim();
+        var compareSymbolKey = "";
+        var compareSymbolName = "";
+        for(var key in compareSymbol) {
+            if(unKnownExpress.startsWith(key) && key.length >= compareSymbolKey.length) {
+                compareSymbolKey = key;
+                compareSymbolName = compareSymbol[key];
+            }
+        }
+
+        var unitSymbolKey = "";
+        var unitSymbolName = "";
+        if(unitOptions){
+            for(var key in unitOptions) {
+                if(unKnownExpress.endsWith(key) && key.length >= unitSymbolKey.length) {
+                    unitSymbolKey = key;
+                    unitSymbolName = unitOptions[key];
+                }
+            }
+        }else{
+            unitSymbolName =  valueUnit;
+        }
+
+
+        var value = unKnownExpress.substring(compareSymbolKey.length, unKnownExpress.length - unitSymbolKey.length).trim()
+
+        var expressDesc;
+
+        if(compareSymbolName.indexOf("{}") > -1) {
+            expressDesc = varTitle + " " + compareSymbolName.replace("{}", " " + value + " " + unitSymbolName + " ");
+        }else {
+            expressDesc = varTitle + " " + compareSymbolName + " " + value + " " + unitSymbolName;
+        }
+        return expressDesc;
+    }
+
+</script>
+</body>
+</html>
