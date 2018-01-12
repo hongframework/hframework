@@ -19,7 +19,13 @@ require(['layer','ajax','js/hframework/errormsg'], function () {
         if(href.endsWith(".json") || href.endsWith(".html")) {
             showProcessBar();
             $(this).attr("orig-href", $(this).attr("href"));
-            $(this).attr("href", $(this).attr("orig-href") + "?" +　getPageContextInfo());
+            var pageInfo = getPageContextInfo();
+            if(pageInfo){
+                $(this).attr("href", $(this).attr("orig-href") + "?" +　pageInfo);
+            }else{
+                $(this).attr("href", $(this).attr("orig-href"));
+            }
+
             //hideProcessBar();
         }
 
@@ -160,7 +166,7 @@ require(['layer','ajax','js/hframework/errormsg'], function () {
                 }
 
                 showProcessBar();
-                if($param != "thisForm") {
+                if($param && $param != "thisForm") {
                     location.href = url + "?" + $param;
                 }else {
                     location.href = url;
@@ -185,7 +191,12 @@ require(['layer','ajax','js/hframework/errormsg'], function () {
                     location.href = url + "?" + $param + "=" + checkIds.join();
                 }else{
                     showProcessBar();
-                    location.href = url + "?" + $param;
+                    if($param) {
+                        location.href = url + "?" + $param;
+                    }else{
+                        location.href = url;
+                    }
+
                 }
 
             }
