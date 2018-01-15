@@ -12,6 +12,20 @@
             </event>
         </component>
     </page>
+    <page id="complex_page" name="复合页面测试" page-template="dynamic">
+        <component id="cForm" data-set="hframe/hfpm_program"  event-extend="false"/>
+        <component id="cForm" data-set="hframe/hfpm_program_cfg"  event-extend="false"/>
+        <component id="cList" data-set="hframe/hfpm_module" event-extend="false">
+            <event name="submit" description="提交">
+                <attach anchor="EOFC">
+                    <appendElement type="button" param='{btnclass:"btn-primary",btnText:" 提 交 "}'></appendElement>
+                </attach>
+                <source scope="EOC" param="thisForm"></source>
+                <effect type="ajaxSubmitByJson" action="ajaxSubmits.json" target-id="cForm,cList"></effect>
+                <effect type="pageFwd" action='${cForm:mgr}' isStack="true"></effect>
+            </event>
+        </component>
+    </page>
     <page id="test" name="test" page-template="container">
         <!--<component id="qList" data-set="SYSTEM_EMPTY_DATASET"  show-title="false">-->
             <!--<event name="save">-->

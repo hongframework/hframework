@@ -310,13 +310,20 @@ public class DefaultController {
 
 
             JSONObject jsonObject = JSONObject.parseObject(dataJson, Feature.OrderedField);
-            Set<String> componentIds = jsonObject.keySet();
+            Set<String> componentKeys = jsonObject.keySet();
             Object parentObject = null;
-            for (String componentId : componentIds) {
+            for (String componentKey : componentKeys) {
+                int index = 0;
+                String componentId = componentKey;
+                if(componentId.contains("|")) {
+                    index = Integer.valueOf(componentId.substring(componentId.indexOf("|") + 1));
+                    componentId = componentId.substring(0, componentId.indexOf("|"));
+                }
                 ComponentDescriptor componentDescriptor = components.get(componentId);
                 if(componentDescriptor == null) {
+                    int tmpIndex = 0;
                     for (ComponentDescriptor descriptor : components.values()) {
-                        if(descriptor.getId().equals(componentId)) {
+                        if(descriptor.getId().equals(componentId) && tmpIndex++ == index) {
                             componentDescriptor = descriptor;
                         }
                     }
@@ -340,7 +347,7 @@ public class DefaultController {
                         WebContext.get().getProgram().getCode(), moduleCode, eventObjectCode);
                 Object controller= ServiceFactory.getService(defControllerClass.getClassName().substring(0, 1).toLowerCase() + defControllerClass.getClassName().substring(1));
                 Object objects = null;
-                componentJsonData = jsonObject.getString(componentId);
+                componentJsonData = jsonObject.getString(componentKey);
                 logger.debug("class: {}; json: {}", defPoClass.getClassName(), componentJsonData);
                 if("treeChart".equals(componentId)) {
                     Map<String, String> result = new LinkedHashMap<String, String>();

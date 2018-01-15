@@ -261,18 +261,21 @@ require(['layer','ajax','js/hframework/errormsg'], function () {
                 var json = {};
                 var targetIds = targetId.split(",");
                 for(var tarId in targetIds) {
-                    $component = $("[component= " + targetIds[tarId] +"]");
-                    if($component.find("form").length > 0) {
-                        //参数检查
-                        if(!$.checkSubmit($($component.find("form")[0]))) {
-                            //alert("字段不能为空！");
-                            return;
+                    $("[component= " + targetIds[tarId] +"]").each(function(i, v){
+                        var $component = $(this);
+                        if($component.find("form").length > 0) {
+                            var $form = $component.find("form:first")
+                            //参数检查
+                            if(!$.checkSubmit($form)) {
+                                //alert("字段不能为空！");
+                                return;
+                            }
+                            json[targetIds[tarId] + "|" + i] = JSON.parse($form.serializeJson());
+                        }else {
+                            var hierarchy = $component.orgchart('getHierarchy');
+                            json[targetIds[tarId] + "|" + i]  = JSON.stringify(hierarchy, null, 2);
                         }
-                        json[targetIds[tarId]] = JSON.parse($($component.find("form")[0]).serializeJson());
-                    }else {
-                        var hierarchy = $component.orgchart('getHierarchy');
-                        json[targetIds[tarId]]  = JSON.stringify(hierarchy, null, 2);
-                    }
+                    });
                 }
                 //console.log(JSON.stringify(json));
                 _data = JSON.stringify(json);
