@@ -425,16 +425,22 @@ require(['layer','ajax','js/hframework/errormsg'], function () {
         var _url =  "/" + module + "/" + page + ".html";
         var _data = {"pageNo":pageNo,"component" : component};
         if(param) {
-            var params =JSON.parse("{\"" + (param + "&1=1").replace(new RegExp("=","gm"),"\":").replace(new RegExp("&","gm"),",\"").replace(new RegExp(":,","gm"),":null,")  + "}");
+            var params =JSON.parse("{\"" + (param + "&1=1").replace(new RegExp("=","gm"),"\":\"").replace(new RegExp("&","gm"),"\",\"").replace(new RegExp(":,","gm"),"\":null,")  + "\"}")
             for (var key in params) {
-                _data[key]=params[key];
+                _data[key]=decodeURI(params[key]).trim();
             }
         }
         console.log(_data);
         //alert(_data);
         ajax.Post(_url,_data,function(data){
             var $newHfList = $(data);
-            $(compoContainer).find(".hflist-pager").html($newHfList.find(".hflist-pager").html());
+            if($newHfList.find(".hflist-pager")[0]){
+                $(compoContainer).find(".hflist-pager").html($newHfList.find(".hflist-pager").html());
+                $(compoContainer).find(".hflist-pager").show();
+            }else {
+                $(compoContainer).find(".hflist-pager").hide();
+            }
+
             $(compoContainer).find(".hflist-data").html($newHfList.find(".hflist-data").html());
             componentinit();
             $.reloadListDisplay();

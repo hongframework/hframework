@@ -24,6 +24,8 @@
 	#parse("component/element/_multiple-select.vm")
 #elseif($column.editType=='datetime')
 		#parse("component/element/_datetime.vm")
+#elseif($column.editType=='datetime-scope')
+	#parse("component/element/_datetime-scope.vm")
 #elseif($column.editType=='tipinput')
 		#parse("component/element/tipinput_FORGRID.vm")
 #elseif($column.editType=='checkbox')

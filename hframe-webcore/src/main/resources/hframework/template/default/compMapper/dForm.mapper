@@ -11,5 +11,6 @@
             <mapping id="dataCondition" value="${relColumns}"></mapping>
         </mapping>
         <mapping id="data" value="${data}"></mapping>
+        <mapping id="cForm:mgr" value="${cForm:mgr}.html"></mapping>
     </baseMapper>
 </mapper>

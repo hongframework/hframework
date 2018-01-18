@@ -125,6 +125,9 @@ function componentinit(){
             $($this).attr("width",count*50 + "px;");
         }
     });
+
+    initRelatComponent();
+
     //$( ".datepicker" ).datepicker({
     //    dateFormat: "yy-mm-dd"
     //});
@@ -163,6 +166,28 @@ function componentinit(){
         //$(this).find(".bootstrap-switch-container .checker").css("margin-right", "0px");
 
     });
+
+
+    function initRelatComponent() {
+        var $firstForm = $(".hfform:first");
+        var firstFormId = $firstForm.attr("id");
+        var mainEntityCode = firstFormId.substring(0, firstFormId.length - "QueryForm".length);
+        var $allLikeRelatField = $("select[data-code*='" + mainEntityCode   + ".']");
+        $allLikeRelatField.each(function(){
+            var $this = $(this);
+            var dateCode = $this.attr("data-code");
+            if(dateCode.split(".").length == 3 && $this.parents(".hfform:first") != $firstForm){
+                if($this.parent().is("td")){
+                    var index = $this.parent().prevAll("td").size();
+                    $this.parents("table:first").find("thead tr th").eq(index).hide();
+                    $this.parent().hide();
+                }else {
+                    $this.parents(".control-group:first").hide();
+                }
+            }
+            $this.removeAttr("not-null");
+        });
+    }
 
 
     /**

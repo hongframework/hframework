@@ -797,7 +797,7 @@ public class DefaultController {
                 }
                 Object componentExtendData = extendData != null ? extendData.containsKey(componentDescriptor.getDataId()) : null;
 
-                JSONObject componentJsonObject = componentInvokeManager.invoke(componentDescriptor, componentExtendData, extendData, pagination, module, pageCode, pageInfo, mav, request, response);
+                JSONObject componentJsonObject = componentInvokeManager.invoke(StringUtils.isNotBlank(componentId), componentDescriptor, componentExtendData, extendData, pagination, module, pageCode, pageInfo, mav, request, response);
 
                 if(componentJsonObject != null) {
                     String key = componentDescriptor.getId();

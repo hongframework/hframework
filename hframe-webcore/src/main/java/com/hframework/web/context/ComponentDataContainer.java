@@ -383,9 +383,9 @@ public class ComponentDataContainer {
                         String endChars = var.substring(var.indexOf(":") + 1);
 //                ComponentDescriptor componentDescriptor = WebContext.get(type);
                         if(componentDescriptor.getPageDescriptor().
-                                getComponentDescriptor(type) != null) {
+                                getComponentDescriptorBy(type) != null) {
                             DataSet relDataSet = componentDescriptor.getPageDescriptor().
-                                    getComponentDescriptor(type).getDataSetDescriptor().getDataSet();
+                                    getComponentDescriptorBy(type).getDataSetDescriptor().getDataSet();
                             value = value.replace("${" + var + "}", relDataSet.getEventObjectCode() + "_" + endChars);
                         }else {
                             value = value.replace("${" + var + "}", dataSet.getEventObjectCode() + "_" + var);
@@ -766,28 +766,9 @@ public class ComponentDataContainer {
                         }
                     }else {
                         for (Object column : columns) {
-                            String propertyName = JavaUtil.getJavaVarName(((JSONObject) column).getString("code"));
-                            try {
-                                Class<?> type = BeanUtils.findPropertyType(propertyName, object.getClass());
-                                if(type == Date.class) {
-                                    Date date = (Date) ReflectUtils.getFieldValue(object, propertyName);
-                                    if(date != null) {
-                                        value.add(DateUtils.getDateYYYYMMDDHHMMSS(date));
-                                    }else {
-                                        value.add("");
-                                    }
-                                }else {
-                                    try{
-                                        String stringVal = org.apache.commons.beanutils.BeanUtils.getProperty(object,propertyName);
-                                        value.add(stringVal == null ? "" : stringVal);
-                                    }catch (Exception e) {
-                                        e.printStackTrace();
-                                        value.add("");
-                                    }
-                                }
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                            }
+                            value.add(getPropertyValue(object,
+                                    JavaUtil.getJavaVarName(((JSONObject) column).getString("code")),
+                                    ((JSONObject) column).getString("editType")));
                         }
 //                        values.add(BeanUtils.getPropertiesArray(object));
                     }
@@ -877,7 +858,6 @@ public class ComponentDataContainer {
         }
 
         public void setData(Object data, JSONArray columns) {
-
             if (data != null) {
                 if (expressesMap.size() != 0) {
                     for (String showCode : expressesMap.keySet()) {
@@ -887,41 +867,52 @@ public class ComponentDataContainer {
                         if(reallyProperty != null) {
                             propertyName = reallyProperty;
                         }
-                        resultMap.put(showCode, getPropertyValue(data, JavaUtil.getJavaVarName(propertyName)));
+                        resultMap.put(showCode, getPropertyValue(data, JavaUtil.getJavaVarName(propertyName), "x"));
                     }
 
                 } else {
                     for (Object column : columns) {
                         resultMap.put(JavaUtil.getJavaVarName(((JSONObject) column).getString("code")),
-                                getPropertyValue(data, JavaUtil.getJavaVarName(((JSONObject) column).getString("code"))));
+                                getPropertyValue(data, JavaUtil.getJavaVarName(((JSONObject) column).getString("code")),
+                                        ((JSONObject) column).getString("editType")));
                     }
                 }
             }
         }
 
-        private String getPropertyValue(Object data, String propertyName) {
-            try {
-                Class<?> type = BeanUtils.findPropertyType(propertyName, data.getClass());
-                if(type == Date.class) {
-                    Date date = (Date) ReflectUtils.getFieldValue(data, propertyName);
-                    if(date != null) {
-                        return DateUtils.getDateYYYYMMDDHHMMSS(date);
-                    }else {
-                        return "";
-                    }
+
+    }
+
+    private String getPropertyValue(Object data, String propertyName, String editType) {
+        try {
+            Class<?> type = BeanUtils.findPropertyType(propertyName, data.getClass());
+            if(type == Date.class) {
+                Date date = (Date) ReflectUtils.getFieldValue(data, propertyName);
+                if(date != null) {
+                    return DateUtils.getDateYYYYMMDDHHMMSS(date);
                 }else {
-                    String stringVal = org.apache.commons.beanutils.BeanUtils.getProperty(data,propertyName);
-                    return stringVal == null ? "" : stringVal;
+                    return "";
                 }
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
-            } catch (InvocationTargetException e) {
-                e.printStackTrace();
-            } catch (NoSuchMethodException e) {
-                e.printStackTrace();
+            }else if(type == Integer.class && propertyName.toLowerCase().endsWith("time") &&
+                    (editType == null || "hidden".equals(editType) || "text".equals(editType))) {
+                Integer date = (Integer) ReflectUtils.getFieldValue(data, propertyName);
+                if(date != null && date > 0) {
+                    return DateUtils.getDateYYYYMMDDHHMMSS(new Date(Long.valueOf(date) * 1000));
+                }else {
+                    return "";
+                }
+            }else {
+                String stringVal = org.apache.commons.beanutils.BeanUtils.getProperty(data,propertyName);
+                return stringVal == null ? "" : stringVal;
             }
-            return null;
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
         }
+        return "";
     }
 
     public class ObjectsJsonSegmentParser extends AbstractJsonSegmentParser implements JsonSegmentParser{

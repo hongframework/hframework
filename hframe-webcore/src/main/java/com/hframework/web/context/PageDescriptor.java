@@ -88,6 +88,19 @@ public class PageDescriptor{
         return components.get(componentId);
     }
 
+    public ComponentDescriptor getComponentDescriptorBy(String componentId) {
+        ComponentDescriptor componentDescriptor = components.get(componentId);
+        if(componentDescriptor != null) {
+            return componentDescriptor;
+        }
+        for (ComponentDescriptor descriptor : components.values()) {
+            if(descriptor.getId().equals(componentId)) {
+                return descriptor;
+            }
+        }
+        return null;
+    }
+
     public void addElementDescriptor(String elementId, ElementDescriptor descriptor) {
         elements.put(elementId,descriptor);
     }

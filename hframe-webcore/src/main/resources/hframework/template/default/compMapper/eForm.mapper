@@ -18,5 +18,6 @@
         <mapping id="updateByAjax" value="${updateByAjax}.json"></mapping>
         <mapping id="saveOrUpdateByAjax" value="${saveOrUpdateByAjax}.json"></mapping>
         <mapping id="mgr" value="${mgr}.html"></mapping>
+        <mapping id="cForm:mgr" value="${cForm:mgr}.html"></mapping>
     </eventMapper>
 </mapper>

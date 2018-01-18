@@ -2,6 +2,9 @@ package com.hframework.web.controller.core;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.google.common.base.Enums;
+import com.google.common.base.Joiner;
+import com.google.common.base.Optional;
 import com.hframework.base.service.CommonDataService;
 import com.hframework.beans.class0.Class;
 import com.hframework.beans.controller.Pagination;
@@ -28,10 +31,11 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.beans.PropertyDescriptor;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.lang.reflect.InvocationTargetException;
+import java.util.*;
+
+import static com.hframework.common.util.ExampleUtils.*;
+import static com.hframework.common.util.ExampleUtils.RelationOperator.*;
 
 /**
  * Created by zhangquanhong on 2018/1/10.
@@ -50,7 +54,7 @@ public class ComponentInvokeManager {
     private FileComponentInvoker fileComponentInvoker;
 
 
-    public  JSONObject invoke(ComponentDescriptor componentDescriptor, Object componentExtendData, Map<String, Object> extendData,
+    public  JSONObject invoke(boolean isRefresh, ComponentDescriptor componentDescriptor, Object componentExtendData, Map<String, Object> extendData,
                               Pagination pagination, String module, String pageCode, PageDescriptor pageInfo,
                               ModelAndView mav, HttpServletRequest request, HttpServletResponse response) throws Throwable {
 
@@ -140,6 +144,9 @@ public class ComponentInvokeManager {
 
             Object controller = ServiceFactory.getService(defControllerClass.getClassName().substring(0, 1).toLowerCase() + defControllerClass.getClassName().substring(1));
             Object poExample = getPoExample(defPoExampleClass, defPoClass, module, pageCode, componentDescriptor, pageInfo, request);
+            if(isRefresh) {
+                invokePoExample(poExample, request);
+            }
             Object po = null;
 
             if ("detail".equals(action)) {
@@ -250,6 +257,51 @@ public class ComponentInvokeManager {
         return jsonObject;
     }
 
+    private void invokePoExample(Object poExample, HttpServletRequest request) throws IllegalAccessException, NoSuchMethodException, InvocationTargetException {
+        List<String> queryStringList = new ArrayList<String>();
+        Enumeration<String> parameterNames = request.getParameterNames();
+        while (parameterNames.hasMoreElements()) {
+            String parameterName = parameterNames.nextElement();
+            String parameterValue = request.getParameter(parameterName);
+            if(StringUtils.isBlank(parameterValue)) {
+                continue;
+            }
+
+            if(parameterName.length() <= 3) {
+                continue;
+            }
+
+            Optional<ExampleUtils.RelationOperator> optional = Enums.getIfPresent(RelationOperator.class, parameterName.substring(parameterName.length() - 3));
+            if(!optional.isPresent()) {
+                continue;
+            }
+
+            parameterName = parameterName.substring(0, parameterName.length() - 3);
+            RelationOperator relationOperator = optional.get();
+            switch (relationOperator){
+                case EQU:
+                case NEQ:
+                case LSS:
+                case LEQ:
+                case GTR:
+                case GEQ:
+                    queryStringList.add(parameterName + ExampleUtils.getSign(relationOperator) + parameterValue);
+                    break;
+                case LKE:
+//                case RLK:
+//                case LLK:
+                    if(parameterValue != null && !parameterValue.startsWith("%")) parameterValue = "%" + parameterValue;
+                    if(parameterValue != null && !parameterValue.endsWith("%")) parameterValue = parameterValue + "%";
+
+                    queryStringList.add(parameterName + ExampleUtils.getSign(relationOperator) + parameterValue);
+                    break;
+                default:
+//                    queryStringList.add(parameterName + "=" + parameterValue);
+            }
+        }
+
+        parseExample(Joiner.on("&").join(queryStringList), poExample);
+    }
 
 
     private JSONObject getJsonObjectByResultData(ComponentDescriptor componentDescriptor, ResultData resultData, String moduleCode, String dataSetCode, String action) {

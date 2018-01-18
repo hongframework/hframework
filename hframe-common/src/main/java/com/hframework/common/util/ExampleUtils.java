@@ -1,7 +1,12 @@
 package com.hframework.common.util;
 
+import com.google.common.base.Enums;
+import com.google.common.base.Optional;
+
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.net.URLDecoder;
+import java.text.ParseException;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -12,6 +17,7 @@ import java.util.regex.Pattern;
 public class ExampleUtils {
 
     private static final Map<String, String> signKeyWordMap = new HashMap<String, String>();
+    public static final Map<RelationOperator, String> inputSignAndSignMap = new HashMap<RelationOperator, String>();
 
     /*
     EQU - 等于:equal
@@ -20,21 +26,51 @@ public class ExampleUtils {
     LEQ - 小于或等于:equal or less than
     GTR - 大于:greater than
     GEQ - 大于或等于:equal or greater than
+    LKE - 模糊匹配:like
+    RLK -右侧模糊匹配：right like
+    LLK - 左侧模糊匹配：left like
      */
 
+    public static String getSign(RelationOperator operator) {
+        return inputSignAndSignMap.get(operator);
+    }
+
+    public enum RelationOperator{
+        EQU, NEQ, LSS, LEQ, GTR, GEQ, LKE/*, RLK, LLK*/;
+    }
+
     static {
-        signKeyWordMap.put("N","IsNull");
-        signKeyWordMap.put("NN","IsNotNull");
+        inputSignAndSignMap.put(RelationOperator.EQU,"==");
+        inputSignAndSignMap.put(RelationOperator.NEQ,"!=");
+        inputSignAndSignMap.put(RelationOperator.GTR,">");
+        inputSignAndSignMap.put(RelationOperator.LSS,"<");
+        inputSignAndSignMap.put(RelationOperator.GEQ,">=");
+        inputSignAndSignMap.put(RelationOperator.LEQ,"<=");
+        inputSignAndSignMap.put(RelationOperator.LKE,"~=");
+//        inputSignAndSignMap.put("N","N");
+//        inputSignAndSignMap.put("NN","NN");
+//        inputSignAndSignMap.put(RelationOperator.GTR,"IN");
+//        inputSignAndSignMap.put(RelationOperator.GTR,"NIN");
+//        inputSignAndSignMap.put(RelationOperator.GTR,"BT");
+//        inputSignAndSignMap.put(RelationOperator.GTR,"NBT");
+//        inputSignAndSignMap.put(RelationOperator.GTR,"NLK");
+    }
+
+    static {
         signKeyWordMap.put("=","EqualTo");
         signKeyWordMap.put("!=","NotEqualTo");
         signKeyWordMap.put(">","GreaterThan");
         signKeyWordMap.put("<","LessThan");
         signKeyWordMap.put(">=","GreaterThanOrEqualTo");
         signKeyWordMap.put("<=","LessThanOrEqualTo");
+        signKeyWordMap.put("~=","Like");
+        signKeyWordMap.put("N","IsNull");
+        signKeyWordMap.put("NN","IsNotNull");
         signKeyWordMap.put("IN","In");
         signKeyWordMap.put("NIN","NotIn");
         signKeyWordMap.put("BT","Between");
         signKeyWordMap.put("NBT","NotBetween");
+        signKeyWordMap.put("NLK","NotLike");
     }
 
 
@@ -77,6 +113,53 @@ public class ExampleUtils {
         return (T) newExample;
     }
 
+    public static Object getBaseCriteriaOrCreate(Object exampleObj) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
+        List oredCriteria = (List) ReflectUtils.getFieldValue(exampleObj, "oredCriteria");
+        Object criteriaObj = null;
+        if(oredCriteria != null && oredCriteria.size() > 0) {
+            criteriaObj = oredCriteria.get(0);
+        }else {
+            Method criteriaMethod = exampleObj.getClass().getMethod("createCriteria");
+            criteriaObj = criteriaMethod.invoke(exampleObj);
+        }
+        return criteriaObj;
+    }
+
+    public static void invokeConditionOnCriteria(Object criteriaObj, Method method, String... parameters) throws InvocationTargetException, IllegalAccessException {
+        if(method == null ||
+                (parameters.length > 0 && StringUtils.isBlank(parameters[0]))) return;
+
+        List<Object> parameterList = new ArrayList<Object>();
+        for (int i = 0; i < method.getParameterTypes().length; i++) {
+            String stringValue = null;
+            if(parameters.length > i && StringUtils.isNotBlank(parameters[i])) {
+                stringValue = parameters[i].trim();
+                // 对exampleObj对象直接赋值
+                if(method.getParameterTypes()[i] == Long.class) {
+                    parameterList.add(Long.valueOf(stringValue));
+                }else if(method.getParameterTypes()[i] == Integer.class) {
+                    parameterList.add(Integer.valueOf(stringValue));
+                }else if(method.getParameterTypes()[i] == Double.class) {
+                    parameterList.add(Double.valueOf(stringValue));
+                }else if(method.getParameterTypes()[i] == Byte.class) {
+                    parameterList.add(Byte.valueOf(stringValue));
+                }else if( method.getParameterTypes()[i] == Date.class) {
+                    try {
+                        parameterList.add(DateUtils.parseYYYYMMDDHHMMSS(URLDecoder.decode(stringValue)));
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
+                }else {
+                    parameterList.add(stringValue);
+                }
+            }else {
+                parameterList.add(null);
+            }
+        }
+
+        method.invoke(criteriaObj, parameterList.toArray(new Object[0]));
+    }
+
     /**
      * 将一个业务对象转换为Example查询对象
      * @param srcObj
@@ -87,18 +170,7 @@ public class ExampleUtils {
      */
     public static Object parseExample(Object srcObj,Object exampleObj) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
 
-        List oredCriteria = (List) ReflectUtils.getFieldValue(exampleObj, "oredCriteria");
-        Object criteriaObj = null;
-        if(oredCriteria != null && oredCriteria.size() > 0) {
-            criteriaObj = oredCriteria.get(0);
-        }else {
-            Method criteriaMethod = exampleObj.getClass().getMethod("createCriteria");
-            criteriaObj = criteriaMethod.invoke(exampleObj);
-        }
-
-
-
-
+        Object criteriaObj = getBaseCriteriaOrCreate(exampleObj);
 
         // 方法名称及方法
         Map<String, Method> criteriaMethods = BeanUtils.getMethods(criteriaObj.getClass());
@@ -113,22 +185,7 @@ public class ExampleUtils {
                 // 获取对应方法
                 Method method = criteriaMethods.get(sb.toString());
                 String value = convertMap.get(filed);
-                if (method != null && value != null && !"".equals(value)) {
-                    if(method.getParameterTypes()[0] == Long.class) {
-                        // 对exampleObj对象直接赋值
-                        method.invoke(criteriaObj, new Object[]{Long.valueOf(value)});
-                    }else if(method.getParameterTypes()[0] == Integer.class) {
-                        // 对exampleObj对象直接赋值
-                        method.invoke(criteriaObj, new Object[]{Integer.valueOf(value)});
-                    }else if(method.getParameterTypes()[0] == Double.class) {
-                        // 对exampleObj对象直接赋值
-                        method.invoke(criteriaObj, new Object[]{Double.valueOf(value)});
-                    }else {
-                        // 对exampleObj对象直接赋值
-                        method.invoke(criteriaObj, new Object[]{value});
-                    }
-
-                }
+                invokeConditionOnCriteria(criteriaObj, method, value);
             }
         }
 
@@ -148,7 +205,7 @@ public class ExampleUtils {
         String[] splits = StringUtils.split(params, "&");
         if(splits !=null && splits.length > 0) {
             for (String split : splits) {
-                Pattern pattern = Pattern.compile("(>=|<=|>|<|!=|=|NIN|IN|NN|N)");
+                Pattern pattern = Pattern.compile("(>=|<=|>|<|!=|==|~=)");
                 Matcher matches = pattern.matcher(split);
 
                 if(matches.find()){
@@ -176,8 +233,7 @@ public class ExampleUtils {
      */
     public static Object parseExample(Map<String, List<String[]>> map,Object exampleObj) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
 
-        Method criteriaMethod = exampleObj.getClass().getMethod("or");
-        Object criteriaObj = criteriaMethod.invoke(exampleObj);
+        Object criteriaObj = getBaseCriteriaOrCreate(exampleObj);
 
         // 方法名称及方法
         Map<String, Method> criteriaMethods = BeanUtils.getMethods(criteriaObj.getClass());
@@ -190,25 +246,18 @@ public class ExampleUtils {
                     String methodName = calcExampleMethodName(sign, filed, value);
                     // 获取对应方法
                     Method method = criteriaMethods.get(methodName);
-                    if (method != null) {
-                        if(method.getParameterTypes()[0] == Long.class) {
-                            // 对exampleObj对象直接赋值
-                            method.invoke(criteriaObj, new Object[]{Long.valueOf(value)});
-                        }else if(method.getParameterTypes()[0] == Integer.class) {
-                            // 对exampleObj对象直接赋值
-                            method.invoke(criteriaObj, new Object[]{Integer.valueOf(value)});
-                        }else if(method.getParameterTypes()[0] == Double.class) {
-                            // 对exampleObj对象直接赋值
-                            method.invoke(criteriaObj, new Object[]{Double.valueOf(value)});
-                        }else {
-                            // 对exampleObj对象直接赋值
-                            method.invoke(criteriaObj, new Object[]{value});
-                        }
-
-                    }
+                    invokeConditionOnCriteria(criteriaObj, method, value);
                 }
             }
         }
+//BUG:nameValue[0] 是java变量名 并非数据库字段名
+//        if(map.get("~=") != null) {
+//            String orderStr = "";
+//            for (String[] nameValue : map.get("~=")) {
+//                orderStr += (nameValue[0] + ",");
+//            }
+//            ReflectUtils.invokeMethod(exampleObj, "setOrderByClause", new java.lang.Class[]{String.class}, new Object[]{orderStr.substring(0, orderStr.length() - 1)});
+//        }
 
         return exampleObj;
     }

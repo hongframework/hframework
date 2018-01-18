@@ -670,7 +670,13 @@ require(['layer','ajax','js/hframework/errormsg'], function () {
         showProcessBar();
         ajax.Post(_url,_data,function(data){
             var $newHfList = $(data);
-            $(compoContainer).find(".hflist-pager").html($newHfList.find(".hflist-pager").html());
+            if($newHfList.find(".hflist-pager")[0]){
+                $(compoContainer).find(".hflist-pager").html($newHfList.find(".hflist-pager").html());
+                $(compoContainer).find(".hflist-pager").show();
+            }else {
+                $(compoContainer).find(".hflist-pager").hide();
+            }
+
             $(compoContainer).find(".hflist-data").html($newHfList.find(".hflist-data").html());
             componentinit();
             $.reloadListDisplay();
