@@ -1,0 +1,22 @@
+<dataset>
+  <module>activiti</module>
+  <code>act_procinst</code>
+  <entity>act_procinst</entity>
+  <name>我的流程实例</name>
+  <fields>
+    <field code="id" name="ID" edit-type="input" show-type="hidden"></field>
+    <field code="processInstanceId" name="流程实例ID" edit-type="input" show-type=""></field>
+    <field code="businessKey" name="业务ID" edit-type="input" show-type=""></field>
+    <field code="name" name="业务名称" edit-type="input" show-type=""></field>
+    <field code="processDefinitionId" name="流程定义ID" edit-type="input" show-type=""></field>
+    <field code="processDefinitionName" name="流程定义名称" edit-type="input" show-type=""></field>
+    <field code="processDefinitionKey" name="流程定义编码" edit-type="input" show-type=""></field>
+    <field code="processDefinitionVersion" name="流程定义版本" edit-type="input" show-type=""></field>
+    <field code="deploymentId" name="发布ID" edit-type="hidden" show-type="hidden"></field>
+    <field code="startUserId" name="流程创建用户" edit-type="input" show-type=""></field>
+    <field code="startTime" name="流程创建时间" edit-type="input" show-type=""></field>
+    <field code="endTime" name="流程归档时间" edit-type="input" show-type=""></field>
+    <field code="durationInMillis" name="延迟时间" edit-type="input" show-type=""></field>
+
+  </fields>
+</dataset>

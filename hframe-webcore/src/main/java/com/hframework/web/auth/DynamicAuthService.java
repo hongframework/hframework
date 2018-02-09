@@ -116,6 +116,7 @@ public class DynamicAuthService implements AuthService {
                     WebContext.get().getProgram().getCode(), moduleCode, dataSetCode).getClassPath());
             DataSetDescriptor dataSet = WebContext.get().getDataSet(defPoClass);
             List list = getAll(moduleCode, dataSetCode);
+            context.getAuthRoleManager().roleClass = defPoClass;
             for (Object roleObject : list) {
                 Long roleId = Long.parseLong(org.apache.commons.beanutils.BeanUtils.getProperty(
                         roleObject, JavaUtil.getJavaVarName(dataSet.getKeyField().getCode())));

@@ -83,6 +83,23 @@ public class XmlUtils {
 
     /**
      * 读取文件列表-类加载器中资源目录
+     * @param <T>
+     * @param directory
+     * @param format
+     * @return
+     * @throws IOException
+     */
+    public static <T> File[] readValuesFromDirectory(String directory, String format) throws IOException {
+        URL fileResource = XmlUtils.class.getResource("/" + directory);
+        if(fileResource != null) {
+            return readValueFromAbsoluteDirectoryPath(fileResource.getPath(), format);
+        }else {
+            return readValueFromAbsoluteDirectoryPath(XmlUtils.class.getResource("/").getPath() + "/" + directory, format);
+        }
+    }
+
+    /**
+     * 读取文件列表-类加载器中资源目录
      * @param directory
      * @param valueType
      * @param format
@@ -106,11 +123,23 @@ public class XmlUtils {
         }else {
             return readValuesFromDirectory(directory, valueType, format);
         }
+    }
 
+    public static File[] readValuesFromDirectory(String rootPath, String directory, String format) throws IOException {
+        if(new File(rootPath).exists()) {
+            return readValueFromAbsoluteDirectoryPath(rootPath + "/" + directory, format);
+        }else {
+            return readValuesFromDirectory(directory, format);
+        }
     }
 
     public static <T> List<T> readValuesFromDirectory(String directory, Class<T> valueType) throws IOException {
-        return readValuesFromDirectory(directory,valueType,null);
+        return readValuesFromDirectory(directory, valueType, null);
+    }
+
+    public static File[] readValueFromAbsoluteDirectoryPath(String directory, String format) throws IOException {
+        logger.debug("入参：{}|{}", directory, format);
+        return  FileUtils.getFileList(new File(directory));
     }
 
     public static <T> List<T> readValueFromAbsoluteDirectoryPath(String directory, Class<T> valueType, String format) throws IOException {

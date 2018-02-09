@@ -36,6 +36,8 @@ public class DataSetDescriptor {
 
     private Field nameField;
 
+    private Field workflowStatusField;
+
 
     private String helperDataXml;
     private JSONObject helperTags;
@@ -62,6 +64,9 @@ public class DataSetDescriptor {
         }
     });
 
+    //<hfpm_program_id,hfpm_module/hfpm_program_id>
+    private Map<String, Set<String>> beenUsedFieldMap = new HashMap<String, Set<String>>();
+
     //<hfpm_program/hfpm_program_id,ProgramDescriptor.class>
     private Map<String, DataSetDescriptor> relDataSetMap = new HashMap<String, DataSetDescriptor>();
 
@@ -80,6 +85,14 @@ public class DataSetDescriptor {
     public void addRelDataSet(String fieldName, String key, DataSetDescriptor descriptor) {
         relDataSetMap.put(key,descriptor);
         relFieldKeyMap.put(fieldName,key);
+        descriptor.addBeenUsedFieldInfo(key.substring(key.indexOf("/") + 1), this.dataSet.getCode(), fieldName);
+    }
+
+    public void addBeenUsedFieldInfo(String currentKey, String subDataSet, String subRelFieldCode) {
+        if(!beenUsedFieldMap.containsKey(currentKey)) {
+            beenUsedFieldMap.put(currentKey, new LinkedHashSet<String>());
+        }
+        beenUsedFieldMap.get(currentKey).add(subDataSet + "/" + subRelFieldCode);
     }
 
     public DataSetDescriptor(DataSet dataSet) {
@@ -93,6 +106,10 @@ public class DataSetDescriptor {
                 if("true".equals(field.getIsName())) {
                     nameField = field;
                 }
+                if("true".equals(field.getIsWorkflowStatus())) {
+                    workflowStatusField = field;
+                }
+
             }
         }
     }
@@ -367,6 +384,10 @@ public class DataSetDescriptor {
         this.nameField = nameField;
     }
 
+    public Field getWorkflowStatusField() {
+        return workflowStatusField;
+    }
+
     public Map<String, Field> getFields() {
         if(fields == null) {
             synchronized (this) {
@@ -497,5 +518,10 @@ public class DataSetDescriptor {
             }
         }
         return (DOMElement) result;
+    }
+
+
+    public Map<String, Set<String>> getBeenUsedFieldMap() {
+        return beenUsedFieldMap;
     }
 }

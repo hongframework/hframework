@@ -1,0 +1,17 @@
+<dataset>
+  <module>activiti</module>
+  <code>act_procdef_extauth</code>
+  <entity>act_procdef_extauth</entity>
+  <name>流程定义扩展授权</name>
+  <fields>
+    <field code="category" name="分类" edit-type="hidden"></field>
+    <field code="name" name="名称" edit-type="hidden"></field>
+    <field code="key" name="编码" edit-type="hidden"></field>
+    <field code="taskKey" name="任务节点" edit-type="text"></field>
+    <field code="role" name="角色" edit-type="select"></field>
+    <field code="{RUNTIME_FIELD}" name="{运行态字段}" edit-type="input"></field>
+    <field code="comment" name="意见" edit-type="select">
+      <enum-class code="DEFAULT.BOOLEAN"/>
+    </field>
+  </fields>
+</dataset>

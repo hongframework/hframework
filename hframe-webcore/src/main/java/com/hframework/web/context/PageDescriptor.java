@@ -18,6 +18,8 @@ public class PageDescriptor{
 
     private Pagetemplate pageTemplate;
 
+    private String subDataSetNames;
+
     //组件信息
     private Map<String, ComponentDescriptor> components = new LinkedHashMap<String, ComponentDescriptor>();
 
@@ -119,5 +121,13 @@ public class PageDescriptor{
 
     public void setPage(Page page) {
         this.page = page;
+    }
+
+    public String getSubDataSetNames() {
+        return subDataSetNames;
+    }
+
+    public void setSubDataSetNames(String subDataSetNames) {
+        this.subDataSetNames = subDataSetNames;
     }
 }

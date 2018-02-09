@@ -1,24 +1,21 @@
 package com.hframework.web.context;
 
 import com.alibaba.fastjson.JSONObject;
+import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
-import com.hframework.common.util.collect.CollectionUtils;
-import com.hframework.common.util.collect.bean.Fetcher;
 import com.hframework.common.util.EnumUtils;
-import com.hframework.common.util.file.FileUtils;
 import com.hframework.common.util.ReflectUtils;
 import com.hframework.common.util.StringUtils;
-import com.hframework.common.util.message.Dom4jUtils;
+import com.hframework.common.util.collect.CollectionUtils;
+import com.hframework.common.util.collect.bean.Fetcher;
+import com.hframework.common.util.file.FileUtils;
 import com.hframework.common.util.message.XmlUtils;
 import com.hframework.web.CreatorUtil;
 import com.hframework.web.config.bean.*;
-import com.hframework.web.config.bean.Component;
 import com.hframework.web.config.bean.component.Event;
 import com.hframework.web.config.bean.component.PreHandle;
 import com.hframework.web.config.bean.dataset.*;
-import com.hframework.web.config.bean.dataset.Entity;
-import com.hframework.web.config.bean.dataset.Node;
-import com.hframework.web.config.bean.module.*;
+import com.hframework.web.config.bean.module.Page;
 import com.hframework.web.config.bean.pagetemplates.Element;
 import com.hframework.web.config.bean.pagetemplates.Pagetemplate;
 import com.hframework.web.context.enums.ElementType;
@@ -31,17 +28,15 @@ import org.activiti.engine.ProcessEngines;
 import org.activiti.engine.repository.Deployment;
 import org.activiti.engine.repository.ProcessDefinition;
 import org.apache.commons.beanutils.BeanUtils;
-import org.dom4j.DocumentException;
-import org.dom4j.DocumentHelper;
-import org.dom4j.dom.DOMElement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.w3c.dom.*;
 
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import java.io.*;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.*;
 
 /**
@@ -93,6 +88,8 @@ public class WebContext {
 
     private Map<String, Map<String, PageDescriptor>> pageSetting = new HashMap<String, Map<String, PageDescriptor>>();
 
+    private static ProcessContext processContext;
+
     private static DataSetDescriptor SYSTEM_EMPTY_DATASET = null;
     {
         DataSet dataSet = new DataSet();
@@ -123,6 +120,27 @@ public class WebContext {
     public WebContext(String companyCode, String programCode, String templateCode) {
         this(companyCode,programCode,templateCode, false);
     }
+
+    public ProcessContext getProcessContext(){
+        try {
+            if(processContext == null) {
+                synchronized (WebContext.class) {
+                    if(processContext == null) {
+                        Class<? extends ProcessContext> processContextClass = (Class<? extends ProcessContext>) Class.forName("com.hframework.web.context.ProcessContext");
+                        processContext = processContextClass.newInstance();
+                    }
+                }
+            }
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (InstantiationException e) {
+            e.printStackTrace();
+        }
+        return processContext;
+    }
+
 
     public WebContext(String companyCode, String programCode, String templateCode, boolean flushAuto) {
         try {
@@ -156,7 +174,7 @@ public class WebContext {
         loadDataSetRuler();
 
         //加载流程
-        loadProcess();
+//        loadProcess();
 
         for (DataSetDescriptor dataSetDescriptor : dataSets.values()) {
             dataSetDescriptor.setDataSetRulers();
@@ -172,14 +190,21 @@ public class WebContext {
 
     }
 
+    /**
+     * 由于工作流的改版后，所有的bpmn配置文件直接通过管理台运行态落库与发布，因此系统启动时静态加载流程被弃用，
+     * 而对应的流程可进行的操作也将调用对应页面时动态计算，不再一次性计算
+     * @throws IOException
+     * @throws XMLStreamException
+     */
+    @Deprecated
     private void loadProcess() throws IOException, XMLStreamException {
-        File dictionaryFile = null;
-        if(new File(contextHelper.programConfigRootDir).exists()) {
-            dictionaryFile = new File(contextHelper.programConfigRootDir + "/" + contextHelper.programConfigDataSetDir + "/" + "process");
-        }else {
-            dictionaryFile = new File(XmlUtils.class.getResource("/").getPath() + "/" + contextHelper.programConfigDataSetDir + "/" + "process");
-        }
-        File[] fileList = FileUtils.getFileList(dictionaryFile);
+//        File dictionaryFile = null;
+//        if(new File(contextHelper.programConfigRootDir).exists()) {
+//            dictionaryFile = new File(contextHelper.programConfigRootDir + "/" + contextHelper.programConfigDataSetDir + "/" + "process");
+//        }else {
+//            dictionaryFile = new File(XmlUtils.class.getResource("/").getPath() + "/" + contextHelper.programConfigDataSetDir + "/" + "process");
+//        }
+        File[] fileList = XmlUtils.readValuesFromDirectory(contextHelper.programConfigRootDir, contextHelper.programConfigDataSetDir + "/" + "process",  ".xml");
         if(fileList == null) return;
         for (File file : fileList) {
             String fileName = file.getName();
@@ -765,6 +790,16 @@ public class WebContext {
         pageDescriptor.setPage(page);
         pageDescriptor.setPageTemplate(pageTemplates.get(page.getPageTemplate()));
 
+        String[] subDataSets = StringUtils.split(page.getSubDataSets(), ",");
+        List<String> subDataSetNames = new ArrayList<String>();
+        if(subDataSets != null) {
+            for (String subDataSet : subDataSets) {
+                subDataSetNames.add(dataSets.get(subDataSet.trim()).getDataSet().getName().replaceAll("【[^【】]*】", ""));
+            }
+        } else if(StringUtils.isNotBlank(page.getDataSet())){
+            subDataSetNames.add(dataSets.get(page.getDataSet()).getDataSet().getName().replaceAll("【[^【】]*】", ""));
+        }
+        pageDescriptor.setSubDataSetNames(Joiner.on(",").join(subDataSetNames));
 
         Stack<Pagetemplate> pageTemplateStack =  getPageTemplateStack(page.getPageTemplate(), new Stack<Pagetemplate>());
         for (Pagetemplate pageTemplate : pageTemplateStack) {
@@ -1091,6 +1126,10 @@ public class WebContext {
         Class<?> aClass = data.getClass();
         String simpleName = aClass.getName();
         Context.put(simpleName, data);
+        Context.put(aClass, data);
+    }
+    public static Set<Class> getAllClassContext() {
+        return Context.getAllClassContext();
     }
 
     public static void clear() {
@@ -1111,6 +1150,14 @@ public class WebContext {
 
     public static <T> T get(String key) {
         return Context.get(key);
+    }
+
+    public static <T> T get(Class key) {
+        return Context.get(key);
+    }
+
+    public static HashMap getDefault() {
+        return Context.getDefault();
     }
 
     public static Map<String, String> putContext(String key, String value) {
@@ -1201,7 +1248,7 @@ public class WebContext {
 
     public static class Context{
         private static ThreadLocal<Map<String, Item>> itemsTL = new ThreadLocal<Map<String, Item>>();
-
+        private static ThreadLocal<Map<Class, Item>> classTL = new ThreadLocal<Map<Class, Item>>();
         public static <T> void put(String key, T data) {
             if(itemsTL.get() == null) {
                 itemsTL.set(new HashMap<String, Item>());
@@ -1209,15 +1256,41 @@ public class WebContext {
             itemsTL.get().put(key, new Item(data));
         }
 
-        public static void clear() {
-            itemsTL.remove();
+        public static <T> void put(Class key, T data) {
+            if(classTL.get() == null) {
+                classTL.set(new HashMap<Class, Item>());
+            }
+            classTL.get().put(key, new Item(data));
         }
 
+        public static void clear() {
+            itemsTL.remove();
+            classTL.remove();
+        }
+
+        public static Set<Class> getAllClassContext(){
+            if(classTL.get() == null) {
+                return null;
+            }
+            return classTL.get().keySet();
+        }
+
+
+        public static <T> T get(Class key) {
+            if(classTL.get() != null && classTL.get().containsKey(key)) {
+                return (T) classTL.get().get(key).getT();
+            }
+            return null;
+        }
         public static <T> T get(String key) {
             if(itemsTL.get() != null && itemsTL.get().containsKey(key)) {
                 return (T) itemsTL.get().get(key).getT();
             }
             return null;
+        }
+
+        public static HashMap getDefault() {
+            return get(HashMap.class.getName());
         }
     }
 
@@ -1331,5 +1404,9 @@ public class WebContext {
 
     public  Object[] getProcess(String dataSet) {
         return processsCache.get(dataSet);
+    }
+
+    public Mapper getMapper(String mapper) {
+        return mappers.get(mapper);
     }
 }

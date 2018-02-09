@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<component id="container" init="true" type="container" data-set="${dataSet}" data-auth="${dataAuth}"  path="component/container.vm">
+<component id="container" init="true" type="" data-set="${dataSet}" data-auth="${dataAuth}"  path="component/container.vm">
     <element id="id" type="characters" default-value=""></element>
     <!--<element id="data" type="object"  default-value=""></element>-->
     <events>

@@ -579,6 +579,53 @@ public class HfModelContainerUtil {
         return hfpmDataField;
     }
 
+        //v1.0
+//    public static List<DataField> getDS4QryDataFieldFromEntityAttr(EntityAttr hfmdEntityAttr, DataSet dataSet) {
+//
+//        List<DataField> result = new ArrayList<DataField>();
+//
+//        DataField dataFieldFromEntityAttr = null;
+//        if("pri".equals(hfmdEntityAttr.getHfmdEntityAttrCode().toLowerCase())) {
+//            return result;
+//        }else if("create_time".equals(hfmdEntityAttr.getHfmdEntityAttrCode().toLowerCase())
+//                || "modify_time".equals(hfmdEntityAttr.getHfmdEntityAttrCode().toLowerCase())) {
+//            dataFieldFromEntityAttr = getDataFieldFromEntityAttr(hfmdEntityAttr, dataSet);
+//            dataFieldFromEntityAttr.setHfpmDataFieldName(
+//                    dataFieldFromEntityAttr.getHfpmDataFieldName().replaceAll("时间","开始时间"));
+//            dataFieldFromEntityAttr.setHfpmDataFieldCode(
+//                    dataFieldFromEntityAttr.getHfpmDataFieldCode() + "_GEQ");
+////            dataFieldFromEntityAttr.setFieldShowCode("222");
+//            dataFieldFromEntityAttr.setCreateEditAuth((byte) 2);
+//            dataFieldFromEntityAttr.setUpdateEditAuth((byte) 2);
+//            dataFieldFromEntityAttr.setListShowAuth((byte) 1);
+//            dataFieldFromEntityAttr.setDetailShowAuth((byte) 1);
+//            result.add(dataFieldFromEntityAttr);
+//            dataFieldFromEntityAttr = getDataFieldFromEntityAttr(hfmdEntityAttr, dataSet);
+//            dataFieldFromEntityAttr.setHfpmDataFieldName(
+//                    dataFieldFromEntityAttr.getHfpmDataFieldName().replaceAll("时间", "结束时间"));
+//            dataFieldFromEntityAttr.setHfpmDataFieldCode(
+//                    dataFieldFromEntityAttr.getHfpmDataFieldCode() + "_LEQ");
+////            dataFieldFromEntityAttr.setFieldShowCode("222");
+//            dataFieldFromEntityAttr.setCreateEditAuth((byte) 2);
+//            dataFieldFromEntityAttr.setUpdateEditAuth((byte) 2);
+//            dataFieldFromEntityAttr.setListShowAuth((byte) 1);
+//            dataFieldFromEntityAttr.setDetailShowAuth((byte) 1);
+//            result.add(dataFieldFromEntityAttr);
+//        }else {
+//            dataFieldFromEntityAttr = getDataFieldFromEntityAttr(hfmdEntityAttr, dataSet);
+////            dataFieldFromEntityAttr.setFieldShowCode("222");
+//            dataFieldFromEntityAttr.setCreateEditAuth((byte) 2);
+//            dataFieldFromEntityAttr.setUpdateEditAuth((byte) 2);
+//            dataFieldFromEntityAttr.setListShowAuth((byte)1);
+//            dataFieldFromEntityAttr.setDetailShowAuth((byte)1);
+//            result.add(dataFieldFromEntityAttr);
+//        }
+//
+//        return result;
+//    }
+
+
+    //v2.0
     public static List<DataField> getDS4QryDataFieldFromEntityAttr(EntityAttr hfmdEntityAttr, DataSet dataSet) {
 
         List<DataField> result = new ArrayList<DataField>();
@@ -587,23 +634,12 @@ public class HfModelContainerUtil {
         if("pri".equals(hfmdEntityAttr.getHfmdEntityAttrCode().toLowerCase())) {
             return result;
         }else if("create_time".equals(hfmdEntityAttr.getHfmdEntityAttrCode().toLowerCase())
-                || "modify_time".equals(hfmdEntityAttr.getHfmdEntityAttrCode().toLowerCase())) {
+                || "modify_time".equals(hfmdEntityAttr.getHfmdEntityAttrCode().toLowerCase())
+                || "ctime".equals(hfmdEntityAttr.getHfmdEntityAttrCode().toLowerCase())
+                || "mtime".equals(hfmdEntityAttr.getHfmdEntityAttrCode().toLowerCase())) {
             dataFieldFromEntityAttr = getDataFieldFromEntityAttr(hfmdEntityAttr, dataSet);
-            dataFieldFromEntityAttr.setHfpmDataFieldName(
-                    dataFieldFromEntityAttr.getHfpmDataFieldName().replaceAll("时间","开始时间"));
-            dataFieldFromEntityAttr.setHfpmDataFieldCode(
-                    dataFieldFromEntityAttr.getHfpmDataFieldCode() + "_GEQ");
-//            dataFieldFromEntityAttr.setFieldShowCode("222");
-            dataFieldFromEntityAttr.setCreateEditAuth((byte) 2);
-            dataFieldFromEntityAttr.setUpdateEditAuth((byte) 2);
-            dataFieldFromEntityAttr.setListShowAuth((byte) 1);
-            dataFieldFromEntityAttr.setDetailShowAuth((byte) 1);
-            result.add(dataFieldFromEntityAttr);
-            dataFieldFromEntityAttr = getDataFieldFromEntityAttr(hfmdEntityAttr, dataSet);
-            dataFieldFromEntityAttr.setHfpmDataFieldName(
-                    dataFieldFromEntityAttr.getHfpmDataFieldName().replaceAll("时间", "结束时间"));
-            dataFieldFromEntityAttr.setHfpmDataFieldCode(
-                    dataFieldFromEntityAttr.getHfpmDataFieldCode() + "_LEQ");
+            dataFieldFromEntityAttr.setHfpmDataFieldName(dataFieldFromEntityAttr.getHfpmDataFieldName());
+            dataFieldFromEntityAttr.setHfpmDataFieldCode(dataFieldFromEntityAttr.getHfpmDataFieldCode());
 //            dataFieldFromEntityAttr.setFieldShowCode("222");
             dataFieldFromEntityAttr.setCreateEditAuth((byte) 2);
             dataFieldFromEntityAttr.setUpdateEditAuth((byte) 2);
@@ -612,6 +648,9 @@ public class HfModelContainerUtil {
             result.add(dataFieldFromEntityAttr);
         }else {
             dataFieldFromEntityAttr = getDataFieldFromEntityAttr(hfmdEntityAttr, dataSet);
+            if(hfmdEntityAttr.getAttrType() == HfmdEntityAttr1AttrTypeEnum.VARCHAR.getIndex() && "1".equals(dataFieldFromEntityAttr.getHfpmFieldShowTypeId())){
+                dataFieldFromEntityAttr.setHfpmDataFieldCode(dataFieldFromEntityAttr.getHfpmDataFieldCode() + "_LKE");
+            }
 //            dataFieldFromEntityAttr.setFieldShowCode("222");
             dataFieldFromEntityAttr.setCreateEditAuth((byte) 2);
             dataFieldFromEntityAttr.setUpdateEditAuth((byte) 2);
@@ -638,7 +677,10 @@ public class HfModelContainerUtil {
             return "2";//TODO
         }else if(hfmdEntityAttr.getRelHfmdEntityAttrId()!= null && hfmdEntityAttr.getRelHfmdEntityAttrId() > 0){ //外键对象
             return "2";//TODO
-        }else if(hfmdEntityAttr.getAttrType() == HfmdEntityAttr1AttrTypeEnum.DATETIME.getIndex() || hfmdEntityAttr.getAttrType() == HfmdEntityAttr1AttrTypeEnum.DATE.getIndex()) {
+        }else if(hfmdEntityAttr.getAttrType() == HfmdEntityAttr1AttrTypeEnum.DATETIME.getIndex()
+                || hfmdEntityAttr.getAttrType() == HfmdEntityAttr1AttrTypeEnum.DATE.getIndex()
+                ||(hfmdEntityAttr.getAttrType() == HfmdEntityAttr1AttrTypeEnum.INT.getIndex() && "ctime".equals(hfmdEntityAttr.getHfmdEntityAttrName()))
+                ||(hfmdEntityAttr.getAttrType() == HfmdEntityAttr1AttrTypeEnum.INT.getIndex() && "mtime".equals(hfmdEntityAttr.getHfmdEntityAttrName()))) {
             return "3";//TODO
         } else {
             return "1";//TODO

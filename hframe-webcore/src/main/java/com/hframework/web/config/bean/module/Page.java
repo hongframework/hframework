@@ -38,6 +38,9 @@ public class Page   {
     @XStreamAlias("data-set")
 	private String dataSet;
     @XStreamAsAttribute
+    @XStreamAlias("sub-data-sets")
+    private String subDataSets;
+    @XStreamAsAttribute
     @XStreamAlias("rel-page")
     private String relPage;
 
@@ -127,5 +130,13 @@ public class Page   {
 
     public void setVmPath(String vmPath) {
         this.vmPath = vmPath;
+    }
+
+    public String getSubDataSets() {
+        return subDataSets;
+    }
+
+    public void setSubDataSets(String subDataSets) {
+        this.subDataSets = subDataSets;
     }
 }

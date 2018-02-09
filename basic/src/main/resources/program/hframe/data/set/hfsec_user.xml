@@ -21,7 +21,7 @@
       <create-edit-type>hidden</create-edit-type>
       <update-edit-type>hidden</update-edit-type>
     </field>
-    <field code="status" name="状态" edit-type="select">
+    <field code="status" name="状态" edit-type="select" is-workflow-status="true">
       <enum-class code="hfsec_user.status"/>
     </field>
     <field code="hfsec_organize_id" name="归属组织ID" edit-type="select" not-null="true">

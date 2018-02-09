@@ -47,6 +47,9 @@ public class Field {
     @XStreamAsAttribute
     @XStreamAlias("not-null")
     private String notNull;
+    @XStreamAsAttribute
+    @XStreamAlias("is-workflow-status")
+    private String isWorkflowStatus;
     @XStreamAlias("tipinfo")
     private String tipinfo;
     @XStreamAsAttribute
@@ -175,5 +178,13 @@ public class Field {
 
     public void setWidth(String width) {
         this.width = width;
+    }
+
+    public String getIsWorkflowStatus() {
+        return isWorkflowStatus;
+    }
+
+    public void setIsWorkflowStatus(String isWorkflowStatus) {
+        this.isWorkflowStatus = isWorkflowStatus;
     }
 }

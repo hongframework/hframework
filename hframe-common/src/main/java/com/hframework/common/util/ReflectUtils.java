@@ -77,7 +77,7 @@ public class ReflectUtils {
         }
     }
 
-    private static Field getDeclaredField(Object object, String filedName) {
+    public static Field getDeclaredField(Object object, String filedName) {
         for (Class<?> superClass = object.getClass(); superClass != Object.class; superClass = superClass.getSuperclass()) {
             try {
                 return superClass.getDeclaredField(filedName);

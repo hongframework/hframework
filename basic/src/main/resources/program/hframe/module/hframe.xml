@@ -132,7 +132,7 @@
   <page id="hfcfg_program_template_create" name="项目模板创建" page-template="create" data-set="hframe/hfcfg_program_template"/>
   <page id="hfcfg_program_template_edit" name="项目模板修改" page-template="edit" data-set="hframe/hfcfg_program_template"/>
   <page id="hfcfg_program_template_detail" name="项目模板明细" page-template="edit" data-set="hframe/hfcfg_program_template"/>
-  <page id="hfcfg_page_template_mgr" name="页面模板管理" page-template="qlist" data-set="hframe/hfcfg_page_template">
+  <page id="hfcfg_page_template_mgr" name="页面模板管理" page-template="qlist" data-set="hframe/hfcfg_page_template" sub-data-sets="hframe/hfcfg_page_template_elements">
     <component id="qForm" data-set="hframe/hfcfg_page_template_DS4Q"/>
   </page>
   <page id="hfcfg_page_template_create" name="页面模板添加" page-template="cComb" data-set="hframe/hfcfg_page_template">

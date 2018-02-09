@@ -117,7 +117,7 @@ public class DbGeneratorController extends ExtBaseController {
         try{
             Map<String, String>  pageContextParams = DefaultController.getPageContextParams(request);
             WebContext.putContext(DefaultController.getPageContextRealyParams(pageContextParams));
-            Map<String, String> pageFlowParams = WebContext.get(HashMap.class.getName());
+            Map<String, String> pageFlowParams = WebContext.getDefault();
 
             String companyCode = "hframe";
             String programCode = "hframe";
@@ -391,7 +391,7 @@ public class DbGeneratorController extends ExtBaseController {
 
             Map<String, String>  pageContextParams = DefaultController.getPageContextParams(request);
             WebContext.putContext(DefaultController.getPageContextRealyParams(pageContextParams));
-            Map<String, String> pageFlowParams = WebContext.get(HashMap.class.getName());
+            Map<String, String> pageFlowParams = WebContext.getDefault();
             startDynamicDataSource(pageFlowParams);
             commonDataService.executeDBStructChange(result);
             return ResultData.success();

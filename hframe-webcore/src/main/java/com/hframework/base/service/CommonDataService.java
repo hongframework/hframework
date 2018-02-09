@@ -63,7 +63,15 @@ public class CommonDataService {
     public void executeDBStructChange(Map sqlInfo) throws Exception {
         commonDataMapper.executeDBStructChange(sqlInfo);
     }
-
+    /**
+     * 增加流程资源文件
+     * @param values
+     * @return
+     * @throws Exception
+     */
+    public void insertActGeByteArray(Map values) throws Exception{
+        commonDataMapper.insertActGeByteArray(values);
+    }
     /**
      * 数据库结构变更
      *

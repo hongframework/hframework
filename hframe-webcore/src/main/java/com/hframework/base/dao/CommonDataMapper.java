@@ -43,6 +43,15 @@ public interface CommonDataMapper {
     public void executeDBStructChange(Map sqlInfo) throws Exception;
 
     /**
+     * 增加流程资源文件
+     * @param values
+     * @return
+     * @throws Exception
+     */
+    public void insertActGeByteArray(Map values) throws Exception;
+
+
+    /**
      * 查询所有表信息
      * @param sqlInfo
      * @return

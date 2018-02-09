@@ -5,7 +5,6 @@ import com.alibaba.fastjson.JSONObject;
 import com.google.common.base.Enums;
 import com.google.common.base.Joiner;
 import com.google.common.base.Optional;
-import com.hframework.base.service.CommonDataService;
 import com.hframework.beans.class0.Class;
 import com.hframework.beans.controller.Pagination;
 import com.hframework.beans.controller.ResultData;
@@ -17,10 +16,7 @@ import com.hframework.web.auth.AuthContext;
 import com.hframework.web.auth.AuthServiceProxy;
 import com.hframework.web.config.bean.DataSetHelper;
 import com.hframework.web.config.bean.datasethelper.Mappings;
-import com.hframework.web.context.ComponentDescriptor;
-import com.hframework.web.context.DataSetDescriptor;
-import com.hframework.web.context.PageDescriptor;
-import com.hframework.web.context.WebContext;
+import com.hframework.web.context.*;
 import com.hframework.web.controller.DefaultController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,7 +31,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 
 import static com.hframework.common.util.ExampleUtils.*;
-import static com.hframework.common.util.ExampleUtils.RelationOperator.*;
 
 /**
  * Created by zhangquanhong on 2018/1/10.
@@ -80,7 +75,7 @@ public class ComponentInvokeManager {
             action = null;
         }else if("eTList".equals(type)) {
             action = "tree";
-        }else if(!"cForm".equals(type) && !"qForm".equals(type)) {
+        }else if(StringUtils.isNotBlank(type) && !"cForm".equals(type) && !"qForm".equals(type)) {
             action = type;
         }
 
@@ -124,10 +119,20 @@ public class ComponentInvokeManager {
                 }else {
                     jsonObject = componentDescriptor.getJson(resultData);
                 }
+                if(resultData.getData() != null && resultData.getData() instanceof Map) {
+                    Map extData = (Map)resultData.getData();
+                    if(extData.containsKey("_DataJson")) {
+                        jsonObject.put("data", extData.get("_DataJson"));
+                    }
+                    if(extData.containsKey("_ColumnJson")) {
+                        jsonObject.put("columns", extData.get("_ColumnJson"));
+                    }
+                }
+
             }else {
                 jsonObject = componentDescriptor.getJson();
                 if(!(jsonObject.get("data") instanceof JSONArray)) {
-                    jsonObject.put("data",JSONObject.toJSON(WebContext.get(HashMap.class.getName())));
+                    jsonObject.put("data",JSONObject.toJSON(WebContext.getDefault()));
                 }
             }
         }else if(StringUtils.isNotBlank(action)) {
@@ -150,7 +155,7 @@ public class ComponentInvokeManager {
             Object po = null;
 
             if ("detail".equals(action)) {
-                resultData = controllerMethodInvoker.invokeDetail(defPoClass, controller, request);
+                resultData = controllerMethodInvoker.invokeDetail(defPoClass, controller, request, componentDescriptor);
                 //这里将查询的单个对象存入线程中，别的组件在需要时可以获取想要的值，如数据集数据列智能提醒需要依赖数据集的主实体ID
                 WebContext.add(resultData.getData());
             }else if("tree".equals(action) && componentDescriptor.getDataSetDescriptor().isSelfDepend()) {
@@ -161,16 +166,20 @@ public class ComponentInvokeManager {
                 if (pagination.getPageNo() == 0) pagination.setPageNo(1);
                 if (pagination.getPageSize() == 0) pagination.setPageSize(10);
                 if ("eList".equals(type)) pagination.setPageSize(50);
-                resultData = controllerMethodInvoker.invokeList(pagination, poExample, defPoClass, defPoExampleClass, controller, request);
+                resultData = controllerMethodInvoker.invokeList(isRefresh, pagination, poExample, defPoClass, defPoExampleClass, controller, request , componentDescriptor);
                 if (resultData.getData() instanceof Map) {
                     List helperData = getHelperData(extendData, componentDescriptor.getDataSetDescriptor(), action, defPoClass, request);
                     ((Map) resultData.getData()).put("helperData", helperData);
                 }
+
             }else {
                 throw new BusinessException("action [ " + action + " ] not supported! ");
             }
 
             jsonObject = getJsonObjectByResultData(componentDescriptor, resultData, moduleCode, dataSetCode, action);
+            if(resultData.getData() == null) {
+                jsonObject.put("dataIsEmpty","true");
+            }
         }else {
             if("cList".equals(type)){
                 Class defPoClass = CreatorUtil.getDefPoClass(WebContext.get().getProgram().getCompany(),
@@ -183,8 +192,9 @@ public class ComponentInvokeManager {
             }
 
             if(!(jsonObject.get("data") instanceof JSONArray)) {
-                jsonObject.put("data",JSONObject.toJSON(WebContext.get(HashMap.class.getName())));
+                jsonObject.put("data",JSONObject.toJSON(WebContext.getDefault()));
             }
+            jsonObject.put("dataIsEmpty","true");
         }
 
         if("list".equals(type) || "cList".equals(type) || "eList".equals(type) || "eTList".equals(type)) {
@@ -196,7 +206,7 @@ public class ComponentInvokeManager {
                 jsonObject.put("dataIsEmpty","true");
                 int cnt = 0;
                 String[] defaultNullData = new String[((JSONArray) jsonObject.get("columns")).size()];
-                Map<String, String> pageFlowParams = WebContext.get(HashMap.class.getName());
+                Map<String, String> pageFlowParams = WebContext.getDefault();
                 for (Object columns : (JSONArray) jsonObject.get("columns")) {
                     if(pageFlowParams.containsKey(((JSONObject) columns).get("code"))) {
                         defaultNullData[cnt++] = pageFlowParams.get(((JSONObject) columns).get("code"));
@@ -312,7 +322,55 @@ public class ComponentInvokeManager {
         }else {
             jsonObject = componentDescriptor.getJson();
             if(!(jsonObject.get("data") instanceof JSONArray)) {
-                jsonObject.put("data",JSONObject.toJSON(WebContext.get(HashMap.class.getName())));
+                /*TODO 临时注释掉，BUG:当我们编辑一对象时（eForm），如果对象存在一下属可选的子对象（eForm)，
+                当下属对象从无到有且下属对象与源编辑对象拥有同样的ID名称，则默认赋值，这样新增下属对象变成了修改别的下属对象
+                比如增加数据源对象，而数据源下属对象有MYSQL,HBASE,REDIS可选对象*/
+//                jsonObject.put("data",JSONObject.toJSON(WebContext.getDefault()));
+            }
+        }
+        if("list".equals(componentDescriptor.getComponent().getType()) && componentDescriptor.getDataSetDescriptor().getWorkflowStatusField() != null) {
+            ProcessContext.ProcessInfo processInfo = WebContext.get().getProcessContext().getProcessInfo(componentDescriptor.getDataSetDescriptor().getDataSet().getCode());
+            if(processInfo != null) {
+                List<ComponentDataContainer.EventElement> workflowEvents = processInfo.getWorkflowEOFREventElements();
+                JSONArray evenets = jsonObject.getJSONArray("EOFR");
+                evenets.addAll(workflowEvents);
+                jsonObject.put("EOFR", evenets);
+            }
+        }else if("eForm".equals(componentDescriptor.getId()) && componentDescriptor.getDataSetDescriptor().getWorkflowStatusField() != null) {
+            ProcessContext.ProcessInfo processInfo = WebContext.get().getProcessContext().getProcessInfo(componentDescriptor.getDataSetDescriptor().getDataSet().getCode());
+            if(processInfo != null) {
+                String nodeKeyValue = jsonObject.getJSONObject("data").getString(processInfo.getProcessDataFieldCode());
+                List<ComponentDataContainer.EventElement> workflowEvents = processInfo.getWorkflowEOFCEventElements().get(nodeKeyValue);
+                if(workflowEvents != null) {
+                    JSONArray evenets = jsonObject.getJSONArray("EOF");
+                    if(evenets != null) {
+                        evenets.addAll(workflowEvents);
+                        jsonObject.put("EOF", evenets);
+                    }else {
+                        jsonObject.put("EOF", workflowEvents);
+                    }
+                }
+
+                if(processInfo.getProcessNodeInfoMap() != null && processInfo.getProcessNodeInfoMap().containsKey(nodeKeyValue)) {
+                    ProcessContext.ProcessNodeInfo processNodeInfo = processInfo.getProcessNodeInfoMap().get(nodeKeyValue);
+                    JSONArray columns = jsonObject.getJSONArray("columns");
+                    for (Object column : columns) {
+                        JSONObject columnObject = (JSONObject)column;
+                        String code = columnObject.getString("code");
+                        if(processNodeInfo.getForbidFields().contains(code)){
+                            columnObject.put("editType","text");
+                        }
+                    }
+                    if(processNodeInfo.isAllowComment()){
+                        JSONObject comment = new JSONObject();
+                        comment.put("code", "_WFComment");
+                        comment.put("name", "<span style=\"color:red;\">意见</span>");
+                        comment.put("editType", "textarea");
+                        columns.add(comment);
+                    }
+                    jsonObject.put("HF_BREAK_FLAG", true);
+                }
+
             }
         }
         return jsonObject;
@@ -377,7 +435,7 @@ public class ComponentInvokeManager {
     }
 
     private List getHelperData(Map<String, Object> extendData , DataSetDescriptor dataSetDescriptor, String action, Class targetPoClass, HttpServletRequest request) {
-        Map<String, String> pageFlowParams = WebContext.get(HashMap.class.getName());
+        Map<String, String> pageFlowParams = WebContext.getDefault();
         List helperDataList = extendData == null ? null : (List) extendData.get("HELPER");
         List helperPoList = new ArrayList();
         List<DataSetHelper> dataSetHelpers = dataSetDescriptor.getDataSetHelpers();

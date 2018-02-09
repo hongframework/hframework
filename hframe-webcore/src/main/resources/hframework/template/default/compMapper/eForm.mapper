@@ -15,9 +15,11 @@
         <mapping id="data" value="${data}"></mapping>
     </baseMapper>
     <eventMapper>
+        <mapping id="name" value="${name}"></mapping>
         <mapping id="updateByAjax" value="${updateByAjax}.json"></mapping>
         <mapping id="saveOrUpdateByAjax" value="${saveOrUpdateByAjax}.json"></mapping>
         <mapping id="mgr" value="${mgr}.html"></mapping>
         <mapping id="cForm:mgr" value="${cForm:mgr}.html"></mapping>
+        <mapping id="DS" value="${DS}"></mapping>
     </eventMapper>
 </mapper>

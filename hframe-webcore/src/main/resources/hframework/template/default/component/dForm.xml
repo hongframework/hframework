@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<component id="dForm" init="true" type="dForm" data-set="${dataSet}" data-auth="${dataAuth}">
+<component id="dForm" init="true" type="dForm" data-set="${dataSet}" data-auth="${dataAuth}"  path="component/detailForm.vm">
     <element id="id" type="characters" default-value=""></element>
     <element id="icon" type="enums" relId="icons" default-value=""></element>
     <element id="title" type="characters"  default-value=""></element>
     <element id="columns" type="objects"  default-value="">
         <element id="code" type="characters"  default-value=""></element>
         <element id="name" type="characters"  default-value=""></element>
-        <element id="editType" type="enums" relId="#{TYPE}"  default-value=""></element>
+        <element id="showType" type="enums" relId="#{TYPE}"  default-value=""></element>
         <element id="dataCode" type="characters"  default-value=""></element>
         <element id="dataCondition" type="characters"  default-value=""></element>
     </element>

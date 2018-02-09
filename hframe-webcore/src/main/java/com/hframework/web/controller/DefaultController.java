@@ -6,15 +6,18 @@ import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.parser.Feature;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.Lists;
 import com.hframework.base.service.CommonDataService;
 import com.hframework.beans.class0.Class;
 import com.hframework.beans.controller.Pagination;
 import com.hframework.beans.controller.ResultCode;
 import com.hframework.beans.controller.ResultData;
+import com.hframework.beans.exceptions.BusinessException;
 import com.hframework.common.frame.ServiceFactory;
 import com.hframework.common.springext.datasource.DataSourceContextHolder;
-import com.hframework.common.util.ReflectUtils;
-import com.hframework.common.util.StringUtils;
+import com.hframework.common.util.*;
+import com.hframework.common.util.collect.CollectionUtils;
+import com.hframework.common.util.collect.bean.Fetcher;
 import com.hframework.common.util.file.FileUtils;
 import com.hframework.web.CreatorUtil;
 import com.hframework.web.SessionKey;
@@ -22,6 +25,7 @@ import com.hframework.web.auth.AuthServiceProxy;
 import com.hframework.web.config.bean.module.Component;
 import com.hframework.web.context.*;
 import com.hframework.web.controller.core.ComponentInvokeManager;
+import com.hframework.web.controller.core.ControllerMethodInvoker;
 import com.hframework.web.controller.core.PageExtendDataManager;
 import com.hframework.web.controller.core.SessionExpiredException;
 import com.vaadin.terminal.StreamResource;
@@ -160,7 +164,7 @@ public class DefaultController {
 //        mav.addObject("staticResourcePath", "/static");
 //        mav.setViewName("/login");
         try {
-            return gotoPage("login",null,null,null,request,response);
+            return gotoPage("login", null, null, null, request, response);
         } catch (Throwable throwable) {
             throwable.printStackTrace();
         }
@@ -242,6 +246,121 @@ public class DefaultController {
         }
         return ResultData.error(ResultCode.UNKNOW);
     };
+
+    /**
+     * 数据保存
+     * @return
+     */
+    @RequestMapping(value = "/deleteByAjax.json")
+    @ResponseBody
+    public ResultData delete(HttpServletRequest request,
+                               HttpServletResponse response)  {
+        try{
+            String refererUrl = request.getHeader("referer");
+            String[] refererUrlInfo = Arrays.copyOfRange(refererUrl.split("[/]+"), 2, refererUrl.split("[/]+").length);
+            String module = refererUrlInfo[0];
+            String pageCode = refererUrlInfo[1].substring(0, refererUrlInfo[1].indexOf(".html"));
+            PageDescriptor pageInfo = WebContext.get().getPageInfo(module, pageCode);
+            String ds = request.getParameter("_DS");
+            String di = request.getParameter("_DI");
+            String[] split = StringUtils.split(pageInfo.getPage().getSubDataSets(), ",");
+            Set<String> cascadeDeleteDataSets = new HashSet<String>();
+            if(split != null) {
+                cascadeDeleteDataSets.addAll(Lists.newArrayList(split));
+            }
+            assetDeleteDataSet(ds, cascadeDeleteDataSets, Lists.<Object>newArrayList(di));
+            deleteDataSet(ds, cascadeDeleteDataSets, Lists.<Object>newArrayList(di));
+        }catch (BusinessException e) {
+            e.printStackTrace();
+            return ResultData.error(e.getResultCode());
+        }catch (Exception e) {
+            e.printStackTrace();
+            return ResultData.error(ResultCode.ERROR);
+        }
+        return ResultData.success();
+    }
+
+    public void deleteDataSet(String deleteDataSet, Set<String> cascadeDeleteDataSets, final List<Object> deleteDataIds) throws Exception {
+        final DataSetDescriptor mainDataSet = WebContext.get().getOnlyDataSetDescriptor(deleteDataSet);
+        if(mainDataSet == null) {
+            throw new BusinessException("data set not exists !");
+        }
+        String company = WebContext.get().getProgram().getCompany();
+        String program = WebContext.get().getProgram().getCode();
+        Map<String, Set<String>> beenUsedFieldMap = mainDataSet.getBeenUsedFieldMap();
+        for (Set<String> beenUsedFields : beenUsedFieldMap.values()) {
+            for (String beenUsedField : beenUsedFields) {
+                String dataSet = beenUsedField.substring(0, beenUsedField.indexOf("/"));
+                final String relField = beenUsedField.substring(beenUsedField.indexOf("/") + 1);
+//                AuthContext.AuthUser.userClass
+                final DataSetDescriptor subDataSetDescriptor = WebContext.get().getOnlyDataSetDescriptor(dataSet);
+                String module = subDataSetDescriptor.getDataSet().getModule();
+                List resultList = ControllerMethodInvoker.invokeSimpleListMethod(
+                        company, program, module, dataSet, new HashMap<String, List<Object>>() {{
+                            put(relField, deleteDataIds);
+                        }}
+                );
+                if(resultList != null && resultList.size() > 0) {
+                    if(cascadeDeleteDataSets.contains(module + "/" + dataSet)) {
+                        List ids = CollectionUtils.fetch(resultList, new Fetcher() {
+                            public Object fetch(Object result) {
+                                return ReflectUtils.getFieldValue(result, JavaUtil.getJavaVarName(subDataSetDescriptor.getKeyField().getCode()));
+                            }
+                        });
+                        for (final Object id : ids) {
+                            ControllerMethodInvoker.invokeSimpleDelete(company, program, module, dataSet, new HashMap<String, Object>() {{
+                                put(JavaUtil.getJavaVarName(subDataSetDescriptor.getKeyField().getCode()), id);
+                            }});
+                        }
+                    }
+                }
+            }
+        }
+        String module = mainDataSet.getDataSet().getModule();
+        for (final Object deleteDataId : deleteDataIds) {
+            ControllerMethodInvoker.invokeSimpleDelete(company, program, module, deleteDataSet, new HashMap<String, Object>() {{
+                put(JavaUtil.getJavaVarName(mainDataSet.getKeyField().getCode()), deleteDataId);
+            }});
+        }
+
+    }
+
+    public void assetDeleteDataSet(String deleteDataSet, Set<String> cascadeDeleteDataSets, final List<Object> deleteDataIds) throws Exception {
+        DataSetDescriptor mainDataSet = WebContext.get().getOnlyDataSetDescriptor(deleteDataSet);
+        if(mainDataSet == null) {
+            throw new BusinessException("data set not exists !");
+        }
+
+        Map<String, Set<String>> beenUsedFieldMap = mainDataSet.getBeenUsedFieldMap();
+        for (Set<String> beenUsedFields : beenUsedFieldMap.values()) {
+            for (String beenUsedField : beenUsedFields) {
+                String dataSet = beenUsedField.substring(0, beenUsedField.indexOf("/"));
+                final String relField = beenUsedField.substring(beenUsedField.indexOf("/") + 1);
+//                AuthContext.AuthUser.userClass
+                final DataSetDescriptor subDataSetDescriptor = WebContext.get().getOnlyDataSetDescriptor(dataSet);
+                String company = WebContext.get().getProgram().getCompany();
+                String program = WebContext.get().getProgram().getCode();
+                String module = subDataSetDescriptor.getDataSet().getModule();
+                List resultList = ControllerMethodInvoker.invokeSimpleListMethod(
+                        company, program, module, dataSet, new HashMap<String, List<Object>>() {{
+                            put(relField, deleteDataIds);
+                        }}
+                );
+                if(resultList != null && resultList.size() > 0) {
+                    if(!cascadeDeleteDataSets.contains(module + "/" + dataSet)) {
+                        throw new BusinessException(dataSet + " [ " + relField + " = " + deleteDataIds + " ] is exists ,please delete first !");
+                    }else {
+                        List ids = CollectionUtils.fetch(resultList, new Fetcher() {
+                            public Object fetch(Object result) {
+                                return ReflectUtils.getFieldValue(result, JavaUtil.getJavaVarName(subDataSetDescriptor.getKeyField().getCode()));
+                            }
+                        });
+                        assetDeleteDataSet(dataSet, cascadeDeleteDataSets, ids);
+                    }
+                }
+            }
+        }
+    }
 
     /**
      * 数据保存
@@ -367,6 +486,17 @@ public class DefaultController {
                         objects = tempList.toArray((Object[]) Array.newInstance(java.lang.Class.forName(defPoClass.getClassPath()), 0));
                     }
                 }else {
+                    java.lang.Class<?> aClass = java.lang.Class.forName(defPoClass.getClassPath());
+                    String[] dateKeyAndValues = RegexUtils.find(componentJsonData, "\"[^\"]+\":\"[12]\\d{3}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}\"");
+                    for (String dateKeyAndValue : dateKeyAndValues) {
+                        String key = dateKeyAndValue.substring(1, dateKeyAndValue.indexOf(":") - 1);
+                        String value = dateKeyAndValue.substring(dateKeyAndValue.indexOf(":") + 2, dateKeyAndValue.length() - 1);
+                        java.lang.Class<?> propertyType = org.springframework.beans.BeanUtils.findPropertyType(key, aClass);
+                        if(propertyType != Date.class) {
+                            long timestamp = DateUtils.parseYYYYMMDDHHMMSS(value).getTime() / 10000;
+                            componentJsonData = componentJsonData.replace(dateKeyAndValue, "\"" + key + "\":\"" + timestamp + "\"");
+                        }
+                    }
                     objects = readObjectsFromJson(componentJsonData, java.lang.Class.forName(defPoClass.getClassPath()));
                     if(parentObject != null) {
 
@@ -795,7 +925,7 @@ public class DefaultController {
                 if(StringUtils.isNotBlank(componentId) && !componentId.equals(componentDescriptor.getId())) {
                     continue;
                 }
-                Object componentExtendData = extendData != null ? extendData.containsKey(componentDescriptor.getDataId()) : null;
+                Object componentExtendData = extendData != null ? extendData.get(componentDescriptor.getDataId()) : null;
 
                 JSONObject componentJsonObject = componentInvokeManager.invoke(StringUtils.isNotBlank(componentId), componentDescriptor, componentExtendData, extendData, pagination, module, pageCode, pageInfo, mav, request, response);
 
@@ -807,7 +937,11 @@ public class DefaultController {
                     System.out.println("=====>" + key + " : " + componentJsonObject.toJSONString());
                     result.put(key, componentJsonObject);
                     mergeGlobalRuler(globalDataSetRulerJsonObject, componentDescriptor.getDataSetDescriptor().getDataSetRulerJsonObject());
+                    if(componentJsonObject.containsKey("HF_BREAK_FLAG") && componentJsonObject.getBoolean("HF_BREAK_FLAG")) {
+                        break;
+                    }
                 }
+
             }
         }catch (SessionExpiredException e) {
             return gotoPage("login",null,null,null,request,response);
@@ -819,6 +953,7 @@ public class DefaultController {
             mav.addObject("loginFowardUrl","/index.html");
 
         }
+        mav.addObject("subDataSetNames", pageInfo.getSubDataSetNames());
         mav.addObject("module",module);
         mav.addObject("page",pageCode);
         mav.addObject("globalRuler", globalDataSetRulerJsonObject.toJSONString());
@@ -1199,112 +1334,5 @@ public class DefaultController {
         }
     }
 
-    /**
-     * 页面跳转
-     * @return
-     * @throws Throwable
-     */
-    @RequestMapping(value = "/editor-app/editor.html")
-    public ModelAndView editor(@ModelAttribute("modelId") String modelId,
 
-                               HttpServletRequest request, HttpServletResponse response) throws Throwable {
-        ModelAndView mav = new ModelAndView();
-        mav.addObject("modelId",modelId);
-        mav.setViewName("/editor");
-        return mav;
-    }
-
-    /**
-     * 页面跳转
-     * @return
-     * @throws Throwable
-     */
-    @RequestMapping(value = "/diagram-viewer/forwarder.html")
-    public ModelAndView diagramForwarder(@ModelAttribute("_DS") String dataSet, @ModelAttribute("_DI") String dataId,
-
-                                         HttpServletRequest request, HttpServletResponse response) throws Throwable {
-        ModelAndView mav = new ModelAndView();
-        String processKey = String.valueOf(WebContext.get().getProcess(dataSet)[1]);
-        ProcessDefinition processDefinition = ProcessEngines.getDefaultProcessEngine().getRepositoryService().
-                createProcessDefinitionQuery().processDefinitionKey(processKey).singleResult();
-        String processDefinitionId = "", processInstanceId = "";
-        if(processDefinition != null) {
-            processDefinitionId = processDefinition.getId();
-            HistoricProcessInstance historicProcessInstance = ProcessEngines.getDefaultProcessEngine().getHistoryService()
-                    .createHistoricProcessInstanceQuery().processInstanceBusinessKey(dataId)
-                    .processDefinitionId(processDefinition.getId())
-                    .singleResult();
-            if(historicProcessInstance != null) {
-
-                processInstanceId = historicProcessInstance.getId();
-            }
-        }
-        mav.setViewName("redirect:/diagram-viewer/index.html?processDefinitionId="
-                + processDefinitionId + "&processInstanceId=" + processInstanceId);
-        return mav;
-    }
-
-    /**
-     * 页面跳转
-     * @return
-     * @throws Throwable
-     */
-    @RequestMapping(value = "/diagram-viewer/index.html")
-    public ModelAndView diagramViewer(HttpServletRequest request, HttpServletResponse response) throws Throwable {
-        ModelAndView mav = new ModelAndView();
-//                List<HistoricProcessInstance> processInstances = historyService .createHistoricProcessInstanceQuery() .startedBy(ExplorerApp.get().getLoggedInUser().getId()) .unfinished() .list();
-        String processInstanceId = request.getParameter("processInstanceId");
-        if(StringUtils.isNotBlank(processInstanceId)) {
-            //自己创建的未完成流程单
-            List<HistoricTaskInstance> tasks = ProcessEngines.getDefaultProcessEngine().getHistoryService().createHistoricTaskInstanceQuery()
-                    .processInstanceId(processInstanceId)
-//                    .orderByHistoricTaskInstanceEndTime().desc()
-                    .orderByHistoricTaskInstanceStartTime().desc()
-                    .list();
-
-            List<Map<String, Object>> taskDisplays = new ArrayList<Map<String, Object>>();
-            if(tasks != null) {
-                ServiceFactory.getService(ExplorerApp.class).onRequestStart(request, response);
-                for (HistoricTaskInstance task : tasks) {
-
-                    Map<String ,Object> item = new HashMap<String, Object>();
-                    taskDisplays.add(item);
-
-                    if(task.getEndTime() != null) {
-                        item.put("finished", "/VAADIN/themes/activiti/" + new Embedded(null, Images.TASK_FINISHED_22).getSource());
-                    } else {
-                        item.put("finished","/VAADIN/themes/activiti/" + new Embedded(null, Images.TASK_22).getSource());
-                    }
-
-                    item.put("name", task.getName());
-                    item.put("priority",task.getPriority());
-
-                    item.put("startDate", new PrettyTimeLabel(task.getStartTime(), true));
-                    item.put("endDate", new PrettyTimeLabel(task.getEndTime(), true));
-
-                    if(task.getDueDate() != null) {
-                        Label dueDateLabel = new PrettyTimeLabel(task.getEndTime(), "尚未完成", true);
-                        item.put("dueDate", dueDateLabel);
-                    }
-
-
-
-                    if(task.getAssignee() != null) {
-                        UserProfileLink taskAssigneeComponent = new UserProfileLink(ProcessEngines.getDefaultProcessEngine().getIdentityService(), true, task.getAssignee());
-                        if(taskAssigneeComponent != null) {
-                            item.put("assigneeName", ((Button) taskAssigneeComponent.getComponent(1)).getCaption());
-                            item.put("assigneePhoto","data:image/gif;base64," +
-                                    new BASE64Encoder().encode(IoUtil.readInputStream(((StreamResource) ((Embedded) taskAssigneeComponent.getComponent(0)).getSource()).getStreamSource().getStream(), "")));
-                        }
-                    }
-                }
-            }
-
-            mav.addObject("tasks", taskDisplays);
-        }
-
-
-        mav.setViewName("/diagram-viewer/index");
-        return mav;
-    }
 }

@@ -46,4 +46,30 @@
         <effect type="ajaxSubmitByJson" action="${batchCreate}"></effect>
         <effect type="component.reload"></effect>
     </event>
+
+    <event name="confirm.process.start" description="启动工作流">
+        <attach anchor="EOFC">
+            <appendElement type="button" param='{btnclass:"btn-primary",btnText:" 启 动 工 作 流 "}'></appendElement>
+        </attach>
+        <source scope="EOC" param="thisForm"></source>
+        <effect type="confirm" content="确认启动流程 &lt;span style=&quot;color:red&quot;&gt;{${name}}&lt;/span&gt; ?"></effect>
+        <effect type="ajaxSubmit" action="${updateByAjax}?${id}&amp;_DI=${id}&amp;_DS=${DS}&amp;_WFB=1"></effect>
+        <effect type="pageFwd" action='${mgr}' isStack="true"></effect>
+    </event>
+    <event name="confirm.process.approval" description="审批工作流">
+        <attach anchor="EOFC">
+            <appendElement type="button" param='{btnclass:"btn-primary",btnText:" 审 批 工 作 流 "}'></appendElement>
+        </attach>
+        <source scope="EOC" param="thisForm"></source>
+        <effect type="confirm" content="确认提交流程 &lt;span style=&quot;color:red&quot;&gt;{${name}}&lt;/span&gt; ?"></effect>
+        <effect type="ajaxSubmit" action="${updateByAjax}?&amp;_DI=&amp;_DS=${DS}&amp;_WFB=1"></effect>
+        <effect type="pageFwd" action='${mgr}' isStack="true"></effect>
+    </event>
+    <event name="openPage.process.diagram" description="查看工作流">
+        <attach anchor="EOFC">
+            <appendElement type="button" param='{btnclass:"btn-primary",btnText:" 查 看 工 作 流 "}'></appendElement>
+        </attach>
+        <source scope="EOC" param="thisForm"></source>
+        <effect type="openPage" action='/diagram-viewer/forwarder.html?_DI=${id}&amp;_DS=${DS}' isStack="true"></effect>
+    </event>
 </event-store>

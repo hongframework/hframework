@@ -90,7 +90,7 @@ public class CodeGeneratorController extends ExtBaseController {
         try{
             Map<String, String> pageContextParams = DefaultController.getPageContextParams(request);
             WebContext.putContext(DefaultController.getPageContextRealyParams(pageContextParams));
-            Map<String, String> pageFlowParams = WebContext.get(HashMap.class.getName());
+            Map<String, String> pageFlowParams = WebContext.getDefault();
 
             String companyCode = "hframe";
             String programCode = "hframe";
@@ -254,7 +254,7 @@ public class CodeGeneratorController extends ExtBaseController {
 
             Map<String, String>  pageContextParams = DefaultController.getPageContextParams(request);
             WebContext.putContext(DefaultController.getPageContextRealyParams(pageContextParams));
-            Map<String, String> pageFlowParams = WebContext.get(HashMap.class.getName());
+            Map<String, String> pageFlowParams = WebContext.getDefault();
 
             String companyCode = "hframe";
             String programCode = "hframe";

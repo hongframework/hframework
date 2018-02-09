@@ -1,0 +1,20 @@
+<dataset>
+  <module>activiti</module>
+  <code>act_edit_procdef</code>
+  <entity>act_edit_procdef</entity>
+  <name>编辑中流程定义</name>
+  <fields>
+    <field code="id" name="ID" edit-type="input" show-type=""></field>
+    <field code="category" name="分类" edit-type="input" show-type=""></field>
+    <field code="name" name="名称" edit-type="input" show-type=""></field>
+    <field code="key" name="编码" edit-type="input" show-type=""></field>
+    <field code="version" name="版本" edit-type="input" show-type=""></field>
+    <field code="editorSourceValueId" name="流程资源ID" edit-type="input"  show-type="hidden"></field>
+    <field code="editorSourceExtraValueId" name="流程图ID" edit-type="input"  show-type="hidden"></field>
+    <field code="tenantId" name="" edit-type="租户ID" show-type="hidden"></field>
+    <field code="deploymentId" name="发布ID" edit-type="input" show-type="hidden" ></field>
+    <field code="deploymentTime" name="发布时间" edit-type="input" show-type="hidden"></field>
+    <field code="createTime" name="创建时间" edit-type="input" show-type=""></field>
+    <field code="lastUpdateTime" name="修改时间" edit-type="input" show-type=""></field>
+  </fields>
+</dataset>

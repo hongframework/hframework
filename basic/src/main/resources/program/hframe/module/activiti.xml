@@ -1,0 +1,105 @@
+<module code="activiti">
+    <page id="editing_procdef" page-template="qlist">
+        <component id="qForm" data-set="activiti/act_edit_procdef_DS4Q"/>
+        <component id="qList" data-set="activiti/act_edit_procdef" dataid="editingProcDefList" title="编辑中流程定义列表" event-extend="false">
+            <event name="goto_event_page" description="编辑流程">
+                <attach anchor="EOFR">
+                    <appendElement type="icon" param='{fillclass:"btn-success",iconclass:"icon-edit"}'></appendElement>
+                </attach>
+                <source scope="CROW" param="modelId={id}"></source>
+                <effect type="openPage" action='/modeler.html' isStack="true"></effect>
+                <effect type="component.reload"></effect>
+            </event>
+            <event name="copy" description="复制流程">
+                <attach anchor="EOFR">
+                    <appendElement type="icon" param='{fillclass:"btn-info",iconclass:" icon-copy"}'></appendElement>
+                </attach>
+                <source scope="CROW" param="id={id}"></source>
+                <effect type="confirm" content="是否复制流程 &lt;span style=&quot;color:red&quot;&gt;{name}&lt;/span&gt; ?"></effect>
+                <effect type="ajaxSubmit" action="/activiti/copy_procdef.json"></effect>
+                <effect type="component.reload"></effect>
+            </event>
+            <event name="export"  description="导出流程">
+                <attach anchor="EOFR">
+                    <appendElement type="icon" param='{fillclass:"btn-info",iconclass:"icon-download"}'></appendElement>
+                </attach>
+                <source scope="CROW" param="id={id}"></source>
+                <effect type="openPage" action='/activiti/export_procdef.json' isStack="true"></effect>
+                <effect type="component.reload"></effect>
+            </event>
+            <event name="deploy"  description="发布流程">
+                <attach anchor="EOFR">
+                    <appendElement type="icon" param='{fillclass:"btn-danger",iconclass:" icon-save"}'></appendElement>
+                </attach>
+                <source scope="CROW" param="id={id}"></source>
+                <effect type="confirm" content="是否发布流程 &lt;span style=&quot;color:red&quot;&gt;{name}&lt;/span&gt; ?"></effect>
+                <effect type="ajaxSubmit" action='/activiti/deploy_procdef.json' isStack="true"></effect>
+                <effect type="component.reload"></effect>
+            </event>
+        </component>
+    </page>
+    <page id="deployed_procdef" page-template="qlist">
+        <component id="qForm" data-set="activiti/act_deploy_procdef_DS4Q"/>
+        <component id="qList" data-set="activiti/act_deploy_procdef" dataid="deployedProcDefList" title="已部署流程定义列表" event-extend="false">
+            <event name="openPage.process.diagram" description="查看流程">
+                <attach anchor="EOFR">
+                    <appendElement type="icon" param='{fillclass:"btn-info",iconclass:"icon-screenshot"}'></appendElement>
+                </attach>
+                <source scope="CROW" param="processDefinitionId={id}"></source>
+                <effect type="openPage" action='/diagram-viewer/index.html' isStack="true"></effect>
+            </event>
+            <event name="openPage.process.diagram" description="权限设置">
+                <attach anchor="EOFR">
+                    <appendElement type="icon" param='{fillclass:"btn-success",iconclass:" icon-legal"}'></appendElement>
+                </attach>
+                <source scope="CROW" param="dataSet={key}"></source>
+                <effect type="pageFwd" action='/activiti/auth_procdef.html' isStack="true"></effect>
+            </event>
+        </component>
+    </page>
+    <page id="auth_procdef" page-template="elist">
+        <component id="eList" data-set="activiti/act_procdef_extauth" dataid="procDefExtAuthList" title="流程授权"  event-extend="absolute_false">
+            <event name="batch.save" description="批量提交">
+                <attach anchor="EOFC">
+                    <appendElement type="button" param='{btnclass:"btn-primary",btnText:" 提 交 "}'></appendElement>
+                </attach>
+                <source scope="EOC" param="thisForm"></source>
+                <effect type="ajaxSubmitByJson" action="/activiti/save_procdef_auth.json"  target-id="eList"></effect>
+                <effect type="page.reload"></effect>
+            </event>
+        </component>
+    </page>
+    <page id="my_unfinish_procinst" page-template="qlist">
+        <component id="qForm" data-set="activiti/act_procinst_DS4Q"/>
+        <component id="qList" data-set="activiti/act_procinst" dataid="deployedProcDefList" title="我的流程" event-extend="false">
+            <event name="openPage.process.diagram" description="查看流程">
+                <attach anchor="EOFR">
+                    <appendElement type="icon" param='{fillclass:"btn-info",iconclass:"icon-eye-open"}'></appendElement>
+                </attach>
+                <source scope="CROW" param="processDefinitionId={processDefinitionId}&amp;processInstanceId={processInstanceId}"></source>
+                <effect type="openPage" action='/diagram-viewer/index.html' isStack="true"></effect>
+            </event>
+        </component>
+    </page>
+    <page id="my_unfinish_taskinst" page-template="qlist">
+        <component id="qForm" data-set="activiti/act_taskinst_DS4Q"/>
+        <component id="qList" data-set="activiti/act_taskinst" dataid="deployedProcDefList" title="我的任务" event-extend="false">
+            <event name="openPage.process.diagram" description="查看流程">
+                <attach anchor="EOFR">
+                    <appendElement type="icon" param='{fillclass:"btn-info",iconclass:"icon-eye-open"}'></appendElement>
+                </attach>
+                <source scope="CROW" param="processDefinitionId={processDefinitionId}&amp;processInstanceId={processInstanceId}"></source>
+                <effect type="openPage" action='/diagram-viewer/index.html' isStack="true"></effect>
+            </event>
+            <event name="pageFwd.process.approval" description="审批流程">
+                <attach anchor="EOFR">
+                    <appendElement type="icon" param='{fillclass:"btn-success",iconclass:"icon-signin"}'></appendElement>
+                </attach>
+                <source scope="CROW" param="processInstanceId={processInstanceId}"></source>
+                <effect type="pageFwd" action='/activiti/approval.html' isStack="true"></effect>
+                <effect type="component.reload"></effect>
+            </event>
+        </component>
+
+    </page>
+</module>

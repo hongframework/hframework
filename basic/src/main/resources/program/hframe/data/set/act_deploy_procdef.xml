@@ -1,0 +1,20 @@
+<dataset>
+  <module>activiti</module>
+  <code>act_deploy_procdef</code>
+  <entity>act_deploy_procdef</entity>
+  <name>已部署流程定义</name>
+  <fields>
+    <field code="id" name="ID" edit-type="input" show-type=""></field>
+    <field code="category" name="分类" edit-type="input" show-type=""></field>
+    <field code="name" name="名称" edit-type="input" show-type=""></field>
+    <field code="key" name="编码" edit-type="input" show-type=""></field>
+    <field code="version" name="版本" edit-type="input" show-type=""></field>
+    <field code="deploymentId" name="发布ID" edit-type="input" show-type=""></field>
+    <field code="resourceName" name="流程资源编码" edit-type="input" show-type="hidden"></field>
+    <field code="diagramResourceName" name="流程图编码" edit-type="input" show-type="hidden"></field>
+    <field code="tenantId" name="租户ID" edit-type="input" show-type="hidden"></field>
+    <field code="deploymentTime" name="发布时间" edit-type="input" show-type=""></field>
+    <field code="suspensionState" name="暂停状态" edit-type="input" show-type=""></field>
+
+  </fields>
+</dataset>

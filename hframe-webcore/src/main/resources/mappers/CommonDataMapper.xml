@@ -31,6 +31,11 @@
     ${sql}
   </insert>
 
+  <insert id="insertActGeByteArray" parameterType="java.util.Map">
+    insert into `act_ge_bytearray` (`ID_`, `REV_`, `NAME_`, `DEPLOYMENT_ID_`, `BYTES_`, `GENERATED_`)
+    values (#{id,jdbcType=VARCHAR},#{rev,jdbcType=INTEGER},#{name,jdbcType=VARCHAR},#{deploymentId,jdbcType=VARCHAR},#{bytes,jdbcType=BLOB},#{generated,jdbcType=TINYINT});
+  </insert>
+
   <select id="showTables" parameterType="java.util.Map" resultType="String"  >
     SHOW TABLES;
   </select>

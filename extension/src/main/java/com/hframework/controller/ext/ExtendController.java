@@ -107,7 +107,7 @@ public class ExtendController {
 //        try{
 //            Map<String, String>  pageContextParams = DefaultController.getPageContextParams(request);
 //            WebContext.putContext(DefaultController.getPageContextRealyParams(pageContextParams));
-//            Map<String, String> pageFlowParams = WebContext.get(HashMap.class.getName());
+//            Map<String, String> pageFlowParams = WebContext.getDefault();
 //
 //            String companyCode = "hframe";
 //            String programCode = "hframe";
@@ -235,7 +235,7 @@ public class ExtendController {
 //        try{
 //            Map<String, String>  pageContextParams = DefaultController.getPageContextParams(request);
 //            WebContext.putContext(DefaultController.getPageContextRealyParams(pageContextParams));
-//            Map<String, String> pageFlowParams = WebContext.get(HashMap.class.getName());
+//            Map<String, String> pageFlowParams = WebContext.getDefault();
 //
 //            String companyCode = "hframe";
 //            String programCode = "hframe";
@@ -467,7 +467,7 @@ public class ExtendController {
 //        try{
 //            Map<String, String>  pageContextParams = DefaultController.getPageContextParams(request);
 //            WebContext.putContext(DefaultController.getPageContextRealyParams(pageContextParams));
-//            Map<String, String> pageFlowParams = WebContext.get(HashMap.class.getName());
+//            Map<String, String> pageFlowParams = WebContext.getDefault();
 //
 //            String companyCode = "hframe";
 //            String programCode = "hframe";
@@ -596,7 +596,7 @@ public class ExtendController {
 //            }
 //            Map<String, String>  pageContextParams = DefaultController.getPageContextParams(request);
 //            WebContext.putContext(DefaultController.getPageContextRealyParams(pageContextParams));
-//            Map<String, String> pageFlowParams = WebContext.get(HashMap.class.getName());
+//            Map<String, String> pageFlowParams = WebContext.getDefault();
 //
 //            String companyCode = "hframe";
 //            String programCode = "hframe";
@@ -689,7 +689,7 @@ public class ExtendController {
 //        try{
 //            Map<String, String>  pageContextParams = DefaultController.getPageContextParams(request);
 //            WebContext.putContext(DefaultController.getPageContextRealyParams(pageContextParams));
-//            Map<String, String> pageFlowParams = WebContext.get(HashMap.class.getName());
+//            Map<String, String> pageFlowParams = WebContext.getDefault();
 //
 //            String companyCode = "hframe";
 //            String programCode = "hframe";
@@ -754,7 +754,7 @@ public class ExtendController {
 //        try {
 //            Map<String, String>  pageContextParams = DefaultController.getPageContextParams(request);
 //            WebContext.putContext(DefaultController.getPageContextRealyParams(pageContextParams));
-//            Map<String, String> pageFlowParams = WebContext.get(HashMap.class.getName());
+//            Map<String, String> pageFlowParams = WebContext.getDefault();
 //            startDynamicDataSource(pageFlowParams);
 //            ResultData resultData = new DefaultController().saveData(request, response);
 //            return resultData;
@@ -796,7 +796,7 @@ public class ExtendController {
 //
 //            Map<String, String>  pageContextParams = DefaultController.getPageContextParams(request);
 //            WebContext.putContext(DefaultController.getPageContextRealyParams(pageContextParams));
-//            Map<String, String> pageFlowParams = WebContext.get(HashMap.class.getName());
+//            Map<String, String> pageFlowParams = WebContext.getDefault();
 //            startDynamicDataSource(pageFlowParams);
 //            commonDataService.executeDBStructChange(result);
 //            return ResultData.success();
@@ -821,7 +821,7 @@ public class ExtendController {
 //
 //            Map<String, String>  pageContextParams = DefaultController.getPageContextParams(request);
 //            WebContext.putContext(DefaultController.getPageContextRealyParams(pageContextParams));
-//            Map<String, String> pageFlowParams = WebContext.get(HashMap.class.getName());
+//            Map<String, String> pageFlowParams = WebContext.getDefault();
 //
 //            String companyCode = "hframe";
 //            String programCode = "hframe";
@@ -904,7 +904,7 @@ public class ExtendController {
 //
 //            Map<String, String>  pageContextParams = DefaultController.getPageContextParams(request);
 //            WebContext.putContext(DefaultController.getPageContextRealyParams(pageContextParams));
-//            Map<String, String> pageFlowParams = WebContext.get(HashMap.class.getName());
+//            Map<String, String> pageFlowParams = WebContext.getDefault();
 //
 //            String companyCode = "hframe";
 //            Long programId = null;
@@ -1114,7 +1114,7 @@ public class ExtendController {
 //        try{
 //            Map<String, String>  pageContextParams = DefaultController.getPageContextParams(request);
 //            WebContext.putContext(DefaultController.getPageContextRealyParams(pageContextParams));
-//            Map<String, String> pageFlowParams = WebContext.get(HashMap.class.getName());
+//            Map<String, String> pageFlowParams = WebContext.getDefault();
 //
 //            String companyCode = "hframe";
 //            String programCode = "hframe";
@@ -1276,7 +1276,7 @@ public class ExtendController {
 //        try{
 //            Map<String, String>  pageContextParams = DefaultController.getPageContextParams(request);
 //            WebContext.putContext(DefaultController.getPageContextRealyParams(pageContextParams));
-//            Map<String, String> pageFlowParams = WebContext.get(HashMap.class.getName());
+//            Map<String, String> pageFlowParams = WebContext.getDefault();
 //
 //            String companyCode = "hframe";
 //            Long programId = null;

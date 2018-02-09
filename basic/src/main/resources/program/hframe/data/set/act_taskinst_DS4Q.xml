@@ -1,0 +1,18 @@
+<dataset>
+  <module>activiti</module>
+  <code>act_taskinst_DS4Q</code>
+  <entity>act_taskinst_DS4Q</entity>
+  <name>流程任务实例</name>
+  <fields>
+    <field code="processDefinitionId" name="流程定义ID" edit-type="input" show-type="" ></field>
+    <field code="processInstanceId" name="流程实例ID" edit-type="input" show-type=""></field>
+    <field code="executionId" name="子流程实例ID" edit-type="input"  show-type=""></field>
+    <field code="parentTaskId" name="上级任务ID" edit-type="input" show-type=""></field>
+    <field code="id" name="任务ID" edit-type="input" show-type=""></field>
+    <field code="name" name="名称" edit-type="input" show-type=""></field>
+
+    <field code="owner" name="上级处理人" edit-type="input" show-type=""></field>
+    <field code="assignee" name="下级处理人" edit-type="input" show-type=""></field>
+    <field code="description" name="描述" edit-type="input"  show-type=""></field>
+  </fields>
+</dataset>

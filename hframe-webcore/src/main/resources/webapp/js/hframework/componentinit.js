@@ -56,7 +56,7 @@ function componentinit(){
         var config = JSON.parse($this.attr("action"))["componentControl"];
         var targetId = config["targetId"];
         var $targetComponent = $this.parents(".hfcontainer:first").find("div[dc='" + targetId + "']:first");
-        if($targetComponent == null) {
+        if(!$targetComponent[0]){
             var seq = 0;
             if(targetId.endsWith("]")){
                 seq = targetId .substring(targetId.length - 2,targetId.length - 1) - 1;
@@ -84,6 +84,8 @@ function componentinit(){
                         }
                     }
                 }else if($targetComponent.find(".form-horizontal table:first tbody tr").size() == 1 && $targetComponent.find(".form-horizontal table:first tbody").is("[data-is-empty=true]")){
+                    isShow = false;
+                }else if($targetComponent.find("[data-is-empty=true]").size() == 1){
                     isShow = false;
                 }
             }

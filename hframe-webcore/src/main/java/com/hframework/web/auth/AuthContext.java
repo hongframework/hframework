@@ -182,6 +182,7 @@ public class AuthContext {
     public class AuthRoleManager extends HashMap<String, List<AuthDataUnit>> {
         private List allRoles ;
         private Map<String, String> roleIdNameMap;
+        public Class roleClass;
 
         public void add(Long dataUnitId, String roleId) {
             if(!this.containsKey(roleId)) {

@@ -1,0 +1,14 @@
+<dataset>
+  <module>activiti</module>
+  <code>act_procinst_DS4Q</code>
+  <entity>act_procinst_DS4Q</entity>
+  <name>我的流程实例</name>
+  <fields>
+    <field code="processInstanceId" name="流程实例ID" edit-type="input" show-type=""></field>
+    <field code="businessKey" name="业务ID" edit-type="input" show-type=""></field>
+    <field code="processDefinitionId" name="流程定义ID" edit-type="input" show-type=""></field>
+    <field code="processDefinitionName" name="流程定义名称" edit-type="input" show-type=""></field>
+    <field code="processDefinitionKey" name="流程定义编码" edit-type="input" show-type=""></field>
+    <field code="processDefinitionVersion" name="流程定义版本" edit-type="input" show-type=""></field>
+  </fields>
+</dataset>

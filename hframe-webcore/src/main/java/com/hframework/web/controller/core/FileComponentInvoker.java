@@ -117,7 +117,7 @@ public class FileComponentInvoker {
         }
 
         if(!(jsonObject.get("data") instanceof JSONArray)) {
-            jsonObject.put("data",JSONObject.toJSON(WebContext.get(HashMap.class.getName())));
+            jsonObject.put("data",JSONObject.toJSON(WebContext.getDefault()));
         }
         jsonObject.put("dataSet", dataSetCode.contains("#") ?dataSetCode.substring(dataSetCode.indexOf("#") + 1) : dataSetCode);
         return jsonObject;

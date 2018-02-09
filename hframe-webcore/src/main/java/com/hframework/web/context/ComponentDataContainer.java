@@ -226,10 +226,13 @@ public class ComponentDataContainer {
         }
 
         allEvent = new ArrayList<Event>();
-        allEvent.addAll(component.getBaseEvents().getEventList());
+        if(!"absolute_false".equals(pageElementDesc.getEventExtend()) &&!"absolute_false".equals(pageComponentEventExtend)){
+            allEvent.addAll(component.getBaseEvents().getEventList());
+        }
 
         //组件自身事件
-        if(!"false".equals(pageElementDesc.getEventExtend()) &&!"false".equals(pageComponentEventExtend)) {
+        if(!"false".equals(pageElementDesc.getEventExtend()) &&!"false".equals(pageComponentEventExtend)
+                && !"absolute_false".equals(pageElementDesc.getEventExtend()) &&!"absolute_false".equals(pageComponentEventExtend)) {
             allEvent.addAll(component.getEvents().getEventList());
         }
 
@@ -282,7 +285,7 @@ public class ComponentDataContainer {
         }
     }
 
-    private void setEventDefaultDefinition(Event targetEvent, Event storeEvent) {
+    public static void setEventDefaultDefinition(Event targetEvent, Event storeEvent) {
         if(targetEvent == null || storeEvent == null) {
             return ;
         }
@@ -352,7 +355,7 @@ public class ComponentDataContainer {
         }
     }
 
-    private void peddingEventElement(List<EventElement> eventElementList, Mapping mapping, DataSetDescriptor dataSetDescriptor,ComponentDescriptor componentDescriptor) {
+    public static void peddingEventElement(List<EventElement> eventElementList, Mapping mapping, DataSetDescriptor dataSetDescriptor,ComponentDescriptor componentDescriptor) {
 
 //        if(componentDescriptor.getComponent().getId().equals("dynTree")) {
 //            System.out.println("1");
@@ -382,7 +385,7 @@ public class ComponentDataContainer {
                         String type = var.substring(0,var.indexOf(":"));
                         String endChars = var.substring(var.indexOf(":") + 1);
 //                ComponentDescriptor componentDescriptor = WebContext.get(type);
-                        if(componentDescriptor.getPageDescriptor().
+                        if(componentDescriptor != null && componentDescriptor.getPageDescriptor() != null && componentDescriptor.getPageDescriptor().
                                 getComponentDescriptorBy(type) != null) {
                             DataSet relDataSet = componentDescriptor.getPageDescriptor().
                                     getComponentDescriptorBy(type).getDataSetDescriptor().getDataSet();
@@ -434,7 +437,7 @@ public class ComponentDataContainer {
         }
     }
 
-    private String getReallyProperty(String val, DataSetDescriptor dataSetDescriptor) {
+    private static String getReallyProperty(String val, DataSetDescriptor dataSetDescriptor) {
         if("KEY_FIELD".equals(val) && dataSetDescriptor.getKeyField() != null) {
             return dataSetDescriptor.getKeyField().getCode();
         }else if("NAME_FIELD".equals(val) && dataSetDescriptor.getNameField() != null) {
@@ -559,9 +562,23 @@ public class ComponentDataContainer {
         jsonObject.put("BOFR",beforeOfRowList.size() == 0 ? null : beforeOfRowList );
         jsonObject.put("EOFR",endOfRowList.size() == 0 ? null : endOfRowList );
         jsonObject.put("EOF",endOfCompList.size() == 0 ? null : endOfCompList );
-        jsonObject.put("BOF",beforeOfCompList.size() == 0 ? null : beforeOfCompList );
-        jsonObject.put("ELE",elementOfRowMap.size() == 0 ? null : elementOfRowMap );
+        jsonObject.put("BOF", beforeOfCompList.size() == 0 ? null : beforeOfCompList);
+        jsonObject.put("ELE", elementOfRowMap.size() == 0 ? null : elementOfRowMap);
+        clearRuntimeData();
+
         return jsonObject;
+    }
+
+    public void clearRuntimeData(){
+        for (String key : runtimeDataMap.keySet()) {
+            if("${data}".equals(key)) {
+                JsonSegmentParser jsonSegmentParser = runtimeDataMap.get(key);
+                if (jsonSegmentParser instanceof ObjectJsonSegmentParser) {
+                    ObjectJsonSegmentParser segmentParser = (ObjectJsonSegmentParser) jsonSegmentParser;
+                    segmentParser.resultMap.clear();
+                }
+            }
+        }
     }
 
     private List getEventJsonString(List<EventElement> eventElements) {
@@ -1354,7 +1371,7 @@ public class ComponentDataContainer {
                 String runtimeValue = express;
                 for (String var : varList) {
                     if (var.startsWith("req:")) {
-                        Map request = WebContext.get(HashMap.class.getName());
+                        Map request = WebContext.getDefault();
                         String requestValue = (String) request.get(var.substring(4));
                         if(StringUtils.isNotBlank(requestValue)) {
                             runtimeValue = runtimeValue.replace("${" + var + "}", requestValue);
@@ -1395,12 +1412,12 @@ public class ComponentDataContainer {
                 }else if("module".equals(var)) {
                     express = express.replace("${module}",dataSet.getModule());
                 }/*else if("legendCode".equals(var)) {
-                    Map request = WebContext.get(HashMap.class.getName());
+                    Map request = WebContext.getDefault();
                     String code = (String) request.get("code");
                     String id = (String) request.get("id");
                     express = express.replace("${legendCode}","['" +code + "_" + id + "']");
                 }else if("legendName".equals(var)) {
-                    Map request = WebContext.get(HashMap.class.getName());
+                    Map request = WebContext.getDefault();
                     String code = (String) request.get("code");
                     String id = (String) request.get("id");
                     express = express.replace("${legendCode}","['" +code + "_" + id + "']");
@@ -1440,7 +1457,7 @@ public class ComponentDataContainer {
         this.elements.put(jonSegmentParser.getId(), jonSegmentParser);
     }
 
-    public class EventElement {
+    public static class EventElement {
         private String component;
         private String params;
         private String action;

@@ -260,22 +260,31 @@ require(['layer','ajax','js/hframework/errormsg'], function () {
             if(targetId != null) {
                 var json = {};
                 var targetIds = targetId.split(",");
+                var checkUnPass = false;
                 for(var tarId in targetIds) {
                     $("[component= " + targetIds[tarId] +"]").each(function(i, v){
                         var $component = $(this);
-                        if($component.find("form").length > 0) {
-                            var $form = $component.find("form:first")
-                            //参数检查
-                            if(!$.checkSubmit($form)) {
-                                //alert("字段不能为空！");
-                                return;
+                        //只要visiable才进行保存，比如添加数据源，如果只有mysql数据源，其他的数据源不需要校验与保存
+                        if($component.is(":visible") && !checkUnPass){
+                            if($component.find("form").length > 0) {
+                                var $form = $component.find("form:first")
+                                //参数检查
+                                if(!$.checkSubmit($form)) {
+                                    //alert("字段不能为空！");
+                                    checkUnPass = true;
+                                    return;
+                                }
+
+                                json[targetIds[tarId] + "|" + i] = JSON.parse($form.serializeJson());
+                            }else {
+                                var hierarchy = $component.orgchart('getHierarchy');
+                                json[targetIds[tarId] + "|" + i]  = JSON.stringify(hierarchy, null, 2);
                             }
-                            json[targetIds[tarId] + "|" + i] = JSON.parse($form.serializeJson());
-                        }else {
-                            var hierarchy = $component.orgchart('getHierarchy');
-                            json[targetIds[tarId] + "|" + i]  = JSON.stringify(hierarchy, null, 2);
                         }
                     });
+                    if(checkUnPass) {
+                        return;
+                    }
                 }
                 //console.log(JSON.stringify(json));
                 _data = JSON.stringify(json);
@@ -305,8 +314,11 @@ require(['layer','ajax','js/hframework/errormsg'], function () {
             //_data ='[{"hfpmProgramId":"123","hfpmProgramName":"test","hfpmProgramCode":"234","hfpmProgramDesc":"234","opId":"234","createTime":"2015-10-31 00:20:58","modifyOpId":"","modifyTime":"2015-10-31 00:20:58","delFlag":""},{"hfpmProgramId":"151031375370","hfpmProgramName":"框架","hfpmProgramCode":"hframe","hfpmProgramDesc":"框架","opId":"999","createTime":"2015-10-31 00:20:58","modifyOpId":"999","modifyTime":"2015-10-31 00:20:58","delFlag":"0"}]';
             //console.log(_data);
             showProcessBar();
+            if(url.substr(0,1) != "/") {
+                url = "/" + url;
+            }
             $.ajax({
-                url: "/" + url  + "?" + $param,
+                url: url  + "?" + $param,
                 data: _data,
                 type: 'post',
                 contentType : 'application/json;charset=utf-8',
@@ -367,6 +379,7 @@ require(['layer','ajax','js/hframework/errormsg'], function () {
 
                 }else {
                     _data = parseUrlParamToObject($param);
+                    $param = "";
                     //版本冲突，不知道为什么加这部分内容， 注掉改部分内容
                     //$thisForm = $this.parents("form")[0];
                     //tmpArray = parseUrlParamToObject($($thisForm).serialize());
@@ -380,8 +393,14 @@ require(['layer','ajax','js/hframework/errormsg'], function () {
             }
             console.log(_data);
             showProcessBar();
+            var curl;
+            if(url.indexOf("?") > 0) {
+                curl = url  + "&" + $param
+            }else {
+                curl = url  + "?" + $param
+            }
             //_data = {"hfmdEntityAttrId":"","hfmdEntityAttrName":"1231232132","hfmdEntityAttrCode":"","hfmdEntityAttrDesc":"","attrType":"","size":"","ispk":"","nullable":"","isBusiAttr":"","isRedundantAttr":"","relHfmdEntityAttrId":"","hfmdEnumClassId":"","pri":"","hfpmProgramId":"","hfpmModuleId":"","hfmdEntityId":"","opId":"","createTime":"2015-02-13 12:12:12","modifyOpId":"","modifyTime":"2015-02-13 12:12:12","delFlag":""};
-            ajax.Post(url  + "?" + $param,_data,function(data){
+            ajax.Post(curl, _data,function(data){
                 hideProcessBar();
                 if(data.resultCode != '0') {
                     alert(data.resultMessage);
@@ -455,7 +474,7 @@ require(['layer','ajax','js/hframework/errormsg'], function () {
                 var json = {};
 
                 var $targetComponent = $this.parents(".hfcontainer:first").find("div[dc='" + targetId + "']:first");
-                if($targetComponent == null) {
+                if(!$targetComponent[0]) {
                     var seq = 0;
                     if(targetId.endsWith("]")){
                         seq = targetId .substring(targetId.length - 2,targetId.length - 1) - 1;
@@ -481,7 +500,6 @@ require(['layer','ajax','js/hframework/errormsg'], function () {
                         if($targetComponent.is(":hidden")) {
                             $targetComponent.show();
                         }
-
                     }
 
                 }
@@ -752,7 +770,7 @@ require(['layer','ajax','js/hframework/errormsg'], function () {
                 //        result[key] = [result[key],value];
                 //    }
                 //}else {
-                if(key == "createTime" || key == "modifyTime") {
+                if(key == "createTime" || key == "modifyTime" || key == "ctime" || key == "mtime") {
                     continue;
                 }
                 if(result[key]) {
@@ -777,8 +795,10 @@ require(['layer','ajax','js/hframework/errormsg'], function () {
                     value = $this.parents("tr").find("span[code="+ position +"]").text();
                 }else if($this.parents("tr").find("[name="+ position +"]").size() > 0 ) {
                     value = $this.parents("tr").find("[name="+ position +"]").val();
-                }else {
+                }else if($this.parents("form").size() > 0 )  {
                     value = $this.parents("form").find("[name="+ position +"]").val();
+                }else if($("#" + position)){
+                    value = $("#" + position).val();
                 }
                 result = result.replace(new RegExp("{" + position +"}", "gm"),value)
             }
@@ -873,7 +893,14 @@ require(['layer','ajax','js/hframework/errormsg'], function () {
     (function($){
 
         $.fn.serializeJson = function(){
-
+            //针对于boolCheckBox进行input标签赋值，否则serializeArray将会出现混乱
+            $(this).find(".boolCheckBox input[value=1]").each(function(){
+                if($(this).is(':checked')){
+                    $.uniform.update($(this).parents(".boolCheckBox:first").prev().find("input[value=0]").removeAttr("checked"));
+                }else {
+                    $.uniform.update($(this).parents(".boolCheckBox:first").prev().find("input[value=0]").attr("checked","true"));
+                }
+            });
 
             var blankModifyElementName ={};
             $(this).find("[data-code][data-condition][name]").each(function(){

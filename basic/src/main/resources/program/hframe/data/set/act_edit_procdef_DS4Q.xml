@@ -1,0 +1,13 @@
+<dataset>
+  <module>activiti</module>
+  <code>act_edit_procdef_DS4Q</code>
+  <entity>act_edit_procdef_DS4Q</entity>
+  <name>编辑中流程定义</name>
+  <fields>
+    <field code="id" name="ID" edit-type="input" show-type=""></field>
+    <field code="name" name="名称" edit-type="input" show-type=""></field>
+    <field code="key" name="编码" edit-type="input" show-type=""></field>
+    <field code="version" name="版本" edit-type="input" show-type=""></field>
+    <field code="category" name="分类" edit-type="input" show-type=""></field>
+  </fields>
+</dataset>

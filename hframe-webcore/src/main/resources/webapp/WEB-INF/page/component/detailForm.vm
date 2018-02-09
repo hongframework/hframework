@@ -18,7 +18,7 @@
                         #set($href = $!{form.ELE.get($column.code)})
                     #end
 
-                    #if($column.editType == "hidden")
+                    #if($column.showType == "hidden")
                         #set($data = $form.data)
                         #set($value = $!data.get($column.code))
                         #parse("component/element/field.vm")
@@ -26,11 +26,12 @@
                     #else
                         <div class="control-group">
                             <label class="control-label" for="$column.code">#if($!column.notNull)<span style="color:red;font-size: larger;">* </span> #end $column.name</label>
-                            <div class="controls">
+                            <div class="controls" style="padding-top: 5px;">
                                 #set($data = $form.data)
                                 #set($value = $!data.get($column.code))
                                 #set($elementSize = "xlarge")
-                                #parse("component/element/field.vm")
+                                <span code="$column.code" #if($!column.dataCode) dataCode="$!column.dataCode" #end>$!value</span>
+                                <input id="$column.code" name="$column.code" type="hidden" value="$!value">
                                 #set($value = "")
                                 <span class="help-inline">$!column.tipinfo</span>
                             </div>

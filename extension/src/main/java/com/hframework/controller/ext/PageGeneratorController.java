@@ -91,7 +91,7 @@ public class PageGeneratorController extends ExtBaseController {
 
             Map<String, String>  pageContextParams = DefaultController.getPageContextParams(request);
             WebContext.putContext(DefaultController.getPageContextRealyParams(pageContextParams));
-            Map<String, String> pageFlowParams = WebContext.get(HashMap.class.getName());
+            Map<String, String> pageFlowParams = WebContext.getDefault();
 
             String companyCode = "hframe";
             Long programId = null;
@@ -303,7 +303,7 @@ public class PageGeneratorController extends ExtBaseController {
         try{
             Map<String, String>  pageContextParams = DefaultController.getPageContextParams(request);
             WebContext.putContext(DefaultController.getPageContextRealyParams(pageContextParams));
-            Map<String, String> pageFlowParams = WebContext.get(HashMap.class.getName());
+            Map<String, String> pageFlowParams = WebContext.getDefault();
 
             String companyCode = "hframe";
             Long programId = null;

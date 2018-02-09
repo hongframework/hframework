@@ -153,6 +153,8 @@ require(['layer','ajax','js/hframework/errormsg'], function () {
 
             var $trueCheckBox = _$this.clone();
             $trueCheckBox.find("input").val(1);
+            $trueCheckBox.find("input").appendTo($trueCheckBox)
+            $trueCheckBox.find("div").remove();
 
             $trueCheckBox.css("display","");
             _$this.after($trueCheckBox);
@@ -184,6 +186,11 @@ require(['layer','ajax','js/hframework/errormsg'], function () {
         if(!_$this.hasClass("hfcheckbox") || !_isBooleanElements) {
             _$this.remove();
         }
+
+        //
+        //if(_$this.hasClass("hfcheckbox") && _isBooleanElements) {
+        //    _$this.remove();
+        //}
 
         _$this.change();
     }
@@ -482,7 +489,7 @@ require(['layer','ajax','js/hframework/errormsg'], function () {
                 $.selectLoad($this,null,true,_$container);
             }else if($this.hasClass("hfcheckbox") || $this.hasClass("hfradio") ) {
                 $.checkboxOrRadioLoad($this,null,true,_$container);
-            }else {
+            }else if(!$this.is('span')){
                 $.selectPanelLoad($this);
             }
         });
@@ -496,29 +503,41 @@ require(['layer','ajax','js/hframework/errormsg'], function () {
     function listTextDisplay() {
         $("th[code][dataCode][dataCode!='']").each(function(){
             var $this =$(this);
-            var code = $(this).attr("code");
-            var dataCode = $(this).attr("dataCode");
-            var dataValues=[];
-            $("span[code='" + code + "']").each(function(){
-                if($(this).text()) {
-                    dataValues.push($(this).text());
-                }
-            });
-            var _url =  "/getTexts.json";
-            var _data = {"dataCode":dataCode, "dataValues" : dataValues};
-            ajax.Post(_url,_data,function(data){
-                if(data.resultCode == 0) {
-                    if($this.html().endsWith("ID")) {
-                        $this.html($this.html().substring(0,$this.html().length-2));
+            if($this.html().endsWith("ID")) {
+                $this.html($this.html().substring(0,$this.html().length-2));
+            }
+            var code = $this.attr("code");
+            initTextDisplay($this, $this.parents("table:first").find("span[code='" + code + "']"));
+        });
+        $("span[code][dataCode][dataCode!='']").each(function(){
+            var $this =$(this);
+            var $label = $this.parent().prev();
+            if($label.html().endsWith("ID")) {
+                $label.html($label.html().substring(0,$label.html().length-2));
+            }
+            initTextDisplay($this, $this);
+        });
+    }
+
+    function initTextDisplay($this, $targets){
+        var dataCode = $this.attr("dataCode");
+        var dataValues=[];
+        $targets.each(function(){
+            if($(this).text()) {
+                dataValues.push($(this).text());
+            }
+        });
+        var _url =  "/getTexts.json";
+        var _data = {"dataCode":dataCode, "dataValues" : dataValues};
+        ajax.Post(_url,_data,function(data){
+            if(data.resultCode == 0) {
+                $targets.each(function(){
+                    if(data.data && data.data[$(this).text()] && data.data[$(this).text()].text) {
+                        $(this).attr("value",$(this).text());
+                        $(this).text(data.data[$(this).text()].text);
                     }
-                    $("span[code='" + code + "']").each(function(){
-                        if(data.data && data.data[$(this).text()] && data.data[$(this).text()].text) {
-                            $(this).attr("value",$(this).text());
-                            $(this).text(data.data[$(this).text()].text);
-                        }
-                    });
-                }
-            });
+                });
+            }
         });
     }
     listTextDisplay();

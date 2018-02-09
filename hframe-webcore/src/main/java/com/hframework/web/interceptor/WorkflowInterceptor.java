@@ -1,6 +1,7 @@
 package com.hframework.web.interceptor;
 
 import com.hframework.common.frame.ServiceFactory;
+import com.hframework.web.context.ProcessContext;
 import com.hframework.web.context.WebContext;
 import com.hframework.web.config.bean.component.Event;
 import org.activiti.engine.ProcessEngines;
@@ -47,8 +48,10 @@ public class WorkflowInterceptor implements HandlerInterceptor {
         String workflowButton = request.getParameter("_WFB");
         String dataSet = request.getParameter("_DS");
         String dataId = request.getParameter("_DI");
+        String comment = request.getParameter("_WFComment");
 
         if(request.getSession().getAttribute(Constants.AUTHENTICATED_USER_ID) == null) {
+            ServiceFactory.getService(ExplorerApp.class).onRequestStart(request, response);
             LoginHandler loginHandler = (LoginHandler) ServiceFactory.getService("activitiLoginHandler");
             LoggedInUser user = loginHandler.authenticate(request, response);
             if(user != null) {
@@ -60,14 +63,27 @@ public class WorkflowInterceptor implements HandlerInterceptor {
         }
 
 
-        if(StringUtils.isNotBlank(workflowButton) && StringUtils.isNotBlank(dataSet) && StringUtils.isNotBlank(dataId) && WebContext.get().getProcess(dataSet) != null) {
-            Object[] objects = WebContext.get().getProcess(dataSet);
-            Event workflowStartEvent = (Event) objects[5];
+        if(StringUtils.isNotBlank(workflowButton) && StringUtils.isNotBlank(dataSet) && WebContext.get().getProcessContext().getProcessInfo(dataSet) != null) {
+            ProcessContext.ProcessInfo processInfo = WebContext.get().getProcessContext().getProcessInfo(dataSet);
+            if(StringUtils.isBlank(dataId)) {
+                dataId = request.getParameter(processInfo.getDataSetKeyCode());
+            }
+            if(StringUtils.isBlank(dataId)) {
+                return true;
+            }
+
+//            Object[] objects = WebContext.get().getProcess(dataSet);
+//            Event workflowStartEvent = (Event) objects[5];
+
+            Event workflowStartEvent =processInfo.getWorkflowEOFREvents().get(0);
             final String case1 = workflowStartEvent.getPreHandleList().get(0).getCase1();
             String when = workflowStartEvent.getPreHandleList().get(0).getWhen();
             String then = workflowStartEvent.getPreHandleList().get(0).getThen();
             final String curWorkflowValue = request.getParameter(case1);
             String oldWorkflowValue = request.getParameter("_" + case1);
+            if(StringUtils.isBlank(oldWorkflowValue)) {
+                oldWorkflowValue = "";
+            }
             if(oldWorkflowValue.equals(when) && then.equals(curWorkflowValue)) {
                 ProcessInstance processInstance = ProcessEngines.getDefaultProcessEngine().getRuntimeService().startProcessInstanceByKey(dataSet, dataId);
                 List<Task> list = ProcessEngines.getDefaultProcessEngine().getTaskService().createTaskQuery().processInstanceId(processInstance.getProcessInstanceId()).active().list();
@@ -83,10 +99,17 @@ public class WorkflowInterceptor implements HandlerInterceptor {
                         if(StringUtils.isBlank(task.getAssignee())) {
                             ProcessEngines.getDefaultProcessEngine().getTaskService().setAssignee(task.getId(), Authentication.getAuthenticatedUserId());
                         }
+
+                        if(StringUtils.isNoneBlank(comment)) {
+                            ProcessEngines.getDefaultProcessEngine().getTaskService().addComment(task.getId(), null, comment);
+                        }
+
                         ProcessEngines.getDefaultProcessEngine().getTaskService().complete(task.getId(),new HashMap<String, Object>(){{
                             put(case1, curWorkflowValue);
                             put(case1.toUpperCase(), curWorkflowValue);
                         }});
+
+
                     }
                 }
             }

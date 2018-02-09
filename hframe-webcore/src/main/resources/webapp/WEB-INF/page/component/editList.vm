@@ -104,7 +104,7 @@
 
                         #if($list.EOFR)
                             <td class="center">
-                                <input name="EOFR_EDIT_FLAG" type="hidden" />
+
                                 #foreach($item in $list.EOFR)
                                     <a class="btn ${item.fillclass} hfhref" href="javascript:void(0)"  params="$!{item.params}" action='${item.action}'>
                                         $item.component
@@ -112,6 +112,7 @@
                                 #end
                             </td>
                         #end
+                        <input name="EOFR_EDIT_FLAG" type="hidden" />
                     </tr>
                     #end
                 </tbody>

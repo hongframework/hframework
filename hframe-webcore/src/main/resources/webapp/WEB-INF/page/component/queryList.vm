@@ -122,3 +122,4 @@
 
     </div>
 </div>
+<input type="hidden" id="sub-data-set-names" value="$!subDataSetNames">

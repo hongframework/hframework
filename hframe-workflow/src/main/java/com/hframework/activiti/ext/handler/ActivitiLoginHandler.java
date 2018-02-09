@@ -76,7 +76,7 @@ public class ActivitiLoginHandler implements LoginHandler {
             AuthService authServiceProxy = (AuthService) ServiceFactory.getService(Class.forName(autoServiceClassPath));
             AuthContext authContext = authServiceProxy.getAuthContext(request);
             Object userObject = authContext.getUser().userObject;
-            if(authContext != null && ExplorerApp.get().getLoggedInUser() == null) {
+            if(authContext != null && (ExplorerApp.get() == null || ExplorerApp.get().getLoggedInUser() == null)) {
                 DataSetDescriptor dataSet = WebContext.get().getDataSet(userObject.getClass());
                 String userId = BeanUtils.getProperty(userObject, JavaUtil.getJavaVarName(dataSet.getKeyField().getCode()));
                 String userName = BeanUtils.getProperty(userObject, JavaUtil.getJavaVarName(dataSet.getNameField().getCode()));
