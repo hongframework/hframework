@@ -77,7 +77,7 @@ public class HfClassContainerUtil {
 			HfClassContainer.HfClassDescriptor classInfo = hfClassContainer.getClassInfo(className);
 			EntityAttr entityAttr = entityAttrMap.get(key);
 			classInfo.addField(entityAttr.getHfmdEntityAttrCode(),
-					JavaUtil.getJavaVarName(entityAttr.getHfmdEntityAttrCode()),
+					JavaUtil.getJavaVarName(entityAttr.getHfmdEntityAttrCode().toLowerCase()),
 					HfmdEntityAttr1AttrTypeEnum.getJavaTypeClass(entityAttr.getAttrType()),
 					entityAttr.getHfmdEntityAttrDesc());
 		}

@@ -7,4 +7,4 @@
 
 
 ## mini  small  medium large xlarge xxlarge
-<input class="input-$!{elementSize} focused" id="$column.code"  name="$column.code" type="text" value="$!value" not-null="$!column.notNull">
+<input class="input-$!{elementSize} focused" id="$column.code#if($column.code == "content")1#end"  name="$column.code" type="text" value="$!value" not-null="$!column.notNull">

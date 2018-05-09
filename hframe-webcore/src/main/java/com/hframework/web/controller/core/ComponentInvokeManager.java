@@ -180,6 +180,9 @@ public class ComponentInvokeManager {
             if(resultData.getData() == null) {
                 jsonObject.put("dataIsEmpty","true");
             }
+            if("detail".equals(action) && "eForm".equals(type) && resultData.getData() == null) {
+                jsonObject.put("data",JSONObject.toJSON(WebContext.getDefault()));
+            }
         }else {
             if("cList".equals(type)){
                 Class defPoClass = CreatorUtil.getDefPoClass(WebContext.get().getProgram().getCompany(),
@@ -207,9 +210,16 @@ public class ComponentInvokeManager {
                 int cnt = 0;
                 String[] defaultNullData = new String[((JSONArray) jsonObject.get("columns")).size()];
                 Map<String, String> pageFlowParams = WebContext.getDefault();
+                Class defPoClass = CreatorUtil.getDefPoClass(WebContext.get().getProgram().getCompany(),
+                        WebContext.get().getProgram().getCode(), moduleCode, eventObjectCode);
                 for (Object columns : (JSONArray) jsonObject.get("columns")) {
                     if(pageFlowParams.containsKey(((JSONObject) columns).get("code"))) {
-                        defaultNullData[cnt++] = pageFlowParams.get(((JSONObject) columns).get("code"));
+                        /*TODO BUG 父子编辑页面，传入父ID，原则上我们用子关联ID关联父ID，但当子主键ID等于父ID时，
+                          TODO 那么子ID主键就赋值为父ID了。 这里临时处理一下，遗留问题当页面中只是子页面数据编辑怎么处理？
+                          TODO 是否父页面请求时，不在直接是主键ID，而应该是实体加主键ID
+                        */
+//                        defaultNullData[cnt++] = pageFlowParams.get(((JSONObject) columns).get("code"));
+                        defaultNullData[cnt++] = "";
                     }else {
                         defaultNullData[cnt++] = "";
                     }

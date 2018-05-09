@@ -227,7 +227,7 @@ public class DataSetDescriptor {
         if(dataSetHelpers != null) {
             for (DataSetHelper dataSetHelper : dataSetHelpers) {
                 String helpDatascore = dataSetHelper.getHelpDatascore();
-                if(StringUtils.isNotBlank(helpDatascore)) {
+                if(StringUtils.isNotBlank(helpDatascore) && helpDatascore.contains("{") && helpDatascore.contains("}")) {
                     Map<String, String> condition = getConditionMap(helpDatascore);
                     for (String propertyName : condition.keySet()) {
                         String propertyValue = condition.get(propertyName);

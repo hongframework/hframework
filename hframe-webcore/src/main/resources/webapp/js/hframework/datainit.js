@@ -535,6 +535,14 @@ require(['layer','ajax','js/hframework/errormsg'], function () {
                     if(data.data && data.data[$(this).text()] && data.data[$(this).text()].text) {
                         $(this).attr("value",$(this).text());
                         $(this).text(data.data[$(this).text()].text);
+                    }else if(data.data && $(this).text() && $(this).text().indexOf(",") > 0){
+                        $(this).attr("value",$(this).text());
+                        var items = $(this).text().split(",");
+                        var itemDisplays = [];
+                        for(i in items){
+                            itemDisplays.push(data.data[items[i]].text);
+                        }
+                        $(this).text(itemDisplays.join(","));
                     }
                 });
             }

@@ -7,7 +7,7 @@ public interface Monitor<T> {
 
     public void addListener(MonitorListener listener);
 
-    public void notifyListener() throws Exception;
+    public void notifyListener(Monitor monitor, T t) throws Exception;
     /**启动*/
     public void start() throws Exception;
     /**重新加载*/
