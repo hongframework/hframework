@@ -1275,7 +1275,7 @@ public class ComponentDataContainer {
                             if(StringUtils.isBlank(stringVal) && elementDefaultMap.containsKey(code)) {
                                 if("#{RANDOM_ICON}".equals(elementDefaultMap.get(code))){
 //                                    List<String> tmpIconPool = Lists.newArrayList(iconPool);
-                                    stringVal = iconPool.get(map.toString().hashCode() % iconPool.size());
+                                    stringVal = iconPool.get(Math.abs(map.toString().hashCode()) % iconPool.size());
 //                                    iconPool.remove(map.toString().hashCode() % iconPool.size());
                                 }
                             }
