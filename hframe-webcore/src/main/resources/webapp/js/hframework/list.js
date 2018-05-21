@@ -258,6 +258,16 @@ require(['layer','ajax','js/hframework/errormsg'], function () {
                 $(this).chosen();//����Ϊselectx
             });
 
+            $($newRow).find(".hfselect").each(function(i){//bug 解决点击快捷工具栏后，panel面板不可选的问题
+                var $target = $($newRow).find(".hfselect").eq(i);
+                $target.removeClass("city-picker-input");
+                $target.next().remove();
+                $target.next().remove();
+                //$target.citypicker.Constructor
+
+                $.selectPanelLoad($target);
+            });
+
             $($newRow).find(".hfcheckbox input").uniform();
 
             if($(".hflist-data").children().length > 1) {
