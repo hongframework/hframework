@@ -214,9 +214,12 @@ public class ComponentInvokeManager {
                         WebContext.get().getProgram().getCode(), moduleCode, eventObjectCode);
                 for (Object columns : (JSONArray) jsonObject.get("columns")) {
                     if(pageFlowParams.containsKey(((JSONObject) columns).get("code"))) {
-                        /*TODO BUG 父子编辑页面，传入父ID，原则上我们用子关联ID关联父ID，但当子主键ID等于父ID时，
-                          TODO 那么子ID主键就赋值为父ID了。 这里临时处理一下，遗留问题当页面中只是子页面数据编辑怎么处理？
-                          TODO 是否父页面请求时，不在直接是主键ID，而应该是实体加主键ID
+                        /* TODO
+                           【BUG】父子编辑页面，传入父ID，原则上我们用子关联ID关联父ID，但当子主键ID等于父ID时，
+                           那么子ID主键就赋值为父ID了。 是否父页面请求时，不在直接是主键ID，而应该是实体加主键ID
+                           这里临时处理一下，遗留问题当页面中只是子页面数据编辑怎么处理？
+                           同时引出新的问题当父子编辑页面，子列表某属性依赖同行某属性，而该同行属性其实又是父id，
+                           如果这样临时处理，那么这里依赖找不到了，新建实体可以复现
                         */
 //                        defaultNullData[cnt++] = pageFlowParams.get(((JSONObject) columns).get("code"));
                         defaultNullData[cnt++] = "";

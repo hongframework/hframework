@@ -201,6 +201,20 @@ public class RegexUtils {
         return result.toArray(new String[0]);
     }
 
+    public static String[] findItem(String string, String pattern) {
+
+        List<String> result = new ArrayList<String>();
+
+        Pattern p= Pattern.compile(pattern);
+        Matcher matcher = p.matcher(string);
+        while (matcher.find()) {
+            for (int i = 1; i <= matcher.groupCount(); i++) {
+                result.add(matcher.group(i));
+            }
+        }
+        return result.toArray(new String[0]);
+    }
+
     public static String[] split(String string, String pattern) {
 
         List<String> result = new ArrayList<String>();
