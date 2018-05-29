@@ -17,10 +17,10 @@
 			<fileMode>0755</fileMode>
 		</fileSet>
 		<fileSet>
-			<directory>../extension/src/main/resources</directory>
+			<directory>../extension/src/main/resources/webapp</directory>
 			<outputDirectory>/webapp</outputDirectory>
 			<includes>
-				<include>webapp/**</include>
+				<include>**/*</include>
 			</includes>
 		</fileSet>
 		<fileSet>
