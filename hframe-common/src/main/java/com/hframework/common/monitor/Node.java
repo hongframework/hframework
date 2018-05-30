@@ -1,7 +1,6 @@
 package com.hframework.common.monitor;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public class Node<T>{
     private String keyValue;
@@ -74,6 +73,17 @@ public class Node<T>{
         return result;
     }
 
+    public <N> List<Node<N>> getInputs(Class<N> objectClass, final Comparator<N> comparator) {
+        List<Node<N>> result = getInputs(objectClass);
+        Collections.sort(result, new Comparator<Node<N>>() {
+            public int compare(Node<N> o1, Node<N> o2) {
+                return comparator.compare(o1.getObject(), o2.getObject());
+            }
+        });
+        return result;
+    }
+
+
     public <N> List<Node<N>> getOutputs(Class<N> objectClass) {
         List<Node<N>> result = new ArrayList<Node<N>>();
         if(outputs != null) {
@@ -84,6 +94,16 @@ public class Node<T>{
             }
         }
 
+        return result;
+    }
+
+    public <N> List<Node<N>> getOutputs(Class<N> objectClass, final Comparator<N> comparator) {
+        List<Node<N>> result = getOutputs(objectClass);
+        Collections.sort(result, new Comparator<Node<N>>() {
+            public int compare(Node<N> o1, Node<N> o2) {
+                return comparator.compare(o1.getObject(), o2.getObject());
+            }
+        });
         return result;
     }
 
