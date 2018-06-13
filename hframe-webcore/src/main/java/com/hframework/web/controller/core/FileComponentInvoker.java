@@ -106,7 +106,7 @@ public class FileComponentInvoker {
     public JSONObject parseFileComponent(String type, String dataSetCode, String module, ComponentDescriptor componentDescriptor,
                                           ModelAndView mav, HttpServletRequest request, HttpServletResponse response) throws Throwable {
         JSONObject jsonObject;
-        if("container".equals(type)) {
+        if("container".equals(type) || "container".equals(componentDescriptor.getComponent().getId())) {
             String xmlContent = getXmlContent(componentDescriptor, request);
             jsonObject = invokerXmlContainer(xmlContent, module, componentDescriptor, mav, request, response);
         }else if(StringUtils.isNotBlank(componentDescriptor.getDataId())) {

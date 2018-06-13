@@ -33,7 +33,7 @@ public class DynamicDataSource extends AbstractRoutingDataSource {
                 logger.error("select datasource error :", e);
             }
         }
-        logger.info("==> datasource :{}","default");
+//        logger.info("==> datasource :{}","default");
         return null;
     }
 
