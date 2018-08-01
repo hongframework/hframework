@@ -63,7 +63,7 @@
             $("[dc='" + relComponentDC + "'] .box-content .pagination").remove();
             $("[dc='" + relComponentDC + "'] ").find("input[name=EOFR_EDIT_FLAG]").parent().each(function(){
                $(this).find("a").not(":first").remove();
-                $(this).append($('<a class="btn btn-danger hfhref" href="javascript:void(0)" params="" action=\'{"component.row.delete":{"param":"{}"}}\'><i class="icon-trash"></i></a>'));
+               $(this).find("a:first").append($('<a class="btn btn-danger hfhref" href="javascript:void(0)" params="" action=\'{"component.row.delete":{"param":"{}"}}\'><i class="icon-trash"></i></a>'));
 
             });
             $("[dc='" + relComponentDC + "']").hide();

@@ -49,51 +49,60 @@ require(['layer','ajax','js/hframework/errormsg'], function () {
             }
         }
 
-        if(dataCode.startsWith("JSON:")) {
-            var enums  =JSON.parse(dataCode.substr(5).replace(new RegExp(/(')/g),'"'));
-            var data = [];
-            for(var key in enums) {
-                data.push({"value":key,"text":enums[key],"extInfo": null});
-            }
-            if(_showEleFunc) {
-                _showEleFunc({"data": data});
-            }
-            if(_func) {
-                _func();
-            }
-            return ;
-        }
+
 
         $this.attr("req_dataCondition", dataCondition);
-        if(_batchLoad) {
-            if(loadingDictionaryKeys[_$container.attr("id") +"|" + tagName + "|" + dataCode + "|" + dataCondition] == null) {//首次加载
-                loadingDictionaryKeys[_$container.attr("id") +"|" + tagName + "|" + dataCode + "|" + dataCondition] = -1;
-            }else if(loadingDictionaryKeys[_$container.attr("id") +"|" + tagName + "|" + dataCode + "|" + dataCondition] == -1) {//正在加载过程中，服务端还未返回
-                return;
-            }else {//已有加载完成
-                loadingDictionaryKeys[_$container.attr("id") +"|" + tagName + "|" + dataCode + "|" + dataCondition] = -1;;
-            }
-        }
 
-        var _url =  "/dictionary.json";
-        if(dataCode.startsWith("URL:")) {
-            _url = dataCode.substring(4);
-        }
-        var _data = {"dataCode":dataCode,"dataCondition" : dataCondition};
-        ajax.Post(_url,_data,function(data){
-            if(data.resultCode == 0) {
-                if(_batchLoad) {
-                    loadingDictionaryKeys[_$container.attr("id") +"|" + tagName + "|" + dataCode + "|" + dataCondition] = 1;
+        if(dataCode) {
+            if(dataCode.startsWith("JSON:")) {
+                var enums  =JSON.parse(dataCode.substr(5).replace(new RegExp(/(')/g),'"'));
+                var data = [];
+                for(var key in enums) {
+                    if(enums[key][1]) {
+                        data.push({"value":key,"text":enums[key][0],"extInfo": null, "parent": enums[key][1]});
+                    }else {
+                        data.push({"value":key,"text":enums[key][0],"extInfo": null});
+                    }
                 }
                 if(_showEleFunc) {
-                    _showEleFunc(data, dataCondition);
+                    _showEleFunc({"data": data});
                 }
                 if(_func) {
                     _func();
                 }
-
+                return ;
             }
-        });
+            if(_batchLoad) {
+                if(loadingDictionaryKeys[_$container.attr("id") +"|" + tagName + "|" + dataCode + "|" + dataCondition] == null) {//首次加载
+                    loadingDictionaryKeys[_$container.attr("id") +"|" + tagName + "|" + dataCode + "|" + dataCondition] = -1;
+                }else if(loadingDictionaryKeys[_$container.attr("id") +"|" + tagName + "|" + dataCode + "|" + dataCondition] == -1) {//正在加载过程中，服务端还未返回
+                    return;
+                }else {//已有加载完成
+                    loadingDictionaryKeys[_$container.attr("id") +"|" + tagName + "|" + dataCode + "|" + dataCondition] = -1;;
+                }
+            }
+            var _url =  "/dictionary.json";
+            if(dataCode.startsWith("URL:")) {
+                _url = dataCode.substring(4);
+            }
+            var _data = {"dataCode":dataCode,"dataCondition" : dataCondition};
+            ajax.Post(_url,_data,function(data){
+                if(data.resultCode == 0) {
+                    if(_batchLoad) {
+                        loadingDictionaryKeys[_$container.attr("id") +"|" + tagName + "|" + dataCode + "|" + dataCondition] = 1;
+                    }
+                    if(_showEleFunc) {
+                        _showEleFunc(data, dataCondition);
+                    }
+                    if(_func) {
+                        _func();
+                    }
+
+                }
+            });
+        }
+
+
     }
 
     $.checkboxOrRadioLoad = function ($this, _func, _batchLoad, _$container) {
@@ -212,10 +221,69 @@ require(['layer','ajax','js/hframework/errormsg'], function () {
         });
     }
 
-    $.selectLoad = function ($this, _func, _batchLoad, _$container) {
+    $.refreshOptionsShowAndHide = function($this){
+
+        if($this.is("SELECT") && $this.children("option[parent][parent!='']").size() == 0) {
+            return false;
+        }
+        var $rule = null;
+        if($this.is(".hflist")) {
+            $rule = $this.find(".ruler:contains('\"ruleType\":3')");
+        }else if($this.find(".hflist") > 0) {
+            $rule = $this.find(".hflist:visible .ruler:contains('\"ruleType\":3')");
+        }else {
+            $rule = $this.parents(".hflist:visible:first").find(".ruler:contains('\"ruleType\":3')");
+        }
+        if($rule) {
+            $rule.each(function(){
+                var ruleJsons = JSON.parse($(this).text());
+                var $list = $(this).parent();
+                for(var key in ruleJsons) {
+                    var rule = ruleJsons[key][0];
+                    var targetCode = rule["targetCode"];
+                    var sourceCode = rule["sourceCode"];
+                    if($this.is("SELECT")) {
+                        var $tr = $this.parents("tr:first");
+                        var sourceValue = $tr.find("[name='" + sourceCode + "']").val();
+                        if($this.is("[name=" + targetCode + "]")) {
+                            if($this.children("option[parent='" + sourceValue + "']").length == 0) {
+                                $this.hide();
+                            }else {
+                                $this.show();
+                                $this.children("option").not(":first").hide(); //请选择
+                                $this.children("option[parent='" + sourceValue + "']").show();
+                            }
+
+                        }
+                    }else {
+                        if($list.find("option[parent][parent!='']")){
+                            $list.find("tr").each(function(){
+                                var $tr = $(this);
+                                var sourceValue = $tr.find("[name='" + sourceCode + "']").val();
+                                if($tr.find("[name='" + targetCode + "'] option[parent='" + sourceValue + "']").length == 0) {
+                                    $this.hide();
+                                }else {
+                                    $tr.find("[name='" + targetCode + "']").show();
+                                    $tr.find("[name='" + targetCode + "'] option").not(":first").hide(); //请选择
+                                    $tr.find("[name='" + targetCode + "'] option[parent='" + sourceValue + "']").show();
+                                }
+                            });
+                        }
+                    }
+                }
+            });
+            return true;
+        }
+        return false;
+    };
+
+    $.selectLoad = function ($this, _func, _batchLoad, _$container, onlyVisible) {
         var $tagName = $this[0].tagName;
         var  dataCode = $this.attr("data-code");
         var  dataCondition = $this.attr("data-condition");
+
+        var visible = "";
+        if(onlyVisible) visible = ":visible";
 
         $.componentLoad($this, _func, _batchLoad, _$container, function(_data,_req_dataCondition){
             if($tagName == 'SELECT') {
@@ -223,21 +291,25 @@ require(['layer','ajax','js/hframework/errormsg'], function () {
 
                 var _html = [];
                 for (var i = 0; i < _data.data.length; i++) {
-                    _html.push('<option value="' + _data.data[i].value + '" data-hide=' + _data.data[i].extInfo + '>' + _data.data[i].text + '</option>');
+                    if(_data.data[i].parent) {
+                        _html.push('<option value="' + _data.data[i].value + '" data-hide="' + _data.data[i].extInfo + '" parent="' + _data.data[i].parent +'">' + _data.data[i].text + '</option>');
+                    }else {
+                        _html.push('<option value="' + _data.data[i].value + '" data-hide="' + _data.data[i].extInfo +'">' + _data.data[i].text + '</option>');
+                    }
+
                 }
                 var htmlStr = _html.join('');
                 if(_batchLoad) {
                     if(dataCode.startsWith("JSON:")) {
-                        _$container.find("select[data-code='" + dataCode + "'][data-condition='" + dataCondition + "']").each(function(){
+                        _$container.find("select[data-code='" + dataCode.replace(new RegExp('\\[' , "g"),'\\[').replace(new RegExp('\\]' , "g"),'\\]') + "'][data-condition='" + dataCondition + "']" + visible).each(function(){
                             initSelect($(this), htmlStr,dataCode,_data);
                         });
-                    }else {
-                        _$container.find("select[data-code='" + dataCode + "'][data-condition='" + dataCondition + "']" +
+                    }else if(dataCode){
+                        _$container.find("select[data-code='" + dataCode + "'][data-condition='" + dataCondition + "']" + visible +
                             "[req_dataCondition='" + _req_dataCondition + "']").each(function(){
                             initSelect($(this), htmlStr,dataCode,_data);
                         });
                     }
-
                 }else {
                     $this.each(function(){
                         initSelect($(this), htmlStr,dataCode,_data);
@@ -264,6 +336,7 @@ require(['layer','ajax','js/hframework/errormsg'], function () {
             _$this.html(_htmlStr);
         }else {
             _$this.html('<option value=""> - 请选择 - </option>' + _htmlStr);
+            var isRelat = $.refreshOptionsShowAndHide(_$this);
             if(_$this.find("option[value='" + _$this.attr("data-value") + "']").size()> 0) {
                 _$this.val(_$this.attr("data-value"));
             }else {
@@ -271,16 +344,17 @@ require(['layer','ajax','js/hframework/errormsg'], function () {
             }
 
         }
-
-        //如果是多选框，或者已经是selectx框
-        if(_$this.attr("multiple") || _$this.hasClass("hfselectx") || (_dataCode.startsWith("URL:") || _dataCode.split(".").length > 2) && _data.data.length > 10) { //选择框设置为selectx元素
-            _$this.addClass("hfselectx");
-            _$this.chosen();//设置为selectx
-            _$this.trigger("chosen:updated");
-        }
-        if(_$this.attr("multiple") && _$this.attr("data-value")) {
-            _$this.val(_$this.attr("data-value").split(","));
-            _$this.trigger("chosen:updated");
+        if(!isRelat) {
+            //如果是多选框，或者已经是selectx框
+            if(_$this.attr("multiple") || _$this.hasClass("hfselectx") || (_dataCode.startsWith("URL:") || _dataCode.split(".").length > 2) && _data.data.length > 10) { //选择框设置为selectx元素
+                _$this.addClass("hfselectx");
+                _$this.chosen();//设置为selectx
+                _$this.trigger("chosen:updated");
+            }
+            if(_$this.attr("multiple") && _$this.attr("data-value")) {
+                _$this.val(_$this.attr("data-value").split(","));
+                _$this.trigger("chosen:updated");
+            }
         }
         _$this.change();
     }
@@ -451,25 +525,27 @@ require(['layer','ajax','js/hframework/errormsg'], function () {
         }
 
         if(treeDataCache[dataCode] == null) {
-            var _url =  "/treeData.json";
-            var _data = {"dataCode":dataCode,"dataCondition" : dataCondition, "dataValue" : dataValue};
-            ajax.Post(_url,_data,function(data){
-                if(data.resultCode == 0) {
-                    //console.info(data.data);
-                    treeDataCache[dataCode] = data.data.data;
-                    $($this).val(data.data.disValue);
-                    //$($this).attr("level","city");
-                    $($this).citypicker(treeDataCache[dataCode], $option);
+            if(dataCode) {
+                var _url =  "/treeData.json";
+                var _data = {"dataCode":dataCode,"dataCondition" : dataCondition, "dataValue" : dataValue};
+                ajax.Post(_url,_data,function(data){
+                    if(data.resultCode == 0) {
+                        //console.info(data.data);
+                        treeDataCache[dataCode] = data.data.data;
+                        $($this).val(data.data.disValue);
+                        //$($this).attr("level","city");
+                        $($this).citypicker(treeDataCache[dataCode], $option);
 
-                    var event = document.createEvent('HTMLEvents'); //创建事件
-                    event.initEvent("input", true, true); //设置事件类型为 input
-                    console.info($this);
-                    $this[0].dispatchEvent(event); //触发下 该事件（input 事件）
-                    //$($this).val(data.data.disValue);
-                    //$($this).change();
-                    //window.ChineseDistricts = data.data;
-                }
-            });
+                        var event = document.createEvent('HTMLEvents'); //创建事件
+                        event.initEvent("input", true, true); //设置事件类型为 input
+                        console.info($this);
+                        $this[0].dispatchEvent(event); //触发下 该事件（input 事件）
+                        //$($this).val(data.data.disValue);
+                        //$($this).change();
+                        //window.ChineseDistricts = data.data;
+                    }
+                });
+            }
         }else {
             $($this).citypicker(treeDataCache[dataCode], $option);
             var event = document.createEvent('HTMLEvents'); //创建事件
@@ -481,12 +557,12 @@ require(['layer','ajax','js/hframework/errormsg'], function () {
         }
     }
 
-    $.reloadDisplay = function (_$container) {
+    $.reloadDisplay = function (_$container, onlyVisible) {
         var $elements = $(_$container).find("[data-code][data-condition]");
         $elements.each(function(){
             var $this = $(this);
             if($this.is('select')) {
-                $.selectLoad($this,null,true,_$container);
+                $.selectLoad($this,null,true,_$container, onlyVisible);
             }else if($this.hasClass("hfcheckbox") || $this.hasClass("hfradio") ) {
                 $.checkboxOrRadioLoad($this,null,true,_$container);
             }else if(!$this.is('span')){
@@ -494,7 +570,13 @@ require(['layer','ajax','js/hframework/errormsg'], function () {
             }
         });
     }
-    $.reloadDisplay($("body"));
+
+    loadMode = false;
+    if($("#select-load-mode").val() && "true" == $("#select-load-mode").val()) {
+        loadMode = true;
+    }
+
+    $.reloadDisplay($("body"), loadMode);//这里只刷新可见的
 
     $.reloadListDisplay = function () {
         listTextDisplay();
@@ -521,6 +603,7 @@ require(['layer','ajax','js/hframework/errormsg'], function () {
 
     function initTextDisplay($this, $targets){
         var dataCode = $this.attr("dataCode");
+        if(!dataCode) return;
         var dataValues=[];
         $targets.each(function(){
             if($(this).text()) {

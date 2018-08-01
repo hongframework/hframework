@@ -15,8 +15,13 @@ function componentinit(){
         $(this).find("div:first .form-horizontal .controls").css("margin-left", "100px");
         $(this).find("div:first .form-horizontal .control-label").css("width", "80px");
         $(this).find("div:first .hfform h2").remove();
+
+        $(this).find("div:first  .form-horizontal div:last").append('<button class="btn btn-danger flat-remove-btn" onclick="javascript:void(0)" title="删除">删除</button>');
     });
 
+    $(".flat-remove-btn").live("click", function(){
+       $(this).parents("div.hfcontainer:first").parent().remove();
+    });
 
 
     $(".hfmutexcont .box-content .box-header .box-icon").html("");

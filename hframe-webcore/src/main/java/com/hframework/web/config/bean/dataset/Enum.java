@@ -15,6 +15,12 @@ public class Enum   {
     @XStreamAlias("name")
 	private String name;
 
+    @XStreamAsAttribute
+    @XStreamAlias("parent")
+    private String parent;
+
+
+
     public Enum() {
     }
    
@@ -34,5 +40,12 @@ public class Enum   {
      public void setName(String name){
      	this.name = name;
      }
-	 
+
+    public String getParent() {
+        return parent;
+    }
+
+    public void setParent(String parent) {
+        this.parent = parent;
+    }
 }

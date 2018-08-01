@@ -1,5 +1,6 @@
 <form id="GLOBAL_TEMP_FORM" style="display:none;"></form>
 <div class="box span12 hfcontainer" id='$container.id'  module="$module" page="$page" param="$!container.param" path="$!filePath" component="$container.component" style="border: 1px solid #B1D2EC">
+    <span  class="ruler" style="display: none;" id="container_rule">$!container.ruler</span>
     #set($isPop = true)
     #set($elements = $container.modelMap.elements)
     #set($style ="margin-bottom:5px;")
@@ -123,7 +124,7 @@
                     </div>
                     <div class="box-content">
                     #foreach($curDataGroup in $compData.dataGroups)
-                        <div class="row-fluid" id="$curDataGroup.name" style="border: 1px solid #ACD6FF;padding-left: 10px;margin-bottom: 5px;">
+                        <div class="row-fluid" id="$curDataGroup.name" style="border: 1px solid #ACD6FF;padding-left: 8px;margin-bottom: 10px;box-shadow: 0 1px 0 1px #86c7e65e;">
                             #parse("component/mutexContainer.vm")
                         </div>
                     #end

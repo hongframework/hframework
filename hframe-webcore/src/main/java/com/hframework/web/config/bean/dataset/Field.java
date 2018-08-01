@@ -55,6 +55,9 @@ public class Field {
     @XStreamAsAttribute
     @XStreamAlias("width")
     private String width;
+    @XStreamAsAttribute
+    @XStreamAlias("rel-field")
+    private String relField;
 
  public Field() {
     }
@@ -186,5 +189,13 @@ public class Field {
 
     public void setIsWorkflowStatus(String isWorkflowStatus) {
         this.isWorkflowStatus = isWorkflowStatus;
+    }
+
+    public String getRelField() {
+        return relField;
+    }
+
+    public void setRelField(String relField) {
+        this.relField = relField;
     }
 }

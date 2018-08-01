@@ -1,5 +1,5 @@
 <div style="position: relative;">
-    <input class="input-small"  id="$column.code"  name="$column.code"  value='$!value' data-value='$!value' not-null="$!column.notNull" readonly type="text" data-code="$column.dataCode"  data-toggle="component-picker">
+    <input class="input-small"  id="$column.code"  name="$column.code"  value='$!value' data-value='$!value' not-null="$!column.notNull" readonly type="text" data-code="$!column.dataCode"  data-toggle="component-picker">
 ##    <div style="display: none">
 ##        <div class="row-fluid" dc="lark_api_xeditor#api.parameters.parameter.checker" style="">
 ##            <div class="box span12 hflist" id="lark_api_xeditor#api.parameters.parameter.checker_list" module="hframe" page="test" param="" component="eList" style="margin-bottom:5px;;overflow:inherit">

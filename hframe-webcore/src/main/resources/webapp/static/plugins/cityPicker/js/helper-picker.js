@@ -262,6 +262,7 @@
                     $fastObj.removeClass("helper-div");
                     $fastObj.show();
                     $targetComponent.find(".helper-div").eq(helperIndex).after($fastObj)
+                    $.reloadDisplay($fastObj);
                     var input = $targetComponent.find("div[dc='" + targetId + "']:first form").serialize()
                     if(!(input + "&").match("=[^=&]+&")){
                         $targetComponent.find(".box-content:first .row-fluid:first").remove();
@@ -279,9 +280,15 @@
                     });
 
                     $($newTR).find(".hfcheckbox input").uniform();
-
+                    $newTR.find("input[data-toggle='component-picker']").each(function(){
+                        $(this).nextAll().remove();
+                        $(this).componentpicker();
+                    });
                     $targetComponent.find(".hflist:first .box-content .hflist-data:first").append($newTR);
-                    var $headTR = $targetComponent.find(".hflist:first .box-content .hflist-data tr:first")
+
+                    $.reloadDisplay($newTR);
+
+                    var $headTR = $targetComponent.find(".hflist:first .box-content .hflist-data tr:first");
                     $("#GLOBAL_TEMP_FORM").html($headTR.html());
 
                     if(!($("#GLOBAL_TEMP_FORM").serialize() + "&").match("=[^=&]+&")){

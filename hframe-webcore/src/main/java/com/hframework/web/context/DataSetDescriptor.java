@@ -336,9 +336,48 @@ public class DataSetDescriptor {
                         JSONArray jsonArray = dataSetRulerJsonObject.getJSONArray(key);
                         jsonArray.add(object);
                     }
+                }else if(StringUtils.isNotBlank(field.getRelField())) {//基於enum的關聯關係
+                    for (String relField : field.getRelField().split(",")) {
+                        JSONObject object = new JSONObject();
+                        object.put("sourceCode", JavaUtil.getJavaVarName(relField));
+                        object.put("targetCode", JavaUtil.getJavaVarName(field.getCode()));
+                        object.put("ruleType",3);
+                        String key = JavaUtil.getJavaVarName(relField);
+                        if(!dataSetRulerJsonObject.containsKey(key)) {
+                            dataSetRulerJsonObject.put(key, new JSONArray());
+                        }
+                        JSONArray jsonArray = dataSetRulerJsonObject.getJSONArray(key);
+                        jsonArray.add(object);
+                    }
                 }
             }
         }
+
+        //范围映射需要增加默认dataset默认的rel关联
+//        if(dataSet.getDescriptor() != null && dataSet.getDescriptor().getFieldsList() != null) {
+//            for (Fields fields1 : dataSet.getDescriptor().getFieldsList()) {
+//                List<Field> fields = fields1.getFieldList();
+//                for (Field field : fields) {
+//                    if(StringUtils.isNotBlank(field.getRelField())) {
+//                        for (String relField : field.getRelField().split(",")) {
+//                            JSONObject object = new JSONObject();
+//                            object.put("sourceCode", JavaUtil.getJavaVarName(relField));
+//                            object.put("targetCode", JavaUtil.getJavaVarName(field.getCode()));
+//                            object.put("ruleType",3);
+//                            String key = JavaUtil.getJavaVarName(relField);
+//                            if(!dataSetRulerJsonObject.containsKey(key)) {
+//                                dataSetRulerJsonObject.put(key, new JSONArray());
+//                            }
+//                            JSONArray jsonArray = dataSetRulerJsonObject.getJSONArray(key);
+//                            jsonArray.add(object);
+//                        }
+//                    }
+//                }
+//            }
+
+//        }
+
+
     }
 
     public JSONObject getDataSetRulerJsonObject() {

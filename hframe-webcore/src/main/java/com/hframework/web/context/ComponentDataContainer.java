@@ -1100,7 +1100,12 @@ public class ComponentDataContainer {
                 if(field.getEnumList() != null && field.getEnumList().size() > 0) {
                     JSONObject enums = new JSONObject();
                     for (Enum anEnum : field.getEnumList()) {
-                        enums.put(anEnum.getValue(),anEnum.getName());
+                        if(StringUtils.isNotBlank(anEnum.getParent())) {
+                            enums.put(anEnum.getValue(),new String[]{anEnum.getName(), anEnum.getParent()});
+                        }else {
+                            enums.put(anEnum.getValue(),new String[]{anEnum.getName()});
+                        }
+
                     }
 
                     return "JSON:" + enums.toJSONString().replaceAll("\"","'");

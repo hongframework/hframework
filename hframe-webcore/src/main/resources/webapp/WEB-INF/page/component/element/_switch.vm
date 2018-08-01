@@ -1,6 +1,6 @@
 
 
-<label class="checkbox hfcheckbox hfswitch inline" data-code="$column.dataCode" data-condition="1=1"  data-value="$!value" not-null="$!column.notNull" style="display: none">
+<label class="checkbox hfcheckbox hfswitch inline" data-code="$!column.dataCode" data-condition="1=1"  data-value="$!value" not-null="$!column.notNull" style="display: none">
     <input type="checkbox" class="switch-checkbox switch-checkbox-not-init"   data-size="small"   name="$column.code" value="" data-handle-width="30"/>
 </label>
 

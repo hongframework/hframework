@@ -63,7 +63,7 @@ require(['layer','ajax','js/hframework/errormsg'], function () {
         if($this.parents(".hfform").size() > 0) {
             $allRules = JSON.parse($this.parents(".hfform:first").find(".ruler").text());
         }else if($this.parents("tr").size() > 0) {
-            $allRules = JSON.parse($(".hflist .ruler:first").text());
+            $allRules = JSON.parse($this.parents(".hflist:first").find(".ruler:first").text());
         }else if($this.parents(".breadcrumb").size() > 0) {
             $allRules = JSON.parse($(".breadcrumb .ruler").text());
         }

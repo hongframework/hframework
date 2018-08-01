@@ -11,11 +11,11 @@
 ##/>
 
 
-<label class="checkbox hfcheckbox inline" data-code="$column.dataCode" data-condition="1=1"  data-value="$!value" not-null="$!column.notNull" style="display: none"  relat-element="$!column.dataCondition"  >
+<label class="checkbox hfcheckbox inline" data-code="$!column.dataCode" data-condition="1=1"  data-value="$!value" not-null="$!column.notNull" style="display: none"  relat-element="$!column.dataCondition"  >
     <input type="checkbox" name="$column.code" value="" />
 </label>
 
-##<input class="form-control hfselect" readonly type="text" name="$column.code" onchange="alert(1);" data-value="$!value" data-code="$column.dataCode" data-condition="1=1" data-level="city" placeholder="请选择" provinceName="实体" cityName="属性" districtName="1" not-null="$!column.notNull">
+##<input class="form-control hfselect" readonly type="text" name="$column.code" onchange="alert(1);" data-value="$!value" data-code="$!column.dataCode" data-condition="1=1" data-level="city" placeholder="请选择" provinceName="实体" cityName="属性" districtName="1" not-null="$!column.notNull">
 
 
 ##<label class="checkbox">

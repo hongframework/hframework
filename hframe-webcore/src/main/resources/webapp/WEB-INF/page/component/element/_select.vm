@@ -7,4 +7,4 @@
 ##		>$option.Text</option>
 ##	#end
 ##</select>
-<select id='$column.code'  name='$column.code' class="input-$!{elementSize}  #if($!{href.params}) hfselect hfselect-init #end" data-value="$!value"  style='$widthStype' data-code="$column.dataCode" data-condition="1=1" relat-element="$!column.dataCondition"  params="$!{href.params}" action='$!{href.action}' not-null="$!column.notNull"></select>
+<select id='$column.code'  name='$column.code' class="input-$!{elementSize}  #if($!{href.params}) hfselect hfselect-init #end" data-value="$!value"  style='$widthStype' data-code="$!column.dataCode" data-condition="1=1" relat-element="$!column.dataCondition"  params="$!{href.params}" action='$!{href.action}' not-null="$!column.notNull"></select>

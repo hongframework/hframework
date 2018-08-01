@@ -15,6 +15,6 @@
 ##    #text
 ##</label>
 
-<label class="radio hfradio inline" data-code="$column.dataCode" data-condition="1=1"  data-value="$!value" not-null="$!column.notNull" style="display: none">
+<label class="radio hfradio inline" data-code="$!column.dataCode" data-condition="1=1"  data-value="$!value" not-null="$!column.notNull" style="display: none">
     <input type="radio" name="$column.code" value="" />
 </label>

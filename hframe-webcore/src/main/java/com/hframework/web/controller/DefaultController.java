@@ -417,6 +417,7 @@ public class DefaultController {
                     String tmpJson = tmpArray.toJSONString();
                     xml = tmpJson.substring(1, tmpJson.length() - 1);
                     if(isDynDataInfo(dataIdStr)) {
+                        xml = xml.substring(1, xml.length() - 1);
                         saveDynDataInfo(dataIdStr, id, xml);
                         return ResultData.success();
                     }else{
