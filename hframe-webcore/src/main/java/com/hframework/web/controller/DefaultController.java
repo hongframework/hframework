@@ -19,15 +19,13 @@ import com.hframework.common.util.*;
 import com.hframework.common.util.collect.CollectionUtils;
 import com.hframework.common.util.collect.bean.Fetcher;
 import com.hframework.common.util.file.FileUtils;
+import com.hframework.common.util.message.Dom4jUtils;
 import com.hframework.web.CreatorUtil;
 import com.hframework.web.SessionKey;
 import com.hframework.web.auth.AuthServiceProxy;
 import com.hframework.web.config.bean.module.Component;
 import com.hframework.web.context.*;
-import com.hframework.web.controller.core.ComponentInvokeManager;
-import com.hframework.web.controller.core.ControllerMethodInvoker;
-import com.hframework.web.controller.core.PageExtendDataManager;
-import com.hframework.web.controller.core.SessionExpiredException;
+import com.hframework.web.controller.core.*;
 import com.vaadin.terminal.StreamResource;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Embedded;
@@ -101,6 +99,51 @@ public class DefaultController {
     @Resource
     private ComponentInvokeManager componentInvokeManager;
 
+    /**
+     * 异步Ajax获取文件编辑器中HelperData（需要走ModelAndView进行视图进行渲染）
+     * @return
+     */
+    @RequestMapping(value = "/getFileEditorHelperData")
+    @ResponseBody
+    public ModelAndView getFileEditorHelperData(HttpServletRequest request,
+                                                HttpServletResponse response) throws Throwable {
+        ModelAndView mav = new ModelAndView();
+        String refererUrl = request.getHeader("referer");
+        String[] refererUrlInfo = Arrays.copyOfRange(refererUrl.split("[/]+"), 2, refererUrl.split("[/]+").length);
+        String module = refererUrlInfo[0];
+        String pageCode = refererUrlInfo[1].substring(0, refererUrlInfo[1].indexOf(".html"));
+        String helperIndex = request.getParameter("helperIndex");
+        String targetId = request.getParameter("targetId");
+
+        logger.debug("request referer : {},{},{}", refererUrl, module, pageCode);
+        PageDescriptor pageInfo = WebContext.get().getPageInfo(module, pageCode);
+        Map<String, ComponentDescriptor> components = pageInfo.getComponents();
+
+        ComponentDescriptor fileComponentDescriptor = null;
+        for (ComponentDescriptor componentDescriptor : components.values()) {
+            DataSetDescriptor dataSetDescriptor = componentDescriptor.getDataSetDescriptor();
+            if(dataSetDescriptor != null && dataSetDescriptor.isHelperRuntime()) {
+                fileComponentDescriptor = componentDescriptor;
+                break;
+            }
+        }
+        DataSetDescriptor dataSetDescriptor = fileComponentDescriptor.getDataSetDescriptor();
+        dataSetDescriptor.resetHelperInfo(true);
+        String helperDataXml = dataSetDescriptor.getHelperDataXml();
+        if(com.hframework.common.util.StringUtils.isBlank(helperDataXml)) helperDataXml = "<xml></xml>";
+        Element helperElement = Dom4jUtils.getDocumentByContent(helperDataXml).getRootElement();
+        DataSetContainer helperContainer = FileComponentInvoker.createRootContainer(fileComponentDescriptor, helperElement, module);
+        mav.addObject("helpCompData", helperContainer.getDataGroups().get(0).getElementMap().get(targetId.substring(targetId.indexOf("#")+ 1)));
+        JSONObject jsonObject = fileComponentDescriptor.getJson();
+        ModelAndView subResult = ServiceFactory.getService(DefaultController.class).
+                gotoPage(module, fileComponentDescriptor.getDataSetDescriptor().getDataSet().getCode() + "#",
+                        null, null, "true", request, response);
+        jsonObject.put("modelMap", subResult.getModelMap());
+        jsonObject.put("view", subResult.getViewName());
+        mav.addObject("container",jsonObject);
+        mav.setViewName("component/helperData");
+        return mav;
+    }
 
     /**
      * 获取某对象详情
@@ -133,6 +176,8 @@ public class DefaultController {
             return ResultData.error(ResultCode.ERROR);
         }
     }
+
+
 
 
     /**

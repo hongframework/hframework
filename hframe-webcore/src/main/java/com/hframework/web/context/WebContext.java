@@ -324,13 +324,13 @@ public class WebContext {
                     for (HelperData helpData : helperDatas.getHelperDatas()) {
                         if(StringUtils.isNotBlank(helpData.getEmbedClass())
                                 && StringUtils.isNotBlank(helpData.getEmbedMethod())
-                                && "runtime".equals(helpData.getEmbedType())) {
+                                && ("runtime".equals(helpData.getEmbedType()) || "ajax".equals(helpData.getEmbedType()))) {
                             isRuntime |= true;
                         }
                         if(isRuntime) {
                             dataSetDescriptor.setHelperRuntime(true);
                         }else{
-                            dataSetDescriptor.resetHelperInfo();
+                            dataSetDescriptor.resetHelperInfo(false);
                         }
                     }
 //                    JSONObject helpTags = new JSONObject(true);

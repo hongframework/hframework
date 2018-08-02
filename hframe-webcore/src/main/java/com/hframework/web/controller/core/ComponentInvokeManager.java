@@ -58,7 +58,7 @@ public class ComponentInvokeManager {
             return null;
         }
         if(componentDescriptor.getDataSetDescriptor().isHelperRuntime()){
-            componentDescriptor.getDataSetDescriptor().resetHelperInfo();
+            componentDescriptor.getDataSetDescriptor().resetHelperInfo(false);
         }
 
         String moduleCode = componentDescriptor.getDataSetDescriptor().getDataSet().getModule();

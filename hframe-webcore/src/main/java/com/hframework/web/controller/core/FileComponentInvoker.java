@@ -194,7 +194,7 @@ public class FileComponentInvoker {
         return xmlContent;
     }
 
-    private DataSetContainer createRootContainer(ComponentDescriptor componentDescriptor, Element rootElement, String module) throws NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {
+    public static DataSetContainer createRootContainer(ComponentDescriptor componentDescriptor, Element rootElement, String module) throws NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {
 //        DataSetContainer rootContainer = (DataSetContainer) org.apache.commons.beanutils.BeanUtils.cloneBean(
 //                componentDescriptor.getDataSetDescriptor().getDateSetStruct());
         //TODO 需要确认深度拷贝是否完整
@@ -211,7 +211,7 @@ public class FileComponentInvoker {
         return rootContainer;
     }
 
-    private void setDataSetInstanceComponentData(DataSetContainer rootContainer, String module,String parentDataSetCode, String subPageCode) {
+    private static void setDataSetInstanceComponentData(DataSetContainer rootContainer, String module,String parentDataSetCode, String subPageCode) {
         PageDescriptor subPageInfo = WebContext.get().getPageInfo(module, parentDataSetCode + "#" + (StringUtils.isNotBlank(subPageCode) ? (subPageCode + "#") : ""));
 
         if(rootContainer.isVirtualContainer()) {
@@ -237,7 +237,7 @@ public class FileComponentInvoker {
         }
     }
 
-    private void setDataSetContainerValue(DataSetGroup parentDataSetGroup, Element parentElement)
+    private static void setDataSetContainerValue(DataSetGroup parentDataSetGroup, Element parentElement)
             throws InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
 
         Set<String> excludeCode = getExcludeCode(parentDataSetGroup.getElementList());
@@ -311,7 +311,7 @@ public class FileComponentInvoker {
         }
     }
 
-    private void setDataSetInstanceComponentData(PageDescriptor subPageInfo, final DataSetInstance dataSet) {
+    private static void setDataSetInstanceComponentData(PageDescriptor subPageInfo, final DataSetInstance dataSet) {
         for (ComponentDescriptor descriptor : subPageInfo.getComponents().values()) {
             if(descriptor.isDefaultComponent()) continue;
             if(descriptor.getDataSetDescriptor() != null) {
@@ -331,7 +331,7 @@ public class FileComponentInvoker {
         }
     }
 
-    private Set<String> getExcludeCode(List<IDataSet> elementList) {
+    private static Set<String> getExcludeCode(List<IDataSet> elementList) {
         Set<String> set = new HashSet<String>();
         for (IDataSet iDataSet : elementList) {
             if (iDataSet instanceof DataSetContainer) {
@@ -343,7 +343,7 @@ public class FileComponentInvoker {
         return set;
     }
 
-    private void addRowData(Map<String, String> oneRowData, Element element, String parentPath, Set<String> excludeCode, Set<String> includeCode) {
+    private static void addRowData(Map<String, String> oneRowData, Element element, String parentPath, Set<String> excludeCode, Set<String> includeCode) {
         Map<String, String> attrMap = getAttrMap(element);
         for (String attrCode : attrMap.keySet()) {
             oneRowData.put(parentPath + "#" + attrCode, attrMap.get(attrCode));
@@ -385,7 +385,7 @@ public class FileComponentInvoker {
 
     }
 
-    private LinkedList<Element> findElementsByPath(final Element rootElement, String path) {
+    private static LinkedList<Element> findElementsByPath(final Element rootElement, String path) {
         if(rootElement.getPath().replaceAll("/",".").substring(1).equals(path)) {
             return new LinkedList<Element>(){{
                 add(rootElement);

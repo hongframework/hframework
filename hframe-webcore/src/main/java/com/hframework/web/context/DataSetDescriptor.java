@@ -478,7 +478,7 @@ public class DataSetDescriptor {
         this.helperRuntime = helperRuntime;
     }
 
-    public void resetHelperInfo() throws DocumentException, ClassNotFoundException, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+    public void resetHelperInfo(boolean containHelpDataAnyWay) throws DocumentException, ClassNotFoundException, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
         if(dataSet == null || dataSet.getDescriptor() == null || dataSet.getDescriptor().getHelperDatas() == null){
             return;
         }
@@ -489,6 +489,7 @@ public class DataSetDescriptor {
             for (HelperData helpData : helperDatas.getHelperDatas()) {
                 String embedClass = helpData.getEmbedClass();
                 String embedMethod = helpData.getEmbedMethod();
+                boolean isAjaxRequest = "ajax".equals(helpData.getEmbedType());
                 if(StringUtils.isNotBlank(embedClass) && StringUtils.isNotBlank(embedMethod)){
                     String replaceString = String.valueOf(java.lang.Class.forName(embedClass).getMethod(embedMethod, new java.lang.Class[0]).invoke(null, null));
                     helpData.setHelpLabels(XmlUtils.readValue("<helper-data>" + replaceString + "</helper-data>", HelperData.class).getHelpLabels());
@@ -499,9 +500,8 @@ public class DataSetDescriptor {
                     Map blankMap = new HashMap();
                     root = Dom4jUtils.createElement(nodes[0], blankMap);
                 }
-                addElementToDomElement(root, Arrays.copyOfRange(nodes, 0, nodes.length - 1), helpData.getHelpLabels());
-                String xml = root.asXML();
-                this.helperDataXml = xml;
+                addElementToDomElement(root, Arrays.copyOfRange(nodes, 0, nodes.length - 1), helpData.getHelpLabels(), isAjaxRequest && !containHelpDataAnyWay);
+
 
                 JSONObject helpTag = new JSONObject(true);
                 helpTags.put(dataSet.getCode() + "#" + targetId, helpTag);
@@ -513,18 +513,24 @@ public class DataSetDescriptor {
                         helpLabel.put(helperLabel.getHelpItems().get(i).getName(), count ++);
                     }
                 }
-                this.helperTags = helpTags;
             }
+            if(root != null) {
+                String xml = root.asXML();
+                this.helperDataXml = xml;
+            }
+            this.helperTags = helpTags;
         }
     }
 
-    private void addElementToDomElement(DOMElement root, String[] nodes, List<HelperLabel> helpLabels) throws DocumentException {
+    private void addElementToDomElement(DOMElement root, String[] nodes, List<HelperLabel> helpLabels, boolean isAjaxRequest) throws DocumentException {
 
         DOMElement parentElement = getCurrentElement(root, nodes);
         for (HelperLabel helpLabel : helpLabels) {
             List<HelperItem> helpItems = helpLabel.getHelpItems();
             for (HelperItem helpItem : helpItems) {
-                parentElement.add(DocumentHelper.parseText(helpItem.getText()).getRootElement());
+                if(StringUtils.isNotBlank(helpItem.getText()) && !isAjaxRequest) {
+                    parentElement.add(DocumentHelper.parseText(helpItem.getText()).getRootElement());
+                }
             }
         }
         ;

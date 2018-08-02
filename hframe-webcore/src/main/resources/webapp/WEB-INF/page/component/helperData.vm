@@ -1,0 +1,6 @@
+###set($helpCompData = $helperFileContainer.dataGroups.get(0).elementMap.get($element.value.dataSet))
+#foreach($curDataGroup in $helpCompData.dataGroups)
+<div class="row-fluid helper-div" id="$curDataGroup.name" style="border: 1px solid #ACD6FF;padding-left: 10px;margin-bottom: 5px;display: none">
+    #parse("component/mutexContainer.vm")
+</div>
+#end
