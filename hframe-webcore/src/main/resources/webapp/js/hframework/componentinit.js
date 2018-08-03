@@ -1,26 +1,90 @@
+function flatContainerStyleReset(_$flatContainer) {
+    _$flatContainer.find(".box").removeClass("box");
+    _$flatContainer.find(".box-content").removeClass("box-content");
+    _$flatContainer.find(".box-header  .box-icon").html("");
+    _$flatContainer.find(".box-header").removeClass("box-header");
 
+
+    _$flatContainer.find("div:first form fieldset .control-group ").addClass("span1");
+    _$flatContainer.find("div:first form fieldset .control-group:first ").removeClass("span1").addClass("span4");
+
+    _$flatContainer.find("div:first .hfform h2").remove();
+
+    _$flatContainer.find("div:first  .form-horizontal div:last").append('<button class="btn btn-danger flat-remove-btn" onclick="javascript:void(0)" title="删除">删除</button>');
+
+    _$flatContainer.find(".pagination").remove();
+
+    _$flatContainer.find("div:first form fieldset").each(function(){
+        $(this).find(".control-group").addClass("span2").removeClass("span1");
+        $(this).find(".control-group:first ").addClass("span3").removeClass("span4").removeClass("span2");
+        $(this).find(".control-group:last ").addClass("span3").removeClass("span1").removeClass("span2");
+        $(this).find("input.input-xlarge").addClass("input-medium").removeClass("input-xlarge");
+        $(this).find("span.help-inline").remove();
+    });
+
+    _$flatContainer.find(".switch-button").each(function(){
+        dispalySwitchButton($(this));
+    });
+}
+
+function dispalySwitchButton(_$switchButton) {
+    var $this = _$switchButton;
+
+    var config = JSON.parse($this.attr("action"))["componentControl"];
+    var targetId = config["targetId"];
+    var $targetComponent = $this.parents(".hfcontainer:first").find("div[dc='" + targetId + "']:first");
+    if(!$targetComponent[0]){
+        var seq = 0;
+        if(targetId.endsWith("]")){
+            seq = targetId .substring(targetId.length - 2,targetId.length - 1) - 1;
+            targetId = targetId.substring(0,targetId.length - 3);
+
+        }
+        $targetComponent = $($("[component= '" + targetId + "']").get(seq));
+    }
+    var isShow = true;
+    if(config["param"]) {
+        var visible = JSON.parse(config["param"])["visible"];
+        var showCondition = JSON.parse(config["param"])["show_condition"];
+        var event = JSON.parse(config["param"])["event"];
+        var showWhenIsNotEmpty = showCondition == "IS_NOT_EMPTY";
+
+        if(visible == "auto" && showWhenIsNotEmpty) {
+            if($targetComponent.children().is("[component=flatContainer]")){
+                isShow = false;
+                var input = $targetComponent.find("div[dc='" + targetId + "']:first form").serialize()
+                var items = input.split("&")
+                for(var i in items){
+                    var value = items[i].split("=")[1];
+                    if(value){
+                        isShow = true;
+                    }
+                }
+            }else if($targetComponent.find(".form-horizontal table:first tbody tr").size() == 1 && $targetComponent.find(".form-horizontal table:first tbody").is("[data-is-empty=true]")){
+                isShow = false;
+            }else if($targetComponent.find("[data-is-empty=true]").size() == 1){
+                isShow = false;
+            }
+        }
+    }
+    if(isShow){
+        if(event == "toggle"){
+            $this.addClass("switch-hidden");
+        }
+
+    }else {
+        $targetComponent.hide();
+    }
+}
 
 function componentinit(){
     $("[component=flatContainer]").find(".box").removeClass("box");
     $(".hfcontainer[component='flatContainer']").each(function(){
-        $(this).find(".box-content").removeClass("box-content");
-        $(this).find(".box-header  .box-icon").html("");
-        $(this).find(".box-header").removeClass("box-header");
-
-        $(this).find("div:first form fieldset .control-group ").css("margin-bottom", 0);
-        $(this).find("div:first form fieldset .control-group ").addClass("span1");
-        $(this).find("div:first form fieldset .control-group:first ").removeClass("span1").addClass("span4");
-        $(this).find("div:first form").css("margin-bottom", 0);
-        $(this).find("div:first form fieldset ").css("margin-top", "15px");
-        $(this).find("div:first .form-horizontal .controls").css("margin-left", "100px");
-        $(this).find("div:first .form-horizontal .control-label").css("width", "80px");
-        $(this).find("div:first .hfform h2").remove();
-
-        $(this).find("div:first  .form-horizontal div:last").append('<button class="btn btn-danger flat-remove-btn" onclick="javascript:void(0)" title="删除">删除</button>');
+        flatContainerStyleReset($(this));
     });
 
     $(".flat-remove-btn").live("click", function(){
-       $(this).parents("div.hfcontainer:first").parent().remove();
+        $(this).parents("div.hfcontainer:first").parent().remove();
     });
 
 
@@ -42,7 +106,7 @@ function componentinit(){
 
     $(".hflist  .box-content .hflist-data a[when][when!='{}']").each(function(){
         $(this).hide();
-       var conditions = JSON.parse( $(this).attr("when"));
+        var conditions = JSON.parse( $(this).attr("when"));
         for(var key in conditions) {
             var $span = $(this).parent("td").parent("tr").find("span[code='"+ key +"']");
             var value = conditions[key];
@@ -56,53 +120,7 @@ function componentinit(){
     });
 
     $(".switch-button").each(function(){
-       var $this = $(this);
-
-        var config = JSON.parse($this.attr("action"))["componentControl"];
-        var targetId = config["targetId"];
-        var $targetComponent = $this.parents(".hfcontainer:first").find("div[dc='" + targetId + "']:first");
-        if(!$targetComponent[0]){
-            var seq = 0;
-            if(targetId.endsWith("]")){
-                seq = targetId .substring(targetId.length - 2,targetId.length - 1) - 1;
-                targetId = targetId.substring(0,targetId.length - 3);
-
-            }
-            $targetComponent = $($("[component= '" + targetId + "']").get(seq));
-        }
-        var isShow = true;
-        if(config["param"]) {
-            var visible = JSON.parse(config["param"])["visible"];
-            var showCondition = JSON.parse(config["param"])["show_condition"];
-            var event = JSON.parse(config["param"])["event"];
-            var showWhenIsNotEmpty = showCondition == "IS_NOT_EMPTY";
-
-            if(visible == "auto" && showWhenIsNotEmpty) {
-                if($targetComponent.children().is("[component=flatContainer]")){
-                    isShow = false;
-                    var input = $targetComponent.find("div[dc='" + targetId + "']:first form").serialize()
-                    var items = input.split("&")
-                    for(var i in items){
-                        var value = items[i].split("=")[1];
-                        if(value){
-                            isShow = true;
-                        }
-                    }
-                }else if($targetComponent.find(".form-horizontal table:first tbody tr").size() == 1 && $targetComponent.find(".form-horizontal table:first tbody").is("[data-is-empty=true]")){
-                    isShow = false;
-                }else if($targetComponent.find("[data-is-empty=true]").size() == 1){
-                    isShow = false;
-                }
-            }
-        }
-        if(isShow){
-            if(event == "toggle"){
-                $this.addClass("switch-hidden");
-            }
-
-        }else {
-            $targetComponent.hide();
-        }
+        dispalySwitchButton($(this));
     });
 
     $("div[group][group!='']").each(function(index,element){
@@ -216,16 +234,16 @@ function componentinit(){
             $contentDiv.append($(this));
             //$newRow.children("td:first").empty();
             $newRow.find("select,input").each(function(){
-               if(data[$(this).attr("name")]) {
-                   if($(this).is("select")){
-                       $(this).attr("data-value", data[$(this).attr("name")]);
-                   }else {
-                       if($(this).is("[type=checkbox]") || $(this).is("[type=radio]")) {
-                           $(this).parents("label.hfcheckbox").attr("data-value", data[$(this).attr("name")]);
-                       }else {
-                           $(this).val(data[$(this).attr("name")]);
-                       }
-                   }
+                if(data[$(this).attr("name")]) {
+                    if($(this).is("select")){
+                        $(this).attr("data-value", data[$(this).attr("name")]);
+                    }else {
+                        if($(this).is("[type=checkbox]") || $(this).is("[type=radio]")) {
+                            $(this).parents("label.hfcheckbox").attr("data-value", data[$(this).attr("name")]);
+                        }else {
+                            $(this).val(data[$(this).attr("name")]);
+                        }
+                    }
                 }
             });
             $newRow.children("td:first").append($contentDiv);

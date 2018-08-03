@@ -258,8 +258,8 @@
                 var targetId  = JSON.parse($button.attr("action"))["componentControl"]["targetId"]
                 var $targetComponent = $button.parents(".hfcontainer:first").find("div[dc='" + targetId + "']:first");
                 if($targetComponent.children().is("[component=flatContainer]")){
-                    if($targetComponent.find(".helper-div").length < helperIndex) {
-                        $.post("/extend/getFileEditorHelperData",{helperIndex:helperIndex, targetId:targetId},function(data){
+                    if($targetComponent.find(".helper-div").length - 1  < helperIndex) {
+                        $.post("/getFileEditorHelperData.html",{helperIndex:helperIndex, targetId:targetId},function(data){
                             // if(data.resultCode != '0') {
                             //     alert(data.resultMessage);
                             //     return;
@@ -267,8 +267,13 @@
                             var $fastObj = $(data);
                             $fastObj.removeClass("helper-div");
                             $fastObj.show();
-                            $targetComponent.append($fastObj);
+                            $targetComponent.find("div.box-content:first").append($fastObj);
+                            flatContainerStyleReset($fastObj);
+                            if(helperItemAddInitial) {
+                                helperItemAddInitial($fastObj);
+                            }
                             $.reloadDisplay($fastObj);
+
                             var input = $targetComponent.find("div[dc='" + targetId + "']:first form").serialize()
                             if(!(input + "&").match("=[^=&]+&")){
                                 $targetComponent.find(".box-content:first .row-fluid:first").remove();
@@ -306,7 +311,9 @@
                     $targetComponent.find(".hflist:first .box-content .hflist-data:first").append($newTR);
 
                     $.reloadDisplay($newTR);
-
+                    if(helperItemAddInitial) {
+                        helperItemAddInitial($newTR);
+                    }
                     var $headTR = $targetComponent.find(".hflist:first .box-content .hflist-data tr:first");
                     $("#GLOBAL_TEMP_FORM").html($headTR.html());
 

@@ -500,7 +500,11 @@ public class DataSetDescriptor {
                     Map blankMap = new HashMap();
                     root = Dom4jUtils.createElement(nodes[0], blankMap);
                 }
-                addElementToDomElement(root, Arrays.copyOfRange(nodes, 0, nodes.length - 1), helpData.getHelpLabels(), isAjaxRequest && !containHelpDataAnyWay);
+
+                if(!isAjaxRequest || containHelpDataAnyWay) {//这个时候没有必要
+                    addElementToDomElement(root, Arrays.copyOfRange(nodes, 0, nodes.length - 1), helpData.getHelpLabels(), isAjaxRequest && !containHelpDataAnyWay);
+                }
+
 
 
                 JSONObject helpTag = new JSONObject(true);

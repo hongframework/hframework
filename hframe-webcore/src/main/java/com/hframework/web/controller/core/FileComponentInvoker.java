@@ -71,12 +71,12 @@ public class FileComponentInvoker {
                 rootElement = new DefaultElement("a");
             }
 
-            DataSetContainer rootContainer = createRootContainer(componentDescriptor, rootElement, module);
+            DataSetContainer rootContainer = createRootContainer(componentDescriptor, rootElement, module, true);
 
             String helperDataXml = componentDescriptor.getDataSetDescriptor().getHelperDataXml();
             if(StringUtils.isBlank(helperDataXml)) helperDataXml = "<xml></xml>";
             Element helperElement = Dom4jUtils.getDocumentByContent(helperDataXml).getRootElement();
-            DataSetContainer helperContainer = createRootContainer(componentDescriptor, helperElement, module);
+            DataSetContainer helperContainer = createRootContainer(componentDescriptor, helperElement, module, false);
 
             for (IDataSet iDataSet : rootContainer.getElementList()) {
                 if (iDataSet instanceof DataSetInstance) {
@@ -194,7 +194,7 @@ public class FileComponentInvoker {
         return xmlContent;
     }
 
-    public static DataSetContainer createRootContainer(ComponentDescriptor componentDescriptor, Element rootElement, String module) throws NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {
+    public static DataSetContainer createRootContainer(ComponentDescriptor componentDescriptor, Element rootElement, String module, boolean blankContainerNecessary) throws NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {
 //        DataSetContainer rootContainer = (DataSetContainer) org.apache.commons.beanutils.BeanUtils.cloneBean(
 //                componentDescriptor.getDataSetDescriptor().getDateSetStruct());
         //TODO 需要确认深度拷贝是否完整
@@ -205,7 +205,7 @@ public class FileComponentInvoker {
         rootDataSetGroup.setElementList(CollectionUtils.copy(rootContainer.getElementList()));
 
 
-        setDataSetContainerValue(rootDataSetGroup, rootElement);
+        setDataSetContainerValue(rootDataSetGroup, rootElement, blankContainerNecessary);
 
         setDataSetInstanceComponentData(rootContainer, module, componentDescriptor.getDataSetDescriptor().getDataSet().getCode(), "");
         return rootContainer;
@@ -237,7 +237,7 @@ public class FileComponentInvoker {
         }
     }
 
-    private static void setDataSetContainerValue(DataSetGroup parentDataSetGroup, Element parentElement)
+    private static void setDataSetContainerValue(DataSetGroup parentDataSetGroup, Element parentElement, boolean blankContainerNecessary)
             throws InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
 
         Set<String> excludeCode = getExcludeCode(parentDataSetGroup.getElementList());
@@ -247,7 +247,9 @@ public class FileComponentInvoker {
             LinkedList<Element> eleList = findElementsByPath(parentElement, path); //满足条件的数据元素
             if(eleList == null || eleList.size() == 0) {
                 logger.warn("xml node [{}] is not exists !", path);
+                if(!blankContainerNecessary) continue;
             }
+
             if (iDataSet instanceof DataSetContainer) {
                 DataSetContainer dataSetContainer = (DataSetContainer) iDataSet;
                 if(eleList == null || eleList.size() == 0) {
@@ -262,7 +264,7 @@ public class FileComponentInvoker {
                         dataSetGroup.setNode(dataSetContainer.getNode());
                         dataSetContainer.addDataGroup(dataSetGroup);
                         dataSetGroup.setElementList(CollectionUtils.copy(dataSetContainer.getElementList()));
-                        setDataSetContainerValue(dataSetGroup, tarElement);
+                        setDataSetContainerValue(dataSetGroup, tarElement, blankContainerNecessary);
                     }
                     continue;
                 }

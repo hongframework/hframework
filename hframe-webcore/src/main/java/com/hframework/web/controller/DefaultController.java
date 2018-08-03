@@ -103,19 +103,25 @@ public class DefaultController {
      * 异步Ajax获取文件编辑器中HelperData（需要走ModelAndView进行视图进行渲染）
      * @return
      */
-    @RequestMapping(value = "/getFileEditorHelperData")
+    @RequestMapping(value = "/getFileEditorHelperData.html")
     @ResponseBody
     public ModelAndView getFileEditorHelperData(HttpServletRequest request,
                                                 HttpServletResponse response) throws Throwable {
         ModelAndView mav = new ModelAndView();
-        String refererUrl = request.getHeader("referer");
-        String[] refererUrlInfo = Arrays.copyOfRange(refererUrl.split("[/]+"), 2, refererUrl.split("[/]+").length);
-        String module = refererUrlInfo[0];
-        String pageCode = refererUrlInfo[1].substring(0, refererUrlInfo[1].indexOf(".html"));
         String helperIndex = request.getParameter("helperIndex");
         String targetId = request.getParameter("targetId");
+        String module = request.getParameter("module");
+        String pageCode = request.getParameter("pageCode");
+        if(org.apache.commons.lang3.StringUtils.isBlank(pageCode)) {
+            String refererUrl = request.getHeader("referer");
+            String[] refererUrlInfo = Arrays.copyOfRange(refererUrl.split("[/]+"), 2, refererUrl.split("[/]+").length);
+            module = refererUrlInfo[0];
+            pageCode = refererUrlInfo[1].substring(0, refererUrlInfo[1].indexOf(".html"));
 
-        logger.debug("request referer : {},{},{}", refererUrl, module, pageCode);
+        }
+
+
+        logger.debug("request referer : {},{},{},{}", module, pageCode, targetId, helperIndex);
         PageDescriptor pageInfo = WebContext.get().getPageInfo(module, pageCode);
         Map<String, ComponentDescriptor> components = pageInfo.getComponents();
 
@@ -127,20 +133,38 @@ public class DefaultController {
                 break;
             }
         }
+        String id = targetId.substring(targetId.indexOf("#")+ 1);
+
         DataSetDescriptor dataSetDescriptor = fileComponentDescriptor.getDataSetDescriptor();
         dataSetDescriptor.resetHelperInfo(true);
         String helperDataXml = dataSetDescriptor.getHelperDataXml();
         if(com.hframework.common.util.StringUtils.isBlank(helperDataXml)) helperDataXml = "<xml></xml>";
         Element helperElement = Dom4jUtils.getDocumentByContent(helperDataXml).getRootElement();
-        DataSetContainer helperContainer = FileComponentInvoker.createRootContainer(fileComponentDescriptor, helperElement, module);
-        mav.addObject("helpCompData", helperContainer.getDataGroups().get(0).getElementMap().get(targetId.substring(targetId.indexOf("#")+ 1)));
+        DataSetContainer helperContainer = FileComponentInvoker.createRootContainer(fileComponentDescriptor, helperElement, module, true);
+
+        IDataSet targetDataGroups = helperContainer.getDataGroups().get(0).getElementMap().get(id);
+        List<DataSetGroup> dataGroups = ((DataSetContainer) targetDataGroups).getDataGroups();
+        ((DataSetContainer) targetDataGroups).setDataGroups(Lists.newArrayList(dataGroups.get(Integer.valueOf(helperIndex))));
+        mav.addObject("helpCompData", targetDataGroups);
+
+        JSONObject container = null;
         JSONObject jsonObject = fileComponentDescriptor.getJson();
         ModelAndView subResult = ServiceFactory.getService(DefaultController.class).
                 gotoPage(module, fileComponentDescriptor.getDataSetDescriptor().getDataSet().getCode() + "#",
                         null, null, "true", request, response);
+        Object elements = subResult.getModelMap().get("elements");
+        for (Object o : ((Map) elements).values()) {
+            container = (JSONObject)o;
+            if(id.equals(container.getString("dataSet"))) {
+                break;
+            }
+        }
+//        ModelAndView subResult = ServiceFactory.getService(DefaultController.class).
+//                gotoPage(module, targetId,
+//                        null, null, "true", request, response);
         jsonObject.put("modelMap", subResult.getModelMap());
         jsonObject.put("view", subResult.getViewName());
-        mav.addObject("container",jsonObject);
+        mav.addObject("container",container);
         mav.setViewName("component/helperData");
         return mav;
     }

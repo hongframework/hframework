@@ -32,6 +32,8 @@
 
     <link rel="stylesheet" href="$staticResourcePath/plugins/timepicker/jquery-ui-timepicker-addon.min.css" />
     <link rel="stylesheet" href="$staticResourcePath/plugins/bootstrapSwitch/css/bootstrap-switch.min.css" />
+
+    <link href="$staticResourcePath/css/feditor.css" rel="stylesheet" />
 ##    <link rel="stylesheet" href="$staticResourcePath/plugins/timepicker/css/jquery-ui.css" />
 ##    <style type="text/css">
 ##        .ui-timepicker-div .ui-widget-header { margin-bottom: 8px; }
