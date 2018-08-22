@@ -14,6 +14,9 @@ public class Component   {
 	@XStreamImplicit
     @XStreamAlias("event")
 	private List<com.hframework.web.config.bean.component.Event> eventList;
+    @XStreamImplicit
+    @XStreamAlias("set-value")
+    private List<SetValue> setValueList;
 	@XStreamAsAttribute
     @XStreamAlias("id")
 	private String id;
@@ -104,5 +107,13 @@ public class Component   {
 
     public void setShowTitle(String showTitle) {
         this.showTitle = showTitle;
+    }
+
+    public List<SetValue> getSetValueList() {
+        return setValueList;
+    }
+
+    public void setSetValueList(List<SetValue> setValueList) {
+        this.setValueList = setValueList;
     }
 }

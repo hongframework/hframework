@@ -76,6 +76,7 @@
         <element id="qList" type="component" event-extend="false"></element>
     </pagetemplate>
     <pagetemplate id="dynamic" path="common.vm" parent-id = "default" name="动态页面" type="forward" />
+    <pagetemplate id="allInOne" path="common.vm" parent-id = "default" name="动态页面" type="forward" />
 
     <pagetemplate id="editByCategory" path="container.vm" parent-id = "default" name="动态页面" type="forward">
         <element id="dynTree" type="component" container="span3">

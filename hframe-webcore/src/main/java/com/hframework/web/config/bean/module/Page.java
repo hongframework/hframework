@@ -43,6 +43,8 @@ public class Page   {
     @XStreamAsAttribute
     @XStreamAlias("rel-page")
     private String relPage;
+    @XStreamAlias("extend-script")
+    private String extendScript;
 
     //父Module
     @XStreamOmitField
@@ -138,5 +140,13 @@ public class Page   {
 
     public void setSubDataSets(String subDataSets) {
         this.subDataSets = subDataSets;
+    }
+
+    public String getExtendScript() {
+        return extendScript;
+    }
+
+    public void setExtendScript(String extendScript) {
+        this.extendScript = extendScript;
     }
 }

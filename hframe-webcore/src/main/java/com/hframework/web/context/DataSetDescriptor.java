@@ -43,6 +43,8 @@ public class DataSetDescriptor {
     private JSONObject helperTags;
     private boolean helperRuntime = false;
 
+    private String[] columnTableKeyAndValue;
+
     private static final String[] orderdEditType = {"input","select","checkbox","hidden"};
 
     //<hfpm_program_id,hfpm_program/hfpm_program_id>
@@ -572,5 +574,13 @@ public class DataSetDescriptor {
 
     public Map<String, Set<String>> getBeenUsedFieldMap() {
         return beenUsedFieldMap;
+    }
+
+    public String[] getColumnTableKeyAndValue() {
+        return columnTableKeyAndValue;
+    }
+
+    public void setColumnTableKeyAndValue(String[] columnTableKeyAndValue) {
+        this.columnTableKeyAndValue = columnTableKeyAndValue;
     }
 }

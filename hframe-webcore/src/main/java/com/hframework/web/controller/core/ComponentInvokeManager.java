@@ -5,6 +5,8 @@ import com.alibaba.fastjson.JSONObject;
 import com.google.common.base.Enums;
 import com.google.common.base.Joiner;
 import com.google.common.base.Optional;
+import com.google.common.collect.Lists;
+import com.hframework.base.bean.MapWrapper;
 import com.hframework.beans.class0.Class;
 import com.hframework.beans.controller.Pagination;
 import com.hframework.beans.controller.ResultData;
@@ -16,6 +18,7 @@ import com.hframework.web.auth.AuthContext;
 import com.hframework.web.auth.AuthServiceProxy;
 import com.hframework.web.config.bean.DataSetHelper;
 import com.hframework.web.config.bean.datasethelper.Mappings;
+import com.hframework.web.config.bean.module.SetValue;
 import com.hframework.web.context.*;
 import com.hframework.web.controller.DefaultController;
 import org.slf4j.Logger;
@@ -64,6 +67,10 @@ public class ComponentInvokeManager {
         String moduleCode = componentDescriptor.getDataSetDescriptor().getDataSet().getModule();
         String eventObjectCode = componentDescriptor.getDataSetDescriptor().getDataSet().getEventObjectCode();
         String dataSetCode = componentDescriptor.getDataSetDescriptor().getDataSet().getCode();
+        String[] columnTableInfo = componentDescriptor.getDataSetDescriptor().getColumnTableKeyAndValue();
+        if(columnTableInfo != null && StringUtils.isNotBlank(columnTableInfo[2])) {
+            moduleCode = columnTableInfo[2].trim();
+        }
 
         String type = componentDescriptor.getComponent().getType();
         String action = null;
@@ -77,6 +84,12 @@ public class ComponentInvokeManager {
             action = "tree";
         }else if(StringUtils.isNotBlank(type) && !"cForm".equals(type) && !"qForm".equals(type)) {
             action = type;
+        }
+
+        //行列转换
+        String sourceAction = action;
+        if(action == "detail" && columnTableInfo != null) {
+            action = "list";
         }
 
         JSONObject jsonObject = null;
@@ -166,6 +179,15 @@ public class ComponentInvokeManager {
                 if (pagination.getPageNo() == 0) pagination.setPageNo(1);
                 if (pagination.getPageSize() == 0) pagination.setPageSize(10);
                 if ("eList".equals(type)) pagination.setPageSize(50);
+                if(columnTableInfo != null) pagination.setPageSize(10000);
+                if(componentDescriptor.getSetValueList() != null && componentDescriptor.getSetValueList().size() > 0) {
+                    List<String> keyValuePairs = new ArrayList<String>();
+                    for (SetValue setValue : componentDescriptor.getSetValueList()) {
+                        keyValuePairs.add(JavaUtil.getJavaVarName(setValue.getField()) + "==" + setValue.getValue());
+                    }
+                    poExample = ExampleUtils.parseExample(Joiner.on("&").join(keyValuePairs), poExample);
+                }
+
                 resultData = controllerMethodInvoker.invokeList(isRefresh, pagination, poExample, defPoClass, defPoExampleClass, controller, request , componentDescriptor);
                 if (resultData.getData() instanceof Map) {
                     List helperData = getHelperData(extendData, componentDescriptor.getDataSetDescriptor(), action, defPoClass, request);
@@ -174,6 +196,10 @@ public class ComponentInvokeManager {
 
             }else {
                 throw new BusinessException("action [ " + action + " ] not supported! ");
+            }
+
+            if(columnTableInfo != null) {
+                convertResultDataColToRow(resultData, componentDescriptor, columnTableInfo, sourceAction);
             }
 
             jsonObject = getJsonObjectByResultData(componentDescriptor, resultData, moduleCode, dataSetCode, action);
@@ -195,7 +221,7 @@ public class ComponentInvokeManager {
             }
 
             if(!(jsonObject.get("data") instanceof JSONArray)) {
-                jsonObject.put("data",JSONObject.toJSON(WebContext.getDefault()));
+                jsonObject.put("data",componentDescriptor.getWebContextDefaultJson(WebContext.getDefault()));
             }
             jsonObject.put("dataIsEmpty","true");
         }
@@ -210,10 +236,14 @@ public class ComponentInvokeManager {
                 int cnt = 0;
                 String[] defaultNullData = new String[((JSONArray) jsonObject.get("columns")).size()];
                 Map<String, String> pageFlowParams = WebContext.getDefault();
-                Class defPoClass = CreatorUtil.getDefPoClass(WebContext.get().getProgram().getCompany(),
-                        WebContext.get().getProgram().getCode(), moduleCode, eventObjectCode);
+//                Class defPoClass = CreatorUtil.getDefPoClass(WebContext.get().getProgram().getCompany(),
+//                        WebContext.get().getProgram().getCode(), moduleCode, eventObjectCode);
                 for (Object columns : (JSONArray) jsonObject.get("columns")) {
-                    if(pageFlowParams.containsKey(((JSONObject) columns).get("code"))) {
+                    String columnName = ((JSONObject) columns).getString("code");
+                    String defaultValue = componentDescriptor.getDefaultValueByCode(columnName);
+                    if(defaultValue != null) {
+                        defaultNullData[cnt++] = defaultValue;
+                    }else if(pageFlowParams.containsKey(columnName)) {
                         /* TODO
                            【BUG】父子编辑页面，传入父ID，原则上我们用子关联ID关联父ID，但当子主键ID等于父ID时，
                            那么子ID主键就赋值为父ID了。 是否父页面请求时，不在直接是主键ID，而应该是实体加主键ID
@@ -278,6 +308,71 @@ public class ComponentInvokeManager {
             jsonObject.put("name","根节点");
         }
         return jsonObject;
+    }
+
+    private void convertResultDataColToRow(ResultData resultData, ComponentDescriptor componentDescriptor, String[] columnTableInfo, String sourceAction) {
+        //行列转换
+        if(columnTableInfo != null && resultData.getData() != null &&  resultData.getData() instanceof Map) {
+            Map<String, Object> map = (Map) resultData.getData();
+            if(map.containsKey("list")) {
+                List datas = (List)map.get("list");
+                if(datas != null) {
+                    if("detail".equals(sourceAction)) {
+                        Map<String, Object> targetMap = new HashMap<String, Object>();
+                        for (Object data : datas) {
+                            targetMap.putAll(parseDataToMap(data, columnTableInfo, componentDescriptor));
+                        }
+                        resultData.setData(MapWrapper.warp(targetMap));
+                    }else {
+                        TreeMap<Integer, Map<String, Object>> targetMap = new TreeMap<Integer, Map<String, Object>>();
+                        for (Object data : datas) {
+                            Map<String, Object> temp = parseDataToMap(data, columnTableInfo, componentDescriptor);
+                            if(!temp.isEmpty()) {
+                                Integer listId = (Integer) temp.get("LIST_ROW_ID");
+                                if(listId != null) {
+                                    if(!targetMap.containsKey(listId)) {
+                                        targetMap.put(listId, new HashMap<String, Object>());
+                                    }
+                                    targetMap.get(listId).putAll(temp);
+                                }
+                            }
+                        }
+                        map.put("list", Lists.newArrayList(targetMap.values()));
+                    }
+                }
+            }
+        }
+    }
+
+    private Map<String, Object> parseDataToMap(Object data, String[] columnTableInfo, ComponentDescriptor componentDescriptor) {
+        Map<String, Object> tmpMap = new HashMap<String, Object>();
+        Map<String, String> srcMap= BeanUtils.convertMap(data, false);
+        String businessCode = srcMap.get(columnTableInfo[0]);
+        int rowId = 0;
+        if(businessCode.matches(".*\\(\\d+\\)")) {
+            String rowIdStr = RegexUtils.find(businessCode, "\\(\\d+\\)")[0];
+            rowId = Integer.valueOf(rowIdStr.substring(1, rowIdStr.length() - 1));
+            businessCode = businessCode.replaceAll("\\(\\d+\\)", "");
+        }
+        if(checkIsNeedDataBlock(businessCode, srcMap, componentDescriptor.getDefaultValues())) {
+            tmpMap.put(businessCode, srcMap.get(columnTableInfo[1]));
+            tmpMap.put("LIST_ROW_ID", rowId);
+
+            for (Map.Entry<String, String> entry : srcMap.entrySet()) {
+                tmpMap.put(businessCode + "#" + entry.getKey(), entry.getValue());
+            }
+        }
+        return tmpMap;
+    }
+
+    private boolean checkIsNeedDataBlock(String businessCode, Map<String, String> srcMap, Map<String, Object> defaultValues) {
+        for (Map.Entry<String, String> entry : srcMap.entrySet()) {
+            String defaultKey = businessCode + "#" + entry.getKey();
+            if(defaultValues.containsKey(defaultKey) && defaultValues.get(defaultKey).equals(entry.getValue())){
+                return true;
+            }
+        }
+        return false;
     }
 
     private void invokePoExample(Object poExample, HttpServletRequest request) throws IllegalAccessException, NoSuchMethodException, InvocationTargetException {

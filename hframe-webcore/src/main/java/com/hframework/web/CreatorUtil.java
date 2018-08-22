@@ -123,18 +123,18 @@ public class CreatorUtil {
 
         return PropertyConfigurerUtils.getProperty(
                 "action_class_package",
-                companyName.toLowerCase(),
-                projectName.toLowerCase(),
-                moduleName.toLowerCase());
+                companyName.toLowerCase().replaceAll("(?<=(.))\\.",""),
+                projectName.toLowerCase().replaceAll("(?<=(.))\\.",""),
+                moduleName.toLowerCase().replaceAll("(?<=(.))\\.",""));
     }
     private static String getServiceImplClassPackage(String companyName,
                                                     String projectName,String moduleName, String tableName) throws Exception {
 
         return PropertyConfigurerUtils.getProperty(
                 "serviceimpl_class_package",
-                companyName.toLowerCase(),
-                projectName.toLowerCase(),
-                moduleName.toLowerCase());
+                companyName.toLowerCase().replaceAll("(?<=(.))\\.",""),
+                projectName.toLowerCase().replaceAll("(?<=(.))\\.",""),
+                moduleName.toLowerCase().replaceAll("(?<=(.))\\.",""));
     }
 
 //    public static String getJavaVarName(String tableName) {
@@ -193,9 +193,9 @@ public class CreatorUtil {
                                            String projectName,String moduleName,String tableName) throws Exception {
         return PropertyConfigurerUtils.getProperty(
                 "po_class_package",
-                companyName.toLowerCase(),
-                projectName.toLowerCase(),
-                moduleName.toLowerCase(),
+                companyName.toLowerCase().replaceAll("(?<=(.))\\.",""),
+                projectName.toLowerCase().replaceAll("(?<=(.))\\.",""),
+                moduleName.toLowerCase().replaceAll("(?<=(.))\\.",""),
                 getJavaClassName(tableName.toLowerCase()));
     }
 

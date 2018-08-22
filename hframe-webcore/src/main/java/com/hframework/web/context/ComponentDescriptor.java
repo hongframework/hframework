@@ -2,12 +2,17 @@ package com.hframework.web.context;
 
 import com.alibaba.fastjson.JSONObject;
 import com.hframework.beans.controller.ResultData;
+import com.hframework.common.util.JavaUtil;
+import com.hframework.common.util.StringUtils;
 import com.hframework.web.config.bean.Component;
 import com.hframework.web.config.bean.Mapper;
 import com.hframework.web.config.bean.component.Event;
+import com.hframework.web.config.bean.dataset.Field;
 import com.hframework.web.config.bean.mapper.Mapping;
+import com.hframework.web.config.bean.module.SetValue;
 import com.hframework.web.config.bean.pagetemplates.Element;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -32,6 +37,10 @@ public class ComponentDescriptor extends ElementDescriptor{
     private String path;
     private String eventExtend;
     private List<Event> eventList;//页面配置的信息
+
+    private Map<String, Object> defaultValues;
+
+    private List<SetValue> setValueList;
 
     public void initComponentDataContainer(Map<String, Event> eventStore) {
         dataContainer = new ComponentDataContainer(component,getElement(), eventList,eventStore, eventExtend);
@@ -171,4 +180,62 @@ public class ComponentDescriptor extends ElementDescriptor{
     public boolean isShowTitle() {
         return showTitle;
     }
+
+    public List<SetValue> getSetValueList() {
+        return setValueList;
+    }
+
+    public void setSetValueList(List<SetValue> setValueList) {
+        this.setValueList = setValueList;
+    }
+
+    public JSONObject getWebContextDefaultJson(HashMap context) {
+        JSONObject result = new JSONObject(context);
+        for (Map.Entry<String, Object> entry : getDefaultValues().entrySet()) {
+            if(result.get(entry.getKey()) == null || "".equals(result.get(entry.getKey()))) {
+                result.put(entry.getKey(), entry.getValue());
+            }
+        }
+        if(setValueList != null && setValueList.size() > 0) {
+            for (SetValue setValue : setValueList) {
+                //TODO 增加SetValue.method的判断
+                result.put(JavaUtil.getJavaVarName(setValue.getField()), setValue.getValue());
+            }
+        }
+        return result;
+    }
+
+    public String getDefaultValueByCode(String columnName) {
+        if(setValueList != null && setValueList.size() > 0){
+            for (SetValue setValue : setValueList) {
+                if(columnName != null && columnName.equals(JavaUtil.getJavaVarName(setValue.getField()))) {
+                    return setValue.getValue();
+                }
+            }
+        }
+        if(getDefaultValues().containsKey(columnName)) {
+            return String.valueOf(getDefaultValues().get(columnName));
+        }
+        return null;
+    }
+
+    public Map<String, Object> getDefaultValues() {
+        if(defaultValues != null) {
+            return defaultValues;
+        }
+
+        try {
+            defaultValues = new HashMap<String, Object>();
+            for (Field field : dataSetDescriptor.getDataSet().getFields().getFieldList()) {
+                if(StringUtils.isNotBlank(field.getDefaultValue())) {
+                    defaultValues.put(JavaUtil.getJavaVarName(field.getCode()), field.getDefaultValue().trim());
+                }
+            }
+        }catch (Exception e) {
+            defaultValues = new HashMap<String, Object>();
+        }
+
+        return defaultValues;
+    }
+
 }

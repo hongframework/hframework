@@ -4,7 +4,7 @@
 
     <!-- start: Meta -->
     <meta charset="utf-8" />
-    <title>${programName}</title>
+    <title>${programName}-${pageTitle}</title>
     <meta name="description" content="${programName} - Flat & Responsive Bootstrap Admin Template." />
     <meta name="author" content="Łukasz Holeczek" />
     <meta name="keyword" content="${programName}, Dashboard, Bootstrap, Admin, Template, Theme, Responsive, Fluid, Retina" />

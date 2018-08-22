@@ -6,6 +6,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import com.hframework.base.bean.MapWrapper;
 import com.hframework.beans.controller.Pagination;
 import com.hframework.common.util.*;
 import com.hframework.web.config.bean.Component;
@@ -902,25 +903,40 @@ public class ComponentDataContainer {
 
     private String getPropertyValue(Object data, String propertyName, String editType) {
         try {
-            Class<?> type = BeanUtils.findPropertyType(propertyName, data.getClass());
-            if(type == Date.class) {
-                Date date = (Date) ReflectUtils.getFieldValue(data, propertyName);
-                if(date != null) {
-                    return DateUtils.getDateYYYYMMDDHHMMSS(date);
-                }else {
+            if(data instanceof MapWrapper || data instanceof Map) {
+                Map map = data instanceof MapWrapper ? ((MapWrapper)data).map() : (Map)data;
+                Object value = map.get(propertyName);
+                if(value == null){
                     return "";
-                }
-            }else if(type == Integer.class && propertyName.toLowerCase().endsWith("time") &&
-                    (editType == null || "hidden".equals(editType) || "text".equals(editType))) {
-                Integer date = (Integer) ReflectUtils.getFieldValue(data, propertyName);
-                if(date != null && date > 0) {
-                    return DateUtils.getDateYYYYMMDDHHMMSS(new Date(Long.valueOf(date) * 1000));
+                }else if(value instanceof Date) {
+                    return DateUtils.getDateYYYYMMDDHHMMSS((Date)value);
+                }else if(value instanceof Integer && propertyName.toLowerCase().endsWith("time") &&
+                        (editType == null || "hidden".equals(editType) || "text".equals(editType))) {
+                    return DateUtils.getDateYYYYMMDDHHMMSS(new Date(Long.valueOf(String.valueOf(value)) * 1000));
                 }else {
-                    return "";
+                    return String.valueOf(value);
                 }
             }else {
-                String stringVal = org.apache.commons.beanutils.BeanUtils.getProperty(data,propertyName);
-                return stringVal == null ? "" : stringVal;
+                Class<?> type = BeanUtils.findPropertyType(propertyName, data.getClass());
+                if(type == Date.class) {
+                    Date date = (Date) ReflectUtils.getFieldValue(data, propertyName);
+                    if(date != null) {
+                        return DateUtils.getDateYYYYMMDDHHMMSS(date);
+                    }else {
+                        return "";
+                    }
+                }else if(type == Integer.class && propertyName.toLowerCase().endsWith("time") &&
+                        (editType == null || "hidden".equals(editType) || "text".equals(editType))) {
+                    Integer date = (Integer) ReflectUtils.getFieldValue(data, propertyName);
+                    if(date != null && date > 0) {
+                        return DateUtils.getDateYYYYMMDDHHMMSS(new Date(Long.valueOf(date) * 1000));
+                    }else {
+                        return "";
+                    }
+                }else {
+                    String stringVal = org.apache.commons.beanutils.BeanUtils.getProperty(data,propertyName);
+                    return stringVal == null ? "" : stringVal;
+                }
             }
         } catch (IllegalAccessException e) {
             e.printStackTrace();
@@ -1215,6 +1231,10 @@ public class ComponentDataContainer {
         public void setData(Map<String, Object> map) {
             resultTree= new ArrayList<Map<String, Object>>();
             String rootId = map.keySet().iterator().hasNext() ? map.keySet().iterator().next() : null;
+            if( !rootId.equals("-1") && (map.containsKey(-1L) || map.containsKey(-1)|| map.containsKey("-1"))) {
+                rootId = "-1";
+            }
+
             List<Object> list = (List<Object>) map.get(rootId);
             if(list != null && list.size() > 0) {
                 for (Object o : list) {

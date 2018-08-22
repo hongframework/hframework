@@ -1,3 +1,26 @@
+if($("#pageTemplate") && $("#pageTemplate").val() == "allInOne") {
+    $("#content .box .box-header").each(function(i){
+        var $head = $(this);
+        var $content = $(this).nextAll("div.box-content:first");
+        var title = $head.find("h2").html();
+        title = title.substr(title.indexOf("</i>") + 4)
+
+        $legend = $("<legend><h2><i class='icon-th-list'></i> " + title + "</h2></legend>");
+
+        if(i != 0) {
+            $head.remove();
+        }else {
+            $head.find("h2").html($head.find("h2").html().substring(0, $head.find("h2").html().indexOf("</i>") + 4) + $("#pageTitle").val());
+        }
+
+        $content.children(":first").before($legend)
+        $content.parent().css("margin-bottom","0px");
+        $content.children("form").css("margin-bottom","0px");
+    });
+    $(".row-fluid:last button").css("margin-left", "180px")
+}
+
+
 function flatContainerStyleReset(_$flatContainer) {
     _$flatContainer.find(".box").removeClass("box");
     _$flatContainer.find(".box-content").removeClass("box-content");
@@ -195,6 +218,7 @@ function componentinit(){
 
     function initRelatComponent() {
         var $firstForm = $(".hfform:first");
+        if(!$firstForm || $firstForm.length == 0) return;
         var firstFormId = $firstForm.attr("id");
         var mainEntityCode = firstFormId.substring(0, firstFormId.length - "QueryForm".length);
         var $allLikeRelatField = $("select[data-code*='" + mainEntityCode   + ".']");

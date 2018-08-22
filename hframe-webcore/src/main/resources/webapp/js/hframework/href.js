@@ -1,3 +1,4 @@
+
 require(['layer','ajax','js/hframework/errormsg'], function () {
     var layer = require('layer');
     var ajax = require('ajax');

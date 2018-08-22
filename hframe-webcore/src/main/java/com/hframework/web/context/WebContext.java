@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 import com.hframework.common.util.EnumUtils;
+import com.hframework.common.util.JavaUtil;
 import com.hframework.common.util.ReflectUtils;
 import com.hframework.common.util.StringUtils;
 import com.hframework.common.util.collect.CollectionUtils;
@@ -282,6 +283,16 @@ public class WebContext {
         List<DataSet> dataSetList = XmlUtils.readValuesFromDirectory(contextHelper.programConfigRootDir, contextHelper.programConfigDataSetDir, DataSet.class, ".xml");
         for (DataSet dataSet : dataSetList) {
             DataSetDescriptor dataSetDescriptor = new DataSetDescriptor(dataSet);
+            if(dataSet.getEntityList() != null && dataSet.getEntityList().size() > 0) {
+                Entity mainEntity = dataSet.getEntityList().get(0);
+                if(StringUtils.isNotBlank(mainEntity.getCode()) && StringUtils.isNotBlank(mainEntity.getValue())) {
+                    dataSetDescriptor.setColumnTableKeyAndValue(new String[]{
+                            JavaUtil.getJavaVarName(mainEntity.getCode().trim()),
+                            JavaUtil.getJavaVarName(mainEntity.getValue().trim()),
+                            mainEntity.getModule()});
+                }
+
+            }
 
             if(dataSet.getDescriptor() != null) {
                 Map<String, DataSetDescriptor> dataSetCodeMap = new HashMap<String, DataSetDescriptor>();
@@ -830,9 +841,14 @@ public class WebContext {
                 if(StringUtils.isBlank(component.getDataSet())) {
                     component.setDataSet(page.getDataSet());
                 }
-                pageDescriptor.addComponentDescriptor(component.getId() + "|" + component.getDataSet()+ "|" + component.getDataid(), parseComponentDescriptor(element));
+                ComponentDescriptor componentDescriptor1 = parseComponentDescriptor(element);
+                componentDescriptor1.setSetValueList(component.getSetValueList());
+                pageDescriptor.addComponentDescriptor(component.getId() + "|" + component.getDataSet()+ "|" + component.getDataid(), componentDescriptor1);
             }
         }
+
+
+
         //获取页面级初始化信息。
         if(StringUtils.isBlank(page.getDataSet())) {
             logger.warn("no mapper exists for page level !");
@@ -898,6 +914,7 @@ public class WebContext {
                 componentDescriptor.setEventExtend(component.getEventExtend());
                 componentDescriptor.setPath(component.getPath());
                 componentDescriptor.setMapper(mapper);
+                componentDescriptor.setSetValueList(component.getSetValueList());
                 componentDescriptor.setDataSetDescriptor(dataSets.get(component.getDataSet()));
                 if(dataSets.get(component.getDataSet()) == null) {
                     System.out.println("==>error : data set [" +  component.getDataSet() +"] is not exists !");
@@ -1019,11 +1036,30 @@ public class WebContext {
         }
 
         //加载页面模板信息
-        PageTemplates pageTemplates = XmlUtils.readValueFromFile(contextHelper.programTemplateUnpackDir,
-                contextHelper.templateResourcePageDescriptorFile, PageTemplates.class);
-        for (Pagetemplate pagetemplate : pageTemplates.getPagetemplateList()) {
-            this.pageTemplates.put(pagetemplate.getId(),pagetemplate);
+        String pageDescriptorFiles = contextHelper.templateResourcePageDescriptorFile;
+        if(pageDescriptorFiles.contains(";")) {
+            String[] fileArrays = pageDescriptorFiles.split(";");
+            try{
+                PageTemplates pageTemplates = XmlUtils.readValueFromFile(contextHelper.programTemplateUnpackDir,
+                        fileArrays[0], PageTemplates.class);
+                for (Pagetemplate pagetemplate : pageTemplates.getPagetemplateList()) {
+                    this.pageTemplates.put(pagetemplate.getId(),pagetemplate);
+                }
+            }catch (Exception e) {
+                PageTemplates pageTemplates = XmlUtils.readValueFromFile(contextHelper.programTemplateUnpackDir,
+                        fileArrays[1], PageTemplates.class);
+                for (Pagetemplate pagetemplate : pageTemplates.getPagetemplateList()) {
+                    this.pageTemplates.put(pagetemplate.getId(),pagetemplate);
+                }
+            }
+        }else {
+            PageTemplates pageTemplates = XmlUtils.readValueFromFile(contextHelper.programTemplateUnpackDir,
+                    contextHelper.templateResourcePageDescriptorFile, PageTemplates.class);
+            for (Pagetemplate pagetemplate : pageTemplates.getPagetemplateList()) {
+                this.pageTemplates.put(pagetemplate.getId(),pagetemplate);
+            }
         }
+
 
         //加载事件信息
         List<EventStore> eventStores = XmlUtils.readValuesFromDirectory(contextHelper.programTemplateUnpackDir,

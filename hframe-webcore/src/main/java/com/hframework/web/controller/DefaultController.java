@@ -26,19 +26,6 @@ import com.hframework.web.auth.AuthServiceProxy;
 import com.hframework.web.config.bean.module.Component;
 import com.hframework.web.context.*;
 import com.hframework.web.controller.core.*;
-import com.vaadin.terminal.StreamResource;
-import com.vaadin.ui.Button;
-import com.vaadin.ui.Embedded;
-import com.vaadin.ui.Label;
-import org.activiti.engine.ProcessEngines;
-import org.activiti.engine.history.HistoricProcessInstance;
-import org.activiti.engine.history.HistoricTaskInstance;
-import org.activiti.engine.impl.util.IoUtil;
-import org.activiti.engine.repository.ProcessDefinition;
-import org.activiti.explorer.ExplorerApp;
-import org.activiti.explorer.ui.Images;
-import org.activiti.explorer.ui.custom.PrettyTimeLabel;
-import org.activiti.explorer.ui.custom.UserProfileLink;
 import org.dom4j.Document;
 import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
@@ -59,7 +46,6 @@ import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
-import sun.misc.BASE64Encoder;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -514,6 +500,7 @@ public class DefaultController {
                     for (ComponentDescriptor descriptor : components.values()) {
                         if(descriptor.getId().equals(componentId) && tmpIndex++ == index) {
                             componentDescriptor = descriptor;
+                            break;
                         }
                     }
 
@@ -527,8 +514,40 @@ public class DefaultController {
                 String moduleCode = componentDescriptor.getDataSetDescriptor().getDataSet().getModule();
                 String eventObjectCode = componentDescriptor.getDataSetDescriptor().getDataSet().getEventObjectCode();
                 String type = componentDescriptor.getComponent().getType();
+                String[] columnTableInfo = componentDescriptor.getDataSetDescriptor().getColumnTableKeyAndValue();
+                if(columnTableInfo != null && StringUtils.isNotBlank(columnTableInfo[2])) {
+                    moduleCode = columnTableInfo[2].trim();
+                }
 
-                String componentJsonData = null;
+                String componentJsonData = jsonObject.getString(componentKey);
+                if(columnTableInfo != null){//行列转换，将form数据转化为纵表结构
+//                    String keyFieldName = "id";
+//                    try{
+//                        keyFieldName = JavaUtil.getJavaVarName(WebContext.get().getOnlyDataSetDescriptor(eventObjectCode).getKeyField().getCode());
+//                    }catch (Exception e) {}
+
+                    JSONArray transResult = new JSONArray();
+                    Object json = JSONObject.parse(componentJsonData);
+                    if(json instanceof JSONArray) {
+                        JSONArray jsonArray = (JSONArray) json;
+                        if(type.endsWith("List")) {//表明为列表数据，需要在code中增加(0)等表示
+                            int count = 0;
+                            JSONObject defaultValues = componentDescriptor.getWebContextDefaultJson(new HashMap());
+                            for (Object oneRow : jsonArray) {
+
+                                Map<String, JSONObject> info = transFormDataToColTableData(defaultValues, oneRow, columnTableInfo, "(" + count + ")");
+                                transResult.addAll(info.values());
+                                count ++;
+                            }
+                        }else {
+                            for (Object oneRow : jsonArray) {
+                                Map<String, JSONObject> info = transFormDataToColTableData(new JSONObject(), oneRow, columnTableInfo, "");
+                                transResult.addAll(info.values());
+                            }
+                        }
+                    }
+                    componentJsonData = transResult.toJSONString();
+                }
 
                 Class defPoClass = CreatorUtil.getDefPoClass(WebContext.get().getProgram().getCompany(),
                         WebContext.get().getProgram().getCode(), moduleCode, eventObjectCode);
@@ -536,7 +555,7 @@ public class DefaultController {
                         WebContext.get().getProgram().getCode(), moduleCode, eventObjectCode);
                 Object controller= ServiceFactory.getService(defControllerClass.getClassName().substring(0, 1).toLowerCase() + defControllerClass.getClassName().substring(1));
                 Object objects = null;
-                componentJsonData = jsonObject.getString(componentKey);
+
                 logger.debug("class: {}; json: {}", defPoClass.getClassName(), componentJsonData);
                 if("treeChart".equals(componentId)) {
                     Map<String, String> result = new LinkedHashMap<String, String>();
@@ -567,6 +586,7 @@ public class DefaultController {
                             componentJsonData = componentJsonData.replace(dateKeyAndValue, "\"" + key + "\":\"" + timestamp + "\"");
                         }
                     }
+
                     objects = readObjectsFromJson(componentJsonData, java.lang.Class.forName(defPoClass.getClassPath()));
                     if(parentObject != null) {
 
@@ -595,6 +615,39 @@ public class DefaultController {
         }
 
 //        return ResultData.error(ResultCode.UNKNOW);
+    }
+
+    private Map<String, JSONObject> transFormDataToColTableData(JSONObject defaultValues, Object oneRow, String[] columnTableInfo, String endCharts) {
+        JSONObject oneRowObject = (JSONObject) oneRow;
+        Map<String, JSONObject> info = new LinkedHashMap<String, JSONObject>();
+        for (Map.Entry<String, Object> entry : oneRowObject.entrySet()) {
+            String businessCode = entry.getKey().contains("#") ? entry.getKey().substring(0,entry.getKey().indexOf("#")) : entry.getKey();
+            if(!info.containsKey(businessCode)) {
+                info.put(businessCode, new JSONObject());
+            }
+            JSONObject newRow = info.get(businessCode);
+            if(entry.getKey().contains("#")) {
+                if(entry.getValue() != null && StringUtils.isNotBlank(String.valueOf(entry.getValue()))) {
+                    newRow.put(entry.getKey().substring(entry.getKey().indexOf("#") + 1), entry.getValue());
+                }else if(defaultValues.containsKey(entry.getKey())){
+                    newRow.put(entry.getKey().substring(entry.getKey().indexOf("#") + 1), defaultValues.get(entry.getKey()));
+                }
+            }else {
+                newRow.put(columnTableInfo[0], entry.getKey() + endCharts);
+                newRow.put(columnTableInfo[1], entry.getValue());
+            }
+        }
+
+
+        //当页面对应字段为空时，传入后台没有这个字段，因此这里需要进行不全，否则插入数据库报字段不为空错误
+        for (Map.Entry<String, JSONObject> entry : info.entrySet()) {
+            JSONObject columnInfo = entry.getValue();
+            if(!columnInfo.containsKey(columnTableInfo[0])){
+                columnInfo.put(columnTableInfo[0], entry.getKey());
+                columnInfo.put(columnTableInfo[1], "");
+            }
+        }
+        return info;
     }
 
     /**
@@ -1023,6 +1076,13 @@ public class DefaultController {
             mav.addObject("loginFowardUrl","/index.html");
 
         }
+
+        if(StringUtils.isNotBlank(pageInfo.getPage().getExtendScript())) {
+            mav.addObject("pageExtendScript", pageInfo.getPage().getExtendScript());
+        }
+
+        mav.addObject("pageTitle", pageInfo.getName());
+        mav.addObject("pageTemplate", pageInfo.getPageTemplate().getId());
         mav.addObject("subDataSetNames", pageInfo.getSubDataSetNames());
         mav.addObject("module",module);
         mav.addObject("page",pageCode);

@@ -194,9 +194,9 @@ public class CreatorUtil {
 //		projectName = StringUtils.isBlank(projectName)?"":"."+(projectName);
 		return PropertyConfigurerUtils.getProperty(
 				CreatorConst.DAO_CLASS_PACKAGE,
-				companyName.toLowerCase(),
-				projectName.toLowerCase(),
-				moduleName.toLowerCase());
+				companyName.toLowerCase().replaceAll("(?<=(.))\\.",""),
+				projectName.toLowerCase().replaceAll("(?<=(.))\\.",""),
+				moduleName.toLowerCase().replaceAll("(?<=(.))\\.",""));
 	}
 
 	public static String getDAOImplClassPackage(String companyName,
@@ -211,9 +211,9 @@ public class CreatorUtil {
 
 		return PropertyConfigurerUtils.getProperty(
 				CreatorConst.DAOIMPL_CLASS_PACKAGE,
-				companyName.toLowerCase(),
-				projectName.toLowerCase(),
-				moduleName.toLowerCase());
+				companyName.toLowerCase().replaceAll("(?<=(.))\\.",""),
+				projectName.toLowerCase().replaceAll("(?<=(.))\\.",""),
+				moduleName.toLowerCase().replaceAll("(?<=(.))\\.",""));
 	}
 
 	public static String getServiceClassPackage(String companyName,
@@ -228,9 +228,9 @@ public class CreatorUtil {
 
 		return PropertyConfigurerUtils.getProperty(
 				CreatorConst.SERVICE_CLASS_PACKAGE,
-				companyName.toLowerCase(),
-				projectName.toLowerCase(),
-				moduleName.toLowerCase());
+				companyName.toLowerCase().replaceAll("(?<=(.))\\.",""),
+				projectName.toLowerCase().replaceAll("(?<=(.))\\.",""),
+				moduleName.toLowerCase().replaceAll("(?<=(.))\\.",""));
 	}
 
 	public static String getServiceImplClassPackage(String companyName,
@@ -245,9 +245,9 @@ public class CreatorUtil {
 
 		return PropertyConfigurerUtils.getProperty(
 				CreatorConst.SERVICEIMPL_CLASS_PACKAGE,
-				companyName.toLowerCase(),
-				projectName.toLowerCase(),
-				moduleName.toLowerCase());
+				companyName.toLowerCase().replaceAll("(?<=(.))\\.",""),
+				projectName.toLowerCase().replaceAll("(?<=(.))\\.",""),
+				moduleName.toLowerCase().replaceAll("(?<=(.))\\.",""));
 	}
 
 	public static String getActionClassPackage(String companyName,
@@ -262,9 +262,9 @@ public class CreatorUtil {
 
 		return PropertyConfigurerUtils.getProperty(
 				CreatorConst.ACTION_CLASS_PACKAGE,
-				companyName.toLowerCase(),
-				projectName.toLowerCase(),
-				moduleName.toLowerCase());
+				companyName.toLowerCase().replaceAll("(?<=(.))\\.",""),
+				projectName.toLowerCase().replaceAll("(?<=(.))\\.",""),
+				moduleName.toLowerCase().replaceAll("(?<=(.))\\.",""));
 	}
 
 	/**
@@ -286,9 +286,9 @@ public class CreatorUtil {
 //		moduleName = StringUtils.isBlank(moduleName)?"":"."+(moduleName);
 		return PropertyConfigurerUtils.getProperty(
 				CreatorConst.PO_CLASS_PACKAGE,
-				companyName.toLowerCase(),
-				projectName.toLowerCase(),
-				moduleName.toLowerCase(),
+				companyName.toLowerCase().replaceAll("(?<=(.))\\.",""),
+				projectName.toLowerCase().replaceAll("(?<=(.))\\.",""),
+				moduleName.toLowerCase().replaceAll("(?<=(.))\\.",""),
 				getJavaClassName(tableName.toLowerCase()));
 	}
 

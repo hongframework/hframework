@@ -1243,9 +1243,9 @@ public class DataSetLoaderService {
                                                String projectName,String moduleName,String tableName) throws Exception {
             return PropertyConfigurerUtils.getProperty(
                     CreatorConst.PO_CLASS_PACKAGE,
-                    companyName.toLowerCase(),
-                    projectName.toLowerCase(),
-                    moduleName.toLowerCase(),
+                    companyName.toLowerCase().replaceAll("(?<=(.))\\.",""),
+                    projectName.toLowerCase().replaceAll("(?<=(.))\\.",""),
+                    moduleName.toLowerCase().replaceAll("(?<=(.))\\.",""),
                     getJavaClassName(tableName.toLowerCase()));
         }
 

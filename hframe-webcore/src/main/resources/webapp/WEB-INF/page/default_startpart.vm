@@ -1,5 +1,7 @@
 #parse("blank_startpart.vm")
 <body>
+<input id="pageTitle" value="$!{pageTitle}" type="hidden"/>
+<input id="pageTemplate" value="$!{pageTemplate}" type="hidden"/>
 <!-- start: Header -->
 <div class="navbar">
     <div class="navbar-inner">

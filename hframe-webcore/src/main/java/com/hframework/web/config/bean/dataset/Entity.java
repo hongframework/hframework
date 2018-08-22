@@ -14,6 +14,16 @@ public class Entity   {
 	@XStreamAsAttribute
     @XStreamAlias("is-main")
 	private String isMain;
+    @XStreamAsAttribute
+    @XStreamAlias("code")
+    private String code;
+    @XStreamAsAttribute
+    @XStreamAlias("value")
+    private String value;
+    @XStreamAsAttribute
+    @XStreamAlias("module")
+    private String module;
+
 	
 	private String text;
 
@@ -36,5 +46,28 @@ public class Entity   {
      public void setText(String text){
      	this.text = text;
      }
-	 
+
+    public String getCode() {
+        return code;
+    }
+
+    public void setCode(String code) {
+        this.code = code;
+    }
+
+    public String getValue() {
+        return value;
+    }
+
+    public void setValue(String value) {
+        this.value = value;
+    }
+
+    public String getModule() {
+        return module;
+    }
+
+    public void setModule(String module) {
+        this.module = module;
+    }
 }

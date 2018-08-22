@@ -58,6 +58,7 @@ public class ExampleUtils {
 
     static {
         signKeyWordMap.put("=","EqualTo");
+        signKeyWordMap.put("==","EqualTo");
         signKeyWordMap.put("!=","NotEqualTo");
         signKeyWordMap.put(">","GreaterThan");
         signKeyWordMap.put("<","LessThan");

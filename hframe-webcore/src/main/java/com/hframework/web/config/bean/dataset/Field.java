@@ -58,6 +58,9 @@ public class Field {
     @XStreamAsAttribute
     @XStreamAlias("rel-field")
     private String relField;
+    @XStreamAsAttribute
+    @XStreamAlias("def-val")
+    private String defaultValue;
 
  public Field() {
     }
@@ -197,5 +200,13 @@ public class Field {
 
     public void setRelField(String relField) {
         this.relField = relField;
+    }
+
+    public String getDefaultValue() {
+        return defaultValue;
+    }
+
+    public void setDefaultValue(String defaultValue) {
+        this.defaultValue = defaultValue;
     }
 }

@@ -268,9 +268,15 @@ public class ControllerMethodInvoker {
 
     public Object getPo(Class defPoClass, Object controller, String action, HttpServletRequest request, ComponentDescriptor componentDescriptor, java.lang.Class[] parameterTypes) throws Exception {
         boolean hasRelEntity = false;
+        DataSetDescriptor dataSetDescriptor = null;
+        if(componentDescriptor.getDataSetDescriptor().getColumnTableKeyAndValue() != null) {//行列转换场景
+            dataSetDescriptor = WebContext.get().getDataSet(java.lang.Class.forName(defPoClass.getClassPath()));
+        }else {
+            dataSetDescriptor = componentDescriptor.getDataSetDescriptor();
+        }
         if(WebContext.getAllClassContext() != null) {
             for (java.lang.Class cacheClass : WebContext.getAllClassContext()) {
-                String relFieldCode = componentDescriptor.getDataSetDescriptor().getRelFieldCode(cacheClass);
+                String relFieldCode = dataSetDescriptor.getRelFieldCode(cacheClass);
                 if(StringUtils.isNoneBlank(relFieldCode)) {
                     hasRelEntity  = true;
                     break;
@@ -281,10 +287,10 @@ public class ControllerMethodInvoker {
         if(hasRelEntity){
             po = java.lang.Class.forName(defPoClass.getClassPath()).newInstance();
             for (java.lang.Class cacheClass : WebContext.getAllClassContext()) {
-                String relFieldCode = componentDescriptor.getDataSetDescriptor().getRelFieldCode(cacheClass);
+                String relFieldCode = dataSetDescriptor.getRelFieldCode(cacheClass);
                 Object relObject = WebContext.get(cacheClass);
                 if(StringUtils.isNoneBlank(relFieldCode) && relObject != null) {
-                    String relObjectInfo = componentDescriptor.getDataSetDescriptor().getRelFieldKeyMap().get(relFieldCode);
+                    String relObjectInfo = dataSetDescriptor.getRelFieldKeyMap().get(relFieldCode);
                     Object relValue = ReflectUtils.getFieldValue(relObject, JavaUtil.getJavaVarName(relObjectInfo.substring(relObjectInfo.lastIndexOf("/") + 1)));
                     ReflectUtils.setFieldValue(po, JavaUtil.getJavaVarName(relFieldCode), relValue);
                 }
