@@ -9,6 +9,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.kafka.support.SendResult;
+import org.springframework.util.concurrent.ListenableFuture;
 
 /**
  * Created by zhangquanhong on 2016/10/10.
@@ -20,39 +22,41 @@ public class KafkaService {
     @Autowired
     private KafkaTemplate<Integer, String> kafkaTemplate;
 
-    public void sendMessage(String topic, String data) {
+    public ListenableFuture<SendResult<Integer, String>> sendMessage(String topic, String data) {
         logger.info("the message is to be send by kafka is : topic = {}, data = {}", topic, data);
 //        kafkaTemplate.setDefaultTopic(topic);
-        kafkaTemplate.send(topic, data);
+        return kafkaTemplate.send(topic, data);
     }
 
-    public void sendMessage(String topic, int key, String data) {
+    public ListenableFuture<SendResult<Integer, String>> sendMessage(String topic, int key, String data) {
         logger.info("the message is to be send by kafka is : topic = {}, key = {}, data = {}", topic, key, data);
-        kafkaTemplate.send(topic, (Integer) null, key, data);
+        return kafkaTemplate.send(topic, (Integer) null, key, data);
     }
 
-    public void sendMessage(String server, String topic, String data) {
+    public ListenableFuture sendMessage(String server, String topic, String data) {
         logger.info("the message is to be send by kafka is : server = {}, topic = {}, data = {}", server, topic, data);
         if (kafkaTemplate instanceof DynamicKafkaTemplate) {
             DynamicKafkaTemplate template = (DynamicKafkaTemplate) kafkaTemplate;
-            template.send(server,topic, data);
+            return template.send(server,topic, data);
         }else {
             logger.warn("can't build [{}] 's producer : " +
                     "this kafkaTemplate must be the com.hframework.ext.template.DynamicKafkaTemplate instance " +
                     ",current is {} instance !",server, kafkaTemplate.getClass());
         }
+        return null;
     }
 
-    public void sendMessage(String server, String topic, int key, String data) {
+    public ListenableFuture sendMessage(String server, String topic, int key, String data) {
         logger.info("the message is to be send by kafka is : server = {}, topic = {}, key = {}, data = {}", server, topic, key, data);
         if (kafkaTemplate instanceof DynamicKafkaTemplate) {
             DynamicKafkaTemplate template = (DynamicKafkaTemplate) kafkaTemplate;
-            template.send(server,topic, key, data);
+            return template.send(server,topic, key, data);
         }else {
             logger.warn("can't build [{}] 's producer : " +
                     "this kafkaTemplate must be the com.hframework.ext.template.DynamicKafkaTemplate instance " +
                     ",current is {} instance !",server, kafkaTemplate.getClass());
         }
+        return null;
     }
 
     public void getTopicDescribe(String server, String topic) {

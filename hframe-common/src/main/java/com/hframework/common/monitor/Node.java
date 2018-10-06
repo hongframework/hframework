@@ -5,9 +5,14 @@ import java.util.*;
 public class Node<T>{
     private String keyValue;
     private T object;
+    private OperateType operateType;
     private List<Node> inputs;
     private List<Node> outputs;
     private Class objectClass;
+
+    public enum OperateType{
+        add, modify, delete;
+    }
 
     public Node(String keyValue, T object) {
         this.keyValue = keyValue;
@@ -129,5 +134,13 @@ public class Node<T>{
 
     public Class getObjectClass() {
         return objectClass;
+    }
+
+    public OperateType getOperateType() {
+        return operateType;
+    }
+
+    public void setOperateType(OperateType operateType) {
+        this.operateType = operateType;
     }
 }

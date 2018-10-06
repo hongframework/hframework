@@ -91,7 +91,7 @@ public class DynamicKafkaTemplate<K, V> extends org.springframework.kafka.core.K
 
         });
         if (this.autoFlush) {
-            flush();
+            getTheProducer(servers).flush();
         }
         if (this.logger.isTraceEnabled()) {
             this.logger.trace("Sent: " + producerRecord);

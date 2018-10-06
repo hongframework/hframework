@@ -5,18 +5,19 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.util.*;
 
 /**
  * Created by zhangquanhong on 2016/9/26.
  */
-public abstract class ConfigMultiMonitor extends AbstractMonitor implements Monitor{
+public abstract class ConfigMultiMonitor<T> extends AbstractMonitor<T> implements Monitor<T>{
     private static final Logger logger = LoggerFactory.getLogger(ConfigMultiMonitor.class);
 
     protected List<ConfigMapMonitor> subMonitors;
+
+    private Map<Class, Set<Object[]>> networkRedirectMap = null; //Object[] = {Class, Fetcher}
 
     private Map<Class, Map<String, Node>> nodeNetwork = new HashMap<Class, Map<String, Node>>();
 
@@ -38,6 +39,7 @@ public abstract class ConfigMultiMonitor extends AbstractMonitor implements Moni
 
     public void reload() {
         if(subMonitors != null) {
+            buildNetworkRedirectMap();
             List<ConfigMapMonitor> changedMonitor = new ArrayList<ConfigMapMonitor>();
             for (ConfigMapMonitor subMonitor : subMonitors) {
                 if(subMonitor.reload(false)){
@@ -50,7 +52,30 @@ public abstract class ConfigMultiMonitor extends AbstractMonitor implements Moni
         }
     }
 
-    public Object getObject() {
+    protected void buildNetworkRedirectMap(){
+        if(networkRedirectMap == null) {
+            synchronized (this) {
+                if(networkRedirectMap == null) {
+                    networkRedirectMap = new HashMap<Class, Set<Object[]>>();
+                    for (ConfigMapMonitor subMonitor : subMonitors) {
+                        Type toClassType = ((ParameterizedType)subMonitor.getClass().getGenericSuperclass()).getActualTypeArguments()[0];
+                        Map<Class, Fetcher<T, String>> fetchers = subMonitor.getFetchers();
+                        if(fetchers != null) {
+                            for (Class fromClass : fetchers.keySet()) {
+                                if(!networkRedirectMap.containsKey(fromClass)) {
+                                    networkRedirectMap.put(fromClass, new HashSet<Object[]>());
+                                }
+                                networkRedirectMap.get(fromClass).add(new Object[]{(Class) toClassType, fetchers.get(fromClass)});
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+
+    public T getObject() {
         return null;
     }
 
@@ -88,6 +113,7 @@ public abstract class ConfigMultiMonitor extends AbstractMonitor implements Moni
             Object value = entry.getValue();
             Class objectClass = value.getClass();
             Node node = getAndCreateNodeIfAbsent(objectClass, key, value);
+            node.setOperateType(Node.OperateType.add);
             nodeLists.add(node);
             buildNodeRelation(node, value, monitor.getFetchers());
         }
@@ -101,7 +127,7 @@ public abstract class ConfigMultiMonitor extends AbstractMonitor implements Moni
             Object value = entry.getValue();
             Class objectClass = value.getClass();
             Node node = getAndCreateNodeIfAbsent(objectClass, key, value);
-
+            node.setOperateType(Node.OperateType.modify);
             if(node.getInputs() != null && node.getInputs().size() > 0) {
                 for (Object inputNode : node.getInputs()) {
                     ((Node)inputNode).removeOutput(node);
@@ -116,7 +142,7 @@ public abstract class ConfigMultiMonitor extends AbstractMonitor implements Moni
 
     public void buildNodeRelation(Node node, Object value, Map<Class, Fetcher<Object, String>> fetchers){
         if(fetchers != null) {
-            for (Class mainClass : fetchers.keySet()) {
+            for (Class mainClass : fetchers.keySet()) {//from
                 String mainKeyVal = fetchers.get(mainClass).fetch(value);
                 if("null".equals(mainKeyVal) || StringUtils.isBlank(mainKeyVal)) {
                     continue;
@@ -135,6 +161,26 @@ public abstract class ConfigMultiMonitor extends AbstractMonitor implements Moni
                     mainNode.addOutput(node);
                 }
             }
+
+            if(networkRedirectMap != null) {
+                if(networkRedirectMap.containsKey(node.getObjectClass())) {
+                    for (Object[] targets : networkRedirectMap.get(node.getObjectClass())) {//to
+                        Class toClass = (Class) targets[0];
+                        Fetcher fetcher = (Fetcher) targets[1];
+                        if(nodeNetwork.containsKey(toClass)) {
+                            Map<String, Node> targetMap = nodeNetwork.get(toClass);
+                            for (Node targetNode : targetMap.values()) {
+                                if(node.getKeyValue().equals(String.valueOf(fetcher.fetch(targetNode.getObject())))){
+                                    targetNode.addInput(node);
+                                    node.addOutput(targetNode);
+                                }
+                            }
+                        }
+
+                    }
+                }
+            }
+
         }
     }
 
@@ -145,6 +191,7 @@ public abstract class ConfigMultiMonitor extends AbstractMonitor implements Moni
             Object value = entry.getValue();
             Class objectClass = value.getClass();
             Node node = removeNode(objectClass, key);
+            node.setOperateType(Node.OperateType.delete);
             if(node != null) {
                 nodeLists.add(node);
             }
