@@ -27,13 +27,17 @@ public class Node<T>{
         if(outputs == null) {
             outputs = new ArrayList<Node>();
         }
-        outputs.add(node);
+        if(!outputs.contains(node)){
+            outputs.add(node);
+        }
     }
     public void addInput(Node node) {
         if(inputs == null) {
             inputs = new ArrayList<Node>();
         }
-        inputs.add(node);
+        if(!inputs.contains(node)){
+            inputs.add(node);
+        }
     }
 
     public void setObject(T object) {

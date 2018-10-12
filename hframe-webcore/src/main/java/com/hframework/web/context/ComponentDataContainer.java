@@ -1070,7 +1070,29 @@ public class ComponentDataContainer {
                     for (String relField : relFields.split(",")) {
                         Field refField = dataSetDescriptor.getFields().get(relField);
                         String paramName = relField;
-                        if(StringUtils.isBlank(field.getRel().getUrl()) && refField != null && refField.getRel() != null && StringUtils.isNotBlank(refField.getRel().getEntityCode())) {
+                        /*BUG:2018-10-08
+                         * case.1 => manis2/cfg_deployment_detail.xml
+                         * <field code="job_template_id" name="任务模板定义id" edit-type="select" not-null="true">
+                         *   <rel entity-code="cfg_job_template_def/id/name"/>
+                         *  </field>
+                         *  <field code="job_id" name="任务定义id" edit-type="select" not-null="true">
+                         *    <rel entity-code="cfg_job/id/name" rel-field="job_template_id"/>
+                         *  </field>
+                         *  job_id的级联查询拼接的relat-element为"1=1&id={jobTemplateId}",
+                         *  实际上应该为job_template_id={jobTemplateId}
+                         *  case.2 => chameleon/program_module_setting.xml
+                         *  <field code="hfpm_program_id_PCXT" name="项目名称" edit-type="select">
+                         *    <rel entity-code="hfpm_program/hfpm_program_id/hfpm_program_name"/>
+                         *  </field>
+                         *  <field code="hfpm_module_id_PCXT" name="模块名称" edit-type="select">
+                         *    <rel entity-code="hfpm_module/hfpm_module_id/hfpm_module_name" rel-field="hfpm_program_id_PCXT"/>
+                         *  </field>
+                         *  hfpm_module_id_PCXT的级联查询拼接的relat-element为"1=1&hfpm_module_id_PCXT={hfpmProgramIdPCXT}",
+                         */
+                        if(dataSetDescriptor.getDataSet().getEntityList().size() > 0 &&
+                                !dataSetDescriptor.getDataSet().getCode().equals(dataSetDescriptor.getDataSet().getEventObjectCode()) &&
+                                StringUtils.isBlank(field.getRel().getUrl()) && refField != null
+                                && refField.getRel() != null && StringUtils.isNotBlank(refField.getRel().getEntityCode())) {
                             String entityCode = refField.getRel().getEntityCode();
                             paramName = entityCode.substring(entityCode.indexOf("/") +1, entityCode.lastIndexOf("/"));
                         }
