@@ -1,12 +1,12 @@
 package com.hframework.common.springext.datasource;
 
-import com.mchange.v2.c3p0.ComboPooledDataSource;
+import com.hframework.smartsql.client.DBClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.datasource.lookup.AbstractRoutingDataSource;
 
 import javax.sql.DataSource;
-import java.beans.PropertyVetoException;
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -29,7 +29,7 @@ public class DynamicDataSource extends AbstractRoutingDataSource {
                 selectAndCreateIfNotExists(dbInfo);
                 logger.info("==> datasource :{}",dbInfo.url);
                 return dbInfo.key;
-            } catch (PropertyVetoException e) {
+            } catch (SQLException e) {
                 logger.error("select datasource error :", e);
             }
         }
@@ -37,7 +37,7 @@ public class DynamicDataSource extends AbstractRoutingDataSource {
         return null;
     }
 
-    private void selectAndCreateIfNotExists(DataSourceContextHolder.DataSourceDescriptor dbInfo) throws PropertyVetoException {
+    private void selectAndCreateIfNotExists(DataSourceContextHolder.DataSourceDescriptor dbInfo) throws SQLException {
         if(!dataSourcePool.containsKey(dbInfo.key)) {
             dataSourcePool.put(dbInfo.key, createDataSource(dbInfo.url, dbInfo.user, dbInfo.password));
         }
@@ -45,16 +45,20 @@ public class DynamicDataSource extends AbstractRoutingDataSource {
         super.afterPropertiesSet();
     }
 
-    private DataSource createDataSource(String url, String user, String password) throws PropertyVetoException {
-        ComboPooledDataSource dataSource = new ComboPooledDataSource();
-        dataSource.setDriverClass("com.mysql.jdbc.Driver");
-        dataSource.setJdbcUrl(url);
-        dataSource.setUser(user);
-        dataSource.setPassword(password);
-        dataSource.setMinPoolSize(2);
-        dataSource.setAcquireIncrement(5);
-        dataSource.setMaxPoolSize(20);
-        dataSource.setMaxIdleTime(300);
-        return dataSource;
+//    private DataSource createDataSource(String url, String user, String password) throws PropertyVetoException {
+//        ComboPooledDataSource dataSource = new ComboPooledDataSource();
+//        dataSource.setDriverClass("com.mysql.jdbc.Driver");
+//        dataSource.setJdbcUrl(url);
+//        dataSource.setUser(user);
+//        dataSource.setPassword(password);
+//        dataSource.setMinPoolSize(2);
+//        dataSource.setAcquireIncrement(5);
+//        dataSource.setMaxPoolSize(20);
+//        dataSource.setMaxIdleTime(300);
+//        return dataSource;
+//    }
+
+    public static DataSource createDataSource(String url, String username, String password) throws SQLException {
+        return DBClient.getDataSourceInternal(url, username, password);
     }
 }

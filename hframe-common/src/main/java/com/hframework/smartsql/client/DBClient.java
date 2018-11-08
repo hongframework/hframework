@@ -80,7 +80,7 @@ public class DBClient {
         return cache.get(cacheKey);
     }
 
-    private static DataSource getDataSourceInternal(String url, String username, String password) throws SQLException {
+    public static DataSource getDataSourceInternal(String url, String username, String password) throws SQLException {
         DruidDataSource dataSource = new DruidDataSource();
         dataSource.setDriverClassName("com.mysql.jdbc.Driver"); //设置驱动
         dataSource.setUsername(username); //用户名

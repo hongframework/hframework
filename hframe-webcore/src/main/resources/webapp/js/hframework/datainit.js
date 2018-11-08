@@ -337,7 +337,8 @@ require(['layer','ajax','js/hframework/errormsg'], function () {
         }else {
             _$this.html('<option value=""> - 请选择 - </option>' + _htmlStr);
             var isRelat = $.refreshOptionsShowAndHide(_$this);
-            if(_$this.find("option[value='" + _$this.attr("data-value") + "']").size()> 0) {
+            //对于data-value中值存在\时，需要进行转移为\\,否则查询不到值
+            if(_$this.find("option[value='" + _$this.attr("data-value").replace("\\","\\\\") + "']").size()> 0) {
                 _$this.val(_$this.attr("data-value"));
             }else {
                 _$this.val("");
@@ -346,9 +347,19 @@ require(['layer','ajax','js/hframework/errormsg'], function () {
         }
         if(!isRelat) {
             //如果是多选框，或者已经是selectx框
-            if(_$this.attr("multiple") || _$this.hasClass("hfselectx") || (_dataCode.startsWith("URL:") || _dataCode.split(".").length > 2) && _data.data.length > 10) { //选择框设置为selectx元素
+            if(_$this.attr("multiple") || _$this.hasClass("hfselectx") || (_dataCode.startsWith("URL:") ||
+                    _dataCode.split(".").length > 2) && _data.data.length > 10) { //选择框设置为selectx元素
                 _$this.addClass("hfselectx");
                 _$this.chosen();//设置为selectx
+                //自动添加选项支持
+                if(_$this.attr("auto_add_option")){
+                    if(_$this.find("option[value='" + _$this.attr("data-value").replace("\\","\\\\") + "']").size() == 0) {
+                        _$this.append($('<option value="' + _$this.attr("data-value") + '" data-hide="null">'
+                            + _$this.attr("data-value") + '</option>'));
+                        _$this.val(_$this.attr("data-value"));
+                    }
+                    auto_add_option(_$this.next("div").find("div.chosen-drop div.chosen-search input"));
+                }
                 _$this.trigger("chosen:updated");
             }
             if(_$this.attr("multiple") && _$this.attr("data-value")) {
@@ -664,6 +675,49 @@ require(['layer','ajax','js/hframework/errormsg'], function () {
         if(_data['onload'] != null) {
             _data['onload']();
         }
+    }
+    function auto_add_option($input){
+        if(!$input) $input = $("div.chosen-drop div.chosen-search input");
+        $input.bind("keydown", function(e) {
+            if (e.which == 13){
+                var $this = $(this);
+                if($this.parent("div.chosen-search").next("ul.chosen-results").children("li.active-result").length == 0) {
+                    e.preventDefault(); //Skip default behavior of the enter key
+                    showConfirmDialog("确认创建选项【" + $this.val() + "】吗",function(){
+                        var $select = $this.parent("div.chosen-search").parent("div.chosen-drop").parent("div.chosen-container").prev("select");
+                        $select.append($('<option value="' + $this.val() + '" data-hide="null">' + $this.val() + '</option>'));
+                        $select.val($this.val());
+                        $select.trigger("chosen:updated");
+                    });
+
+
+                }
+            }
+        });
+    }
+
+    function showConfirmDialog(msg, ok){
+        var _tpl = $('#myModal').html();
+        layer.open({
+            area: ['510px', '170px'],
+            type: 1,
+            title: false,
+            closeBtn: 0,
+            content: _tpl,
+            success: function (l, i){
+                $('.hfconfirm-content').html(msg);
+                $('.hfconfirm-btn-ok').on('click', function(){
+                    layer.closeAll();
+                    ok();
+                    return true;
+                });
+                $('.hfconfirm-btn-cancel').on('click', function(){
+                    layer.closeAll();
+                    return false;
+                    //location.reload();
+                });
+            }
+        });
     }
     //
     //var pageNo = $(this).attr("pageNo");

@@ -5,29 +5,47 @@
        default-autowire="byName">
 
     <!-- dataSource -->
-    <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource" destroy-method="close">
-        <property name="driverClass" value="${jdbc.driverClass}"/>
-        <property name="jdbcUrl" value="${jdbc.url}"/>
-        <property name="user" value="${jdbc.user}"/>
-        <property name="password" value="${jdbc.password}"/>
-        <!-- 连接池中保留的最小连接数 -->
-        <property name="minPoolSize" value="${jdbc.minPoolSize}"/>
-        <!-- 连接池中保留的最大连接数 -->
-        <property name="maxPoolSize" value="${jdbc.maxPoolSize}"/>
-        <!--最大空闲时间,300秒内未使用则连接被丢弃。若为0则永不丢弃 -->
-        <property name="maxIdleTime" value="${jdbc.maxIdleTime}"/>
-        <!-- 当连接池中的连接耗尽的时候c3p0一次同时获取的连接数 -->
-        <property name="acquireIncrement" value="${jdbc.acquireIncrement}"/>
-        <!-- JDBC的标准参数，用以控制数据源内加载的PreparedStatements数量。但由于预缓存的statements　
-        属于单个connection而不是整个连接池。所以设置这个参数需要考虑到多方面的因素。　
-        如果maxStatements与maxStatementsPerConnection均为0，则缓存被关闭。Default:0 -->
-        <property name="maxStatements" value="${jdbc.maxStatements}"/>
-        <!-- 初始化时获取的连接数，取值应在minPoolSize与maxPoolSize之间 -->
-        <property name="initialPoolSize" value="${jdbc.initialPoolSize}"/>
-        <!-- 每300秒检查所有连接池中的空闲连接 -->
-        <property name="idleConnectionTestPeriod" value="${jdbc.idleConnectionTestPeriod}"/>
-        <!-- 定义在从数据库获取新连接失败后重复尝试的次数 -->
-        <property name="acquireRetryAttempts" value="${jdbc.acquireRetryAttempts}"/>
+    <!--<bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource" destroy-method="close">-->
+        <!--<property name="driverClass" value="${jdbc.driverClass}"/>-->
+        <!--<property name="jdbcUrl" value="${jdbc.url}"/>-->
+        <!--<property name="user" value="${jdbc.user}"/>-->
+        <!--<property name="password" value="${jdbc.password}"/>-->
+        <!--&lt;!&ndash; 连接池中保留的最小连接数 &ndash;&gt;-->
+        <!--<property name="minPoolSize" value="${jdbc.minPoolSize}"/>-->
+        <!--&lt;!&ndash; 连接池中保留的最大连接数 &ndash;&gt;-->
+        <!--<property name="maxPoolSize" value="${jdbc.maxPoolSize}"/>-->
+        <!--&lt;!&ndash;最大空闲时间,300秒内未使用则连接被丢弃。若为0则永不丢弃 &ndash;&gt;-->
+        <!--<property name="maxIdleTime" value="${jdbc.maxIdleTime}"/>-->
+        <!--&lt;!&ndash; 当连接池中的连接耗尽的时候c3p0一次同时获取的连接数 &ndash;&gt;-->
+        <!--<property name="acquireIncrement" value="${jdbc.acquireIncrement}"/>-->
+        <!--&lt;!&ndash; JDBC的标准参数，用以控制数据源内加载的PreparedStatements数量。但由于预缓存的statements　-->
+        <!--属于单个connection而不是整个连接池。所以设置这个参数需要考虑到多方面的因素。　-->
+        <!--如果maxStatements与maxStatementsPerConnection均为0，则缓存被关闭。Default:0 &ndash;&gt;-->
+        <!--<property name="maxStatements" value="${jdbc.maxStatements}"/>-->
+        <!--&lt;!&ndash; 初始化时获取的连接数，取值应在minPoolSize与maxPoolSize之间 &ndash;&gt;-->
+        <!--<property name="initialPoolSize" value="${jdbc.initialPoolSize}"/>-->
+        <!--&lt;!&ndash; 每300秒检查所有连接池中的空闲连接 &ndash;&gt;-->
+        <!--<property name="idleConnectionTestPeriod" value="${jdbc.idleConnectionTestPeriod}"/>-->
+        <!--&lt;!&ndash; 定义在从数据库获取新连接失败后重复尝试的次数 &ndash;&gt;-->
+        <!--<property name="acquireRetryAttempts" value="${jdbc.acquireRetryAttempts}"/>-->
+    <!--</bean>-->
+
+    <bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource" init-method="init" destroy-method="close">
+        <property name="driverClassName" value="${jdbc.driverClass}" />
+        <property name="url" value="${jdbc.url}" />
+        <property name="username" value="${jdbc.user}" />
+        <property name="password" value="${jdbc.password}" />
+        <property name="maxIdle" value="30" />
+        <!-- <property name="maxWaitMillis" value="2000" /> -->
+        <property name="testOnBorrow" value="true" />
+        <property name="testOnReturn" value="true" />
+        <property name="validationQuery" value="select 1" />
+        <property name="defaultAutoCommit" value="true" />
+        <property name="filters" value="stat" />
+        <property name="connectionProperties" value="druid.stat.slowSqlMillis=5000" />
+        <property name="poolPreparedStatements" value="false" />
+        <!-- 每隔10分钟把监控数据输出到日志中 -->
+        <property name="timeBetweenLogStatsMillis" value="600000" />
     </bean>
 
     <!-- dataSource -->
