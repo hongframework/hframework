@@ -8,6 +8,7 @@ import org.springframework.data.redis.connection.RedisConnection;
 import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.RedisSerializer;
+import org.springframework.util.CollectionUtils;
 
 import java.io.IOException;
 import java.util.*;
@@ -43,16 +44,51 @@ public class RedisService {
         return (Boolean) redisTemplate.execute(new RedisCallback<Boolean>() {
             public Boolean doInRedis(RedisConnection connection)
                     throws DataAccessException {
-                RedisSerializer<String> serializer = getRedisSerializer();
-                byte[] keybt = serializer.serialize(String.valueOf(key));
-                String value = null;
-                try {
-                    value = JsonUtils.writeValueAsString(t);
-                } catch (IOException e) {
-                    e.printStackTrace();
+                byte[] keyBts = serializeKey(key);
+                byte[] valBts = serializeJsonValue(t);
+                return connection.setNX(keyBts, valBts);
+            }
+        });
+    }
+
+    public byte[] serializeKey(String key) {
+        RedisSerializer<String> serializer = getRedisSerializer();
+        byte[] keybt = serializer.serialize(key);
+        return keybt;
+    }
+
+    public  <T>  byte[] serializeJsonValue(final T t) {
+        RedisSerializer<String> serializer = getRedisSerializer();
+        String value = null;
+        try {
+            value = JsonUtils.writeValueAsString(t);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        byte[] json = serializer.serialize(value);
+        return json;
+    }
+
+
+    /**
+     * 添加对象
+     * @param key
+     * @param t
+     * @param <T>
+     * @return
+     */
+    public <T> Boolean add(final String key, final T t, final Long seconds) {
+        return (Boolean) redisTemplate.execute(new RedisCallback<Boolean>() {
+            public Boolean doInRedis(RedisConnection connection)
+                    throws DataAccessException {
+                byte[] keyBts = serializeKey(key);
+                byte[] valBts = serializeJsonValue(t);
+                boolean result = connection.setNX(keyBts, valBts);
+                if(result) {
+                    connection.setEx(keyBts, seconds, valBts);
                 }
-                byte[] json = serializer.serialize(value);
-                return connection.setNX(keybt, json);
+
+                return result;
             }
         });
     }
@@ -71,16 +107,9 @@ public class RedisService {
         return (Boolean) redisTemplate.execute(new RedisCallback<Boolean>() {
             public Boolean doInRedis(RedisConnection connection)
                     throws DataAccessException {
-                RedisSerializer<String> serializer = getRedisSerializer();
-                byte[] keyTemp = serializer.serialize(key);
-                String value = null;
-                try {
-                    value = JsonUtils.writeValueAsString(t);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                byte[] json = serializer.serialize(value);
-                connection.set(keyTemp, json);
+                byte[] keyBts = serializeKey(key);
+                byte[] valBts = serializeJsonValue(t);
+                connection.set(keyBts, valBts);
                 return true;
             }
         });
@@ -98,22 +127,7 @@ public class RedisService {
             //如果值不存在，则添加入库
             return this.add(key, t);
         }
-        return (Boolean) redisTemplate.execute(new RedisCallback<Boolean>() {
-            public Boolean doInRedis(RedisConnection connection)
-                    throws DataAccessException {
-                RedisSerializer<String> serializer = getRedisSerializer();
-                byte[] keyTemp = serializer.serialize(key);
-                String value = null;
-                try {
-                    value = JsonUtils.writeValueAsString(t);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                byte[] json = serializer.serialize(value);
-                connection.set(keyTemp, json);
-                return true;
-            }
-        });
+        return update(key, t);
     }
 
     /**
@@ -126,21 +140,14 @@ public class RedisService {
     public <T> boolean saveOrUpdate(final String key, final T t, final Long seconds) {
         if (!contains(key)) {
             //如果值不存在，则添加入库
-            return this.add(key, t);
+            return this.add(key, t, seconds);
         }
         return (Boolean) redisTemplate.execute(new RedisCallback<Boolean>() {
             public Boolean doInRedis(RedisConnection connection)
                     throws DataAccessException {
-                RedisSerializer<String> serializer = getRedisSerializer();
-                byte[] keyTemp = serializer.serialize(key);
-                String value = null;
-                try {
-                    value = JsonUtils.writeValueAsString(t);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                byte[] json = serializer.serialize(value);
-                connection.setEx(keyTemp, seconds, json);
+                byte[] keyBts = serializeKey(key);
+                byte[] valBts = serializeJsonValue(t);
+                connection.setEx(keyBts, seconds, valBts);
                 return true;
             }
         });
@@ -180,8 +187,27 @@ public class RedisService {
      * 批量删除
      * @param keys
      */
-    public void delete(List<String> keys) {
-        redisTemplate.delete(keys);
+    public Long delete(final List<String> keys) {
+        if (CollectionUtils.isEmpty(keys)) {
+            return 0L;
+        }
+        return (Long) redisTemplate.execute(new RedisCallback<Long>() {
+            public Long doInRedis(RedisConnection connection)
+                    throws DataAccessException {
+                final byte[][] rawKeys = rawStringKeys(keys);
+                return connection.del(rawKeys);
+            }
+        });
+    }
+
+
+    private byte[][] rawStringKeys(Collection<String> keys) {
+        final byte[][] rawKeys = new byte[keys.size()][];
+        int i = 0;
+        for (String key : keys) {
+            rawKeys[i++] = serializeKey(key);
+        }
+        return rawKeys;
     }
 
     public Boolean contains(final String key) {
