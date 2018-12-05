@@ -51,7 +51,7 @@ public class DBClient {
         if(StringUtils.isBlank(key)) {
             throw new DBInitializeException("get current database key [" + key + "] failed , not exists !");
         }
-        logger.info("get current database success :{}", key);
+        logger.debug("get current database success :{}", key);
         return key;
     }
 
@@ -193,7 +193,7 @@ public class DBClient {
             affectedLine = preparedStatement.executeUpdate();
 
         } catch (Exception e) {
-            logger.error("db update error => {}", ExceptionUtils.getFullStackTrace(e));
+            logger.warn("db update error => {}", ExceptionUtils.getMessage(e));
             throw new DBUpdateException(e);
         } finally {
             // 释放资源
@@ -247,6 +247,16 @@ public class DBClient {
      * @throws Exception
      */
     public static List<Map<String, Object>> executeQueryMaps(String dbKey, String sql, Object[] params)  {
+        return executeQueryMaps(dbKey, sql, params, -1);
+    }
+
+    /**
+     * 获取结果集，并将结果放在List中
+     * @param sql SQL语句
+     * @return List 结果集
+     * @throws Exception
+     */
+    public static List<Map<String, Object>> executeQueryMaps(String dbKey, String sql, Object[] params, int timeOutSecond)  {
         logger.debug("db query => {}|{}|{}",dbKey, sql, Arrays.toString(params));
 
         ResultSet resultSet = null;
@@ -274,6 +284,10 @@ public class DBClient {
                 }
             }
 
+            if(timeOutSecond > 0) {
+                preparedStatement.setQueryTimeout(timeOutSecond);
+            }
+
             // 执行
             resultSet = preparedStatement.executeQuery();
 
@@ -289,17 +303,18 @@ public class DBClient {
                 list.add(map);
             }
         } catch (Exception e) {
-            logger.error("db query error => {}", ExceptionUtils.getFullStackTrace(e));
+            logger.warn("db query error => {}", ExceptionUtils.getMessage(e));
             throw new DBQueryException(e);
         } finally {
             // 释放资源
             closeAll(resultSet, preparedStatement, null, connection);
         }
-
-        try {
-            logger.debug("db query result => {}", JsonUtils.writeValueAsString(list));
-        } catch (IOException e) {
-            logger.debug("db query result => {}", list);
+        if(logger.isDebugEnabled()) {
+            try {
+                logger.debug("db query result => {}", JsonUtils.writeValueAsString(list));
+            } catch (IOException e) {
+                logger.debug("db query result => {}", list);
+            }
         }
         return list;
     }
@@ -311,7 +326,17 @@ public class DBClient {
      * @throws Exception
      */
     public static List<List<Object>> executeQueryList(String sql, Object[] params)  {
-        return executeQueryList(getCurrentDatabaseKey(), sql, params, false);
+        return executeQueryList(sql, params, -1);
+    }
+
+    /**
+     * 获取结果集，并将结果放在List中
+     * @param sql SQL语句
+     * @return List 结果集
+     * @throws Exception
+     */
+    public static List<List<Object>> executeQueryList(String sql, Object[] params, int timeOutSecond)  {
+        return executeQueryList(getCurrentDatabaseKey(), sql, params, false, timeOutSecond);
     }
 
     /**
@@ -331,6 +356,16 @@ public class DBClient {
      * @throws Exception
      */
     public static List<List<Object>> executeQueryList(String dbKey, String sql, Object[] params, boolean addHead)  {
+        return executeQueryList(dbKey, sql, params, addHead, -1);
+    }
+
+    /**
+     * 获取结果集，并将结果放在List中
+     * @param sql SQL语句
+     * @return List 结果集
+     * @throws Exception
+     */
+    public static List<List<Object>> executeQueryList(String dbKey, String sql, Object[] params, boolean addHead, int timeOutSecond)  {
         logger.debug("db query => {}|{}|{}|{}",dbKey, sql, Arrays.toString(params), addHead);
         ResultSet resultSet = null;
         Connection connection = null;
@@ -357,6 +392,10 @@ public class DBClient {
                 }
             }
 
+            if(timeOutSecond > 0) {
+                preparedStatement.setQueryTimeout(timeOutSecond);
+            }
+
             // 执行
             resultSet = preparedStatement.executeQuery();
 
@@ -381,17 +420,20 @@ public class DBClient {
                 data.add(row);
             }
         } catch (Exception e) {
-            logger.error("db query error => {}", ExceptionUtils.getFullStackTrace(e));
+            logger.warn("db query error => {}", ExceptionUtils.getMessage(e));
             throw new DBQueryException(e);
         } finally {
             // 释放资源
             closeAll(resultSet, preparedStatement, null, connection);
         }
-        try {
-            logger.debug("db query result => {}", JsonUtils.writeValueAsString(data));
-        } catch (IOException e) {
-            logger.debug("db query result => {}", data);
+        if(logger.isDebugEnabled()){
+            try {
+                logger.debug("db query result => {}", JsonUtils.writeValueAsString(data));
+            } catch (IOException e) {
+                logger.debug("db query result => {}", data);
+            }
         }
+
         return data;
     }
 
