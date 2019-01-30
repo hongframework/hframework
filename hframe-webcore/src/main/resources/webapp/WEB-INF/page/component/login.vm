@@ -17,9 +17,9 @@
                     #set($value = "")
                 #else
                     #if("$column.editType" == "input")
-                        <input class="input-large span12" name="$column.code" id="$column.code" type="text" placeholder="$column.name" />
+                        <input class="input-large span12" name="$column.code" id="$column.code" type="text" placeholder="$column.name"  not-null="true"/>
                     #else
-                        <input class="input-large span12" name="$column.code" id="$column.code" type="password" placeholder="$column.name" />
+                        <input class="input-large span12" name="$column.code" id="$column.code" type="password" placeholder="$column.name"  not-null="true"/>
                     #end
 
                     <div class="clearfix"></div>

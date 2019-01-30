@@ -275,8 +275,12 @@ require(['layer','ajax','js/hframework/errormsg'], function () {
                                     checkUnPass = true;
                                     return;
                                 }
+                                if($.checkListIsEmpty($form)){
+                                    json[targetIds[tarId] + "|" + i] = [];
+                                }else {
+                                    json[targetIds[tarId] + "|" + i] = JSON.parse($form.serializeJson());
+                                }
 
-                                json[targetIds[tarId] + "|" + i] = JSON.parse($form.serializeJson());
                             }else {
                                 var hierarchy = $component.orgchart('getHierarchy');
                                 json[targetIds[tarId] + "|" + i]  = JSON.stringify(hierarchy, null, 2);
@@ -306,7 +310,11 @@ require(['layer','ajax','js/hframework/errormsg'], function () {
                         //alert("字段不能为空！");
                         return;
                     }
-                    _data = $($thisForm).serializeJson();
+                    if($.checkListIsEmpty($($thisForm))){
+                        _data = "[]";
+                    }else {
+                        _data = $($thisForm).serializeJson();
+                    }
                 }
 
             }else {

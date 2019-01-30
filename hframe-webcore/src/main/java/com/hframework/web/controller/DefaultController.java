@@ -557,6 +557,9 @@ public class DefaultController {
                 Object objects = null;
 
                 logger.debug("class: {}; json: {}", defPoClass.getClassName(), componentJsonData);
+                if(componentJsonData.equals("[]")) {
+                    continue;
+                }
                 if("treeChart".equals(componentId)) {
                     Map<String, String> result = new LinkedHashMap<String, String>();
                     JSONObject jsonObject1 = JSONObject.parseObject(componentJsonData);
