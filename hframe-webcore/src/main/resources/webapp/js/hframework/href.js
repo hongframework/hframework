@@ -314,7 +314,15 @@ require(['layer','ajax','js/hframework/errormsg'], function () {
                     if($this.parents("form").length > 0){
                         $thisForm = $this.parents("form")[0];
                     }else {
-                        $thisForm =$this.parents(".hflist").find("form")[0]
+                        $thisForm =$this.parents(".hflist").find("form")[0];
+                        var requestParameters = parseUrlParamToObject(location.href.substr(location.href.indexOf("?") + 1));
+                        for(var parameter in requestParameters){
+                            var param_val = requestParameters[parameter];
+                            if(param_val) {
+                                $($thisForm).find("input[name=" + parameter + "]:hidden[value='']").val(param_val)
+                            }
+                        }
+
                     }
                     //参数检查
                     if(!$.checkSubmit($($thisForm))) {
