@@ -293,8 +293,11 @@ require(['layer','ajax','js/hframework/errormsg'], function () {
                 }
                 //console.log(JSON.stringify(json));
                 _data = JSON.stringify(json);
+                if(url.substr(0,1) != "/") {
+                    url = "/" + url;
+                }
             }else if($param.endsWith("thisForm")) {
-                if($this.parents("form").length == 0) {
+                if($this.parents("form").length == 0 && $this.parents(".hflist").find("form").length == 0) {//由于hflist按钮并在form内，这里特殊处理一下
                     //var $rootNodes = $this.parents("div .hfspan").children(".hfcontainer").children("div").children("div .box");
                     var $rootNodes = $this.parents("div.hfspan").find(".hfcontainer:first > div > div > div.box:first, .hfcontainer:first > div > div.box")
                     var filePath = $this.parents("div .hfspan").find("div[path]").attr("path");
@@ -303,8 +306,16 @@ require(['layer','ajax','js/hframework/errormsg'], function () {
                     var json = getNodesJson($rootNodes);
                     _data = JSON.stringify(json);
                     //console.log(JSON.stringify(json));
+                    if(url.substr(0,1) != "/") {
+                        url = "/" + url;
+                    }
                 }else {
-                    var $thisForm = $this.parents("form")[0];
+                    var $thisForm = null;
+                    if($this.parents("form").length > 0){
+                        $thisForm = $this.parents("form")[0];
+                    }else {
+                        $thisForm =$this.parents(".hflist").find("form")[0]
+                    }
                     //参数检查
                     if(!$.checkSubmit($($thisForm))) {
                         //alert("字段不能为空！");
@@ -316,16 +327,16 @@ require(['layer','ajax','js/hframework/errormsg'], function () {
                         _data = $($thisForm).serializeJson();
                     }
                 }
-
             }else {
                 _data = parseUrlParamToObject($param);
+                if(url.substr(0,1) != "/") {
+                    url = "/" + url;
+                }
             }
             //_data ='[{"hfpmProgramId":"123","hfpmProgramName":"test","hfpmProgramCode":"234","hfpmProgramDesc":"234","opId":"234","createTime":"2015-10-31 00:20:58","modifyOpId":"","modifyTime":"2015-10-31 00:20:58","delFlag":""},{"hfpmProgramId":"151031375370","hfpmProgramName":"框架","hfpmProgramCode":"hframe","hfpmProgramDesc":"框架","opId":"999","createTime":"2015-10-31 00:20:58","modifyOpId":"999","modifyTime":"2015-10-31 00:20:58","delFlag":"0"}]';
             //console.log(_data);
             showProcessBar();
-            if(url.substr(0,1) != "/") {
-                url = "/" + url;
-            }
+
             $.ajax({
                 url: url  + "?" + $param,
                 data: _data,
