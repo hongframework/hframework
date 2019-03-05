@@ -29,6 +29,7 @@
 				<include>/hframework/**</include>
 				<include>/properties/**</include>
 				<include>jetty.xml</include>
+				<include>jetty_web_default.xml</include>
 				<include>mybatis.xml</include>
 				<include>transactions.xml</include>
 			</includes>

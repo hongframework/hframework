@@ -40,6 +40,7 @@ public class JettyEmbedServer {
         Handler handler = server.getHandler();
         if (handler != null && handler instanceof WebAppContext) {
             WebAppContext webAppContext = (WebAppContext) handler;
+            webAppContext.setDefaultsDescriptor("/jetty_web_default.xml"); //copy by webdefault.xml & change useFileMappedBuffer config
             webAppContext.setResourceBase(JettyEmbedServer.class.getResource("/webapp").toString());
         }
         server.start();
