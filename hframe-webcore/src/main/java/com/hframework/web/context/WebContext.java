@@ -341,37 +341,22 @@ public class WebContext {
                         if(isRuntime) {
                             dataSetDescriptor.setHelperRuntime(true);
                         }else{
-                            dataSetDescriptor.resetHelperInfo(false);
+                            dataSetDescriptor.resetHelperInfo(false, null);
                         }
                     }
-//                    JSONObject helpTags = new JSONObject(true);
-//                    DOMElement root = null;
-//                    for (HelperData helpData : helperDatas.getHelperDatas()) {
-//                        String targetId = helpData.getTargetId();
-//                        String[] nodes = StringUtils.split(targetId, ".");
-//                        if(root == null) {
-//                            Map blankMap = new HashMap();
-//                            root = Dom4jUtils.createElement(nodes[0], blankMap);
-//                        }
-//                        addElementToDomElement(root, Arrays.copyOfRange(nodes, 0, nodes.length - 1), helpData.getHelpLabels());
-//                        String xml = root.asXML();
-//                        dataSetDescriptor.setHelperDataXml(xml);
-//
-//                        JSONObject helpTag = new JSONObject(true);
-//                        helpTags.put(dataSet.getCode() + "#" + targetId, helpTag);
-//                        int count = 0;
-//                        for (HelperLabel helperLabel : helpData.getHelpLabels()) {
-//                            JSONObject helpLabel = new JSONObject(true);
-//                            helpTag.put(helperLabel.getName(), helpLabel);
-//                            for (int i = 0; i < helperLabel.getHelpItems().size(); i++) {
-//                                helpLabel.put(helperLabel.getHelpItems().get(i).getName(), count ++);
-//                            }
-//                        }
-//                        dataSetDescriptor.setHelperTags(helpTags);
-//                    }
+                }
+                List<Fields> fieldsList = dataSet.getDescriptor().getFieldsList();
+                for (Fields fields : fieldsList) {
+                    for (Field field : fields.getFieldList()) {
+                        if(StringUtils.isNotBlank(field.getEmbedClass())
+                                && StringUtils.isNotBlank(field.getEmbedMethod())
+                                && ("runtime".equals(field.getEmbedType()) || "ajax".equals(field.getEmbedType()))) {
+                            dataSetDescriptor.addRuntimeField(field);
+                        }
+                    }
                 }
 
-               if(dataSet.getDescriptor().getNode() != null) {
+                if(dataSet.getDescriptor().getNode() != null) {
                    Node rootNode = dataSet.getDescriptor().getNode();
                    Set<String> virtualContainerSubNodePath = new HashSet<String>();
                    rootNode.calcPath();
@@ -468,6 +453,7 @@ public class WebContext {
         com.hframework.web.config.bean.module.Component component = new com.hframework.web.config.bean.module.Component();
         component.setId(componentId);
         component.setTitle(node.getName());
+        component.setEventExtend(node.getEventExtend());
         component.setDataSet(module + "/" + dataSetCode);
         componentList.add(component);
         List<Node> subNodeList = node.getNodeList();

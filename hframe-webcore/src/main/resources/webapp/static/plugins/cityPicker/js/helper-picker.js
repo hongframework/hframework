@@ -143,14 +143,15 @@
                     w = w * 100 + '%';
                 }
             }
-            var tw = 480;
+            var tw = 680;
 
             return {
                 top: p.top || 0,
                 left: p.left || 0,
                 height: h,
                 width: w,
-                tableWidth:Math.min(480, tw)
+                tableWidth:'80%'
+                //tableWidth:Math.min(680, tw)
             };
         },
 
@@ -658,7 +659,7 @@
 
     HelperPicker.DEFAULTS = {
         simple: false,
-        responsive: false,
+        responsive: true,
         placeholder: '请选择省/市/区',
         level: 'district',
         province: '',

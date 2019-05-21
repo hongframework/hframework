@@ -45,6 +45,9 @@ public class Page   {
     private String relPage;
     @XStreamAlias("extend-script")
     private String extendScript;
+    @XStreamAsAttribute
+    @XStreamAlias("no-login")
+    private boolean noLogin;
 
     //父Module
     @XStreamOmitField
@@ -148,5 +151,13 @@ public class Page   {
 
     public void setExtendScript(String extendScript) {
         this.extendScript = extendScript;
+    }
+
+    public boolean isNoLogin() {
+        return noLogin;
+    }
+
+    public void setNoLogin(boolean noLogin) {
+        this.noLogin = noLogin;
     }
 }

@@ -95,6 +95,7 @@ public class DefaultController {
                                                 HttpServletResponse response) throws Throwable {
         ModelAndView mav = new ModelAndView();
         String helperIndex = request.getParameter("helperIndex");
+        String helperName = request.getParameter("helperName");
         String targetId = request.getParameter("targetId");
         String module = request.getParameter("module");
         String pageCode = request.getParameter("pageCode");
@@ -107,7 +108,7 @@ public class DefaultController {
         }
 
 
-        logger.debug("request referer : {},{},{},{}", module, pageCode, targetId, helperIndex);
+        logger.debug("request referer : {},{},{},{},{}", module, pageCode, targetId, helperIndex, helperName);
         PageDescriptor pageInfo = WebContext.get().getPageInfo(module, pageCode);
         Map<String, ComponentDescriptor> components = pageInfo.getComponents();
 
@@ -122,7 +123,7 @@ public class DefaultController {
         String id = targetId.substring(targetId.indexOf("#")+ 1);
 
         DataSetDescriptor dataSetDescriptor = fileComponentDescriptor.getDataSetDescriptor();
-        dataSetDescriptor.resetHelperInfo(true);
+        dataSetDescriptor.resetHelperInfo(true, request);
         String helperDataXml = dataSetDescriptor.getHelperDataXml();
         if(com.hframework.common.util.StringUtils.isBlank(helperDataXml)) helperDataXml = "<xml></xml>";
         Element helperElement = Dom4jUtils.getDocumentByContent(helperDataXml).getRootElement();
@@ -130,7 +131,17 @@ public class DefaultController {
 
         IDataSet targetDataGroups = helperContainer.getDataGroups().get(0).getElementMap().get(id);
         List<DataSetGroup> dataGroups = ((DataSetContainer) targetDataGroups).getDataGroups();
-        ((DataSetContainer) targetDataGroups).setDataGroups(Lists.newArrayList(dataGroups.get(Integer.valueOf(helperIndex))));
+        List<DataSetGroup> targetDataSetGroups = new ArrayList<DataSetGroup>();
+        if(helperIndex != null) {
+            targetDataSetGroups.add(dataGroups.get(Integer.valueOf(helperIndex)));
+        }else {
+            for (DataSetGroup dataGroup : dataGroups) {
+                if(dataGroup.getName() != null && dataGroup.getName().equals(helperName)) {
+                    targetDataSetGroups.add(dataGroup);
+                }
+            }
+        }
+        ((DataSetContainer) targetDataGroups).setDataGroups(targetDataSetGroups);
         mav.addObject("helpCompData", targetDataGroups);
 
         JSONObject container = null;
@@ -216,6 +227,13 @@ public class DefaultController {
                             HttpServletResponse response){
         ModelAndView mav = new ModelAndView();
         request.getSession().setAttribute("context", null);
+        request.getSession().removeAttribute(SessionKey.USER);
+        request.getSession().removeAttribute(SessionKey.AUTH);
+        Object userKey = request.getSession().getAttribute(SessionKey.USER_KEY);
+        if(userKey != null) {
+            request.getSession().removeAttribute(String.valueOf(userKey));
+            request.getSession().removeAttribute(SessionKey.USER_KEY);
+        }
 //        mav.addObject("staticResourcePath", "/static");
 //        mav.setViewName("/login");
         try {
@@ -293,6 +311,7 @@ public class DefaultController {
                 Object data = resultData.getData();
                 request.getSession().setAttribute(java.lang.Class.forName(defPoClass.getClassPath()).getName(),data);
                 request.getSession().setAttribute(SessionKey.USER,data);
+                request.getSession().setAttribute(SessionKey.USER_KEY, java.lang.Class.forName(defPoClass.getClassPath()).getName());
                 authServiceProxy.auth(request);
             }
             return resultData;
@@ -1021,6 +1040,7 @@ public class DefaultController {
             logger.error("page {} not exists", module, pageCode);
             return error404(request,response);
         }
+        boolean loginRequired = !pageInfo.getPage().isNoLogin();
 
         Map<String, Object> extendData = pageExtendDataManager.getExtendData("/extend/" + pageCode + ".json", request, response, mav);
 
@@ -1053,12 +1073,15 @@ public class DefaultController {
                 }
                 Object componentExtendData = extendData != null ? extendData.get(componentDescriptor.getDataId()) : null;
 
-                JSONObject componentJsonObject = componentInvokeManager.invoke(StringUtils.isNotBlank(componentId), componentDescriptor, componentExtendData, extendData, pagination, module, pageCode, pageInfo, mav, request, response);
+                JSONObject componentJsonObject = componentInvokeManager.invoke(loginRequired,
+                        StringUtils.isNotBlank(componentId), componentDescriptor, componentExtendData,
+                        extendData, pagination, module, pageCode, pageInfo, mav, request, response);
 
                 if(componentJsonObject != null) {
                     String key = componentDescriptor.getId();
                     if(result.containsKey(key)) {
-                        key = componentDescriptor.getId() + "|" + componentDescriptor.getDataSetDescriptor().getDataSet().getCode() + "|" + componentDescriptor.getDataId();
+                        key = componentDescriptor.getId() + "|" + componentDescriptor.getDataSetDescriptor().getDataSet()
+                                .getCode() + "|" + componentDescriptor.getDataId();
                     }
                     System.out.println("=====>" + key + " : " + componentJsonObject.toJSONString());
                     result.put(key, componentJsonObject);
@@ -1071,6 +1094,9 @@ public class DefaultController {
             }
         }catch (SessionExpiredException e) {
             return gotoPage("login",null,null,null,request,response);
+        }catch (Exception e) {
+            logger.error("component invoke error => ", e);
+            return error500(request, response);
         }
 
         if(request.getRequestURI() != null && !request.getRequestURI().contains("login.html") && !request.getRequestURI().contains("logout.html")) {
@@ -1122,7 +1148,7 @@ public class DefaultController {
         final String tableName = tableInfo[0];
         String targetField = tableInfo[1];
         final String keyField = tableInfo[2];
-        commonDataService.executeDBStructChange("update " + tableName + " set " + targetField + " = '" + content + "' where " + keyField + " = " + id);
+        commonDataService.executeDBStructChange("update " + tableName + " set " + targetField + " = '" + content.replaceAll("'", "\\\\'") + "' where " + keyField + " = " + id);
         return true;
     }
 

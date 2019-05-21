@@ -570,12 +570,24 @@ require(['layer','ajax','js/hframework/errormsg'], function () {
 
     $.reloadDisplay = function (_$container, onlyVisible) {
         var $elements = $(_$container).find("[data-code][data-condition]");
+        var repeatLoadCache = []; //如果是批量初始化下拉框列表，同配置下拉框仅第一个需要初始化
+        $elements.each(function(){//针对于没有关联元素的情况，这里统一初始化req_dataCondition，否则isFirstInit不能batchInit
+            if(!$(this).attr("relat-element")) {
+                $(this).attr("req_dataCondition", $(this).attr("data-condition"));
+            }
+
+        });
         $elements.each(function(){
             var $this = $(this);
+            var cacheKey = $this.attr("data-code") + "." + $this.attr("data-condition") + "." + $this.attr("relat-element");
+            var isFirstInit = repeatLoadCache.indexOf(cacheKey) < 0;
+            if(isFirstInit) {
+                repeatLoadCache.push(cacheKey);
+            }
             if($this.is('select')) {
-                $.selectLoad($this,null,true,_$container, onlyVisible);
+                if(isFirstInit || $this.attr("relat-element")) $.selectLoad($this,null,true,_$container, onlyVisible);
             }else if($this.hasClass("hfcheckbox") || $this.hasClass("hfradio") ) {
-                $.checkboxOrRadioLoad($this,null,true,_$container);
+                if(isFirstInit || $this.attr("relat-element")) $.checkboxOrRadioLoad($this,null,true,_$container);
             }else if(!$this.is('span')){
                 $.selectPanelLoad($this);
             }

@@ -10,6 +10,13 @@ import java.util.List;
  */
 public interface AuthService {
 
+    /**
+     * 获取系统菜单类
+     * @return
+     * @throws Exception
+     */
+    public List<Class> getFunctionClasses() throws Exception;
+
     public AuthContext initAuthContext(HttpServletRequest request) throws Exception;
 
     public List<Long> getFunctionIds(HttpServletRequest request) throws Exception;

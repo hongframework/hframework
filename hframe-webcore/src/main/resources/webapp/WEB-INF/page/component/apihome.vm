@@ -1,5 +1,7 @@
 #set($list = $jsonObject.data.list)
 #set($role = $jsonObject.data.role)
+#set($islist = $jsonObject.data.islist)
+#set($program = $jsonObject.data.program)
 #foreach($inter in $list)
 <div class="row-fluid" id="$!inter.url">
     <div class="box span12 hflist" id="" module="" page="" param="" component="">
@@ -31,10 +33,19 @@
                         <th> <span>说明</span> </th>
                         <td> <span>$!inter.description</span></td>
                     </tr>
+                    <tr>
+                        <th> </th>
+                        <td>
+                            #if($islist)
+                                <a style="color: red" href="doc.html?path=$!inter.url&program=$!program"  target='_blank'>【接口详情】</a>
+                            #end
+
+                            <a style="color: red" href="test.html?path=$!inter.url&program=$!program"  target='_blank'>【在线测试】</a></td>
+                    </tr>
                     </tbody>
                 </table>
             </div>
-            <h3><i class="icon-hand-right"></i>&nbsp;请求参数</h3>
+            <h3><i class="icon-signin"></i>&nbsp;请求参数</h3>
             <table class="table table-bordered table-striped table-condensed"  style="margin-left:10px;width:90%;">
                 <thead>
                 <tr>
@@ -60,7 +71,7 @@
                 </tbody>
             </table>
             #if("$role" == "manager")
-                <h3><i class="icon-hand-right"></i>&nbsp;配置参数</h3>
+                <h3><i class="icon-cogs"></i>&nbsp;配置参数</h3>
                 <table class="table table-bordered table-striped table-condensed"  style="margin-left:10px;width:90%;">
                     <thead>
                     <tr>
@@ -89,29 +100,60 @@
                 </table>
             #end
 
-            <h3><i class="icon-hand-right"></i>&nbsp;响应参数</h3>
+            <h3><i class="icon-signout"></i>&nbsp;响应参数</h3>
             <table class="table table-bordered table-striped table-condensed" style="margin-left:10px;width:90%;">
                 <thead>
                 <tr>
-                    <th width="" code="userEntityName">字段名</th>
-                    <th width="" code="dataEntityName">参数名</th>
-                    <th width="" code="funcEntityName">参数类型</th>
-                    <th width="" code="userAuthPath">是否必传</th>
-                    <th width="" code="funcAuthPath">默认值</th>
+                    <th width="15%" code="userEntityName">字段名</th>
+                    <th width="10%" code="dataEntityName">参数名</th>
+                    <th width="10%" code="funcEntityName">参数类型</th>
+                    <th width="10%" code="userAuthPath">是否必传</th>
+                    <th width="10%" code="funcAuthPath">默认值</th>
                     <th width="" code="hfpmProgramId">描述</th>
                 </tr>
                 </thead>
                 <tbody class="hflist-data">
-##                <tr>
-##                    <td> <span code="userEntityName">任务编码</span> </td>
-##                    <td> <span code="dataEntityName">taskCode</span> </td>
-##                    <td> <span code="funcEntityName">String</span> </td>
-##                    <td> <span code="userAuthPath">是</span> </td>
-##                    <td> <span code="funcAuthPath"></span> </td>
-##                    <td> <span code="hfpmProgramId"></span> </td>
-##                </tr>
+                    #foreach($paramInfo in $inter.responseInfos)
+                    <tr>
+                        <td> <span code="name">$!paramInfo.name</span> </td>
+                        <td> <span code="code">$!paramInfo.code</span> </td>
+                        <td> <span code="type">$!paramInfo.type</span> </td>
+                        <td> <span code="required">$!paramInfo.required</span> </td>
+                        <td> <span code="defaultValue">$!paramInfo.defaultValue</span> </td>
+                        <td> <span code="description">$!paramInfo.description</span> </td>
+                    </tr>
+                    #end
                 </tbody>
             </table>
+
+
+            #foreach($entry in $inter.childResponseInfos.entrySet())
+            <h4><i class="icon-caret-right"></i>&nbsp;响应参数[$entry.key.name]</h4>
+            <table class="table table-bordered table-striped table-condensed" style="margin-left:10px;width:90%;">
+                <thead>
+                <tr>
+                    <th width="15%" code="userEntityName">字段名</th>
+                    <th width="10%" code="dataEntityName">参数名</th>
+                    <th width="10%" code="funcEntityName">参数类型</th>
+                    <th width="10%" code="userAuthPath">是否必传</th>
+                    <th width="10%" code="funcAuthPath">默认值</th>
+                    <th width="" code="hfpmProgramId">描述</th>
+                </tr>
+                </thead>
+                <tbody class="hflist-data">
+                    #foreach($paramInfo in $entry.value)
+                    <tr>
+                        <td> <span code="name">$!paramInfo.name</span> </td>
+                        <td> <span code="code">$!paramInfo.code</span> </td>
+                        <td> <span code="type">$!paramInfo.type</span> </td>
+                        <td> <span code="required">$!paramInfo.required</span> </td>
+                        <td> <span code="defaultValue">$!paramInfo.defaultValue</span> </td>
+                        <td> <span code="description">$!paramInfo.description</span> </td>
+                    </tr>
+                    #end
+                </tbody>
+            </table>
+            #end
         </div>
     </div>
 </div>

@@ -33,7 +33,9 @@ function flatContainerStyleReset(_$flatContainer) {
 
     _$flatContainer.find("div:first .hfform h2").remove();
 
-    _$flatContainer.find("div:first  .form-horizontal div:last").append('<button class="btn btn-danger flat-remove-btn" onclick="javascript:void(0)" title="删除">删除</button>');
+    _$flatContainer.find("div:first  .form-horizontal div:last").append('' +
+        '<button class="btn btn-info flat-copy-btn" onclick="javascript:void(0)" title="拷贝">拷贝</button>' +
+        '<button class="btn btn-danger flat-remove-btn" onclick="javascript:void(0)" title="删除">删除</button>');
 
     _$flatContainer.find(".pagination").remove();
 
@@ -41,7 +43,7 @@ function flatContainerStyleReset(_$flatContainer) {
         $(this).find(".control-group").addClass("span2").removeClass("span1");
         $(this).find(".control-group:first ").addClass("span3").removeClass("span4").removeClass("span2");
         $(this).find(".control-group:last ").addClass("span3").removeClass("span1").removeClass("span2");
-        $(this).find("input.input-xlarge").addClass("input-medium").removeClass("input-xlarge");
+        $(this).find("input.input-xlarge").addClass("input").addClass("span11").removeClass("input-xlarge");
         $(this).find("span.help-inline").remove();
     });
 
@@ -108,6 +110,18 @@ function componentinit(){
 
     $(".flat-remove-btn").live("click", function(){
         $(this).parents("div.hfcontainer:first").parent().remove();
+    });
+    $(".flat-copy-btn").live("click", function(){
+        var $newFlat = $(this).parents("div.hfcontainer:first").parent().clone();
+        $newFlat.find("select").each(function(){
+            var $this = $(this);
+            if(!$this.val() && $this.attr("last-value")) {
+                $this.val($this.attr("last-value"));
+            }else if(!$this.val() && $this.attr("data-value")) {
+                $this.val($this.attr("data-value"));
+            }
+        });
+        $(this).parents("div.hfcontainer:first").parent().parent().append($newFlat);
     });
 
 
@@ -216,69 +230,7 @@ function componentinit(){
     });
 
 
-    function initRelatComponent() {
-        var $firstForm = $(".hfform:first");
-        if(!$firstForm || $firstForm.length == 0) return;
-        var firstFormId = $firstForm.attr("id");
-        var mainEntityCode = firstFormId.substring(0, firstFormId.length - "QueryForm".length);
-        var $allLikeRelatField = $("select[data-code*='" + mainEntityCode   + ".']");
-        $allLikeRelatField.each(function(){
-            var $this = $(this);
-            var dateCode = $this.attr("data-code");
-            if(dateCode.split(".").length == 3 && $this.parents(".hfform:first") != $firstForm){
-                if($this.parent().is("td")){
-                    var index = $this.parent().prevAll("td").size();
-                    $this.parents("table:first").find("thead tr th").eq(index).hide();
-                    $this.parent().hide();
-                }else {
-                    $this.parents(".control-group:first").hide();
-                }
-            }
-            $this.removeAttr("not-null");
-        });
-    }
 
-
-    /**
-     * 循环递归 嵌套table
-     * @param $table
-     * @param $treeItems
-     * @param $templateTable
-     * @param $templateTableRow
-     */
-    function recursionNestTable(_$tree, _$table, _$treeItems, _$templateTable, _$templateTableRow, deepIndex){
-        _$treeItems.each(function(){
-            var $newRow = _$templateTableRow.clone();
-            var $contentDiv = $("<div class='tree-folder-content' style='position:relative;margin-left: " + deepIndex * 23 + "px;'></div>");
-            var data = $(this).data()["additionalParameters"];
-            if($(this).hasClass("tree-folder")) {
-                data = $(this).children().data()["additionalParameters"];
-            }
-            //var data = _$tree.tree('getAdditionalParameters', $(this));
-            $contentDiv.append($(this));
-            //$newRow.children("td:first").empty();
-            $newRow.find("select,input").each(function(){
-                if(data[$(this).attr("name")]) {
-                    if($(this).is("select")){
-                        $(this).attr("data-value", data[$(this).attr("name")]);
-                    }else {
-                        if($(this).is("[type=checkbox]") || $(this).is("[type=radio]")) {
-                            $(this).parents("label.hfcheckbox").attr("data-value", data[$(this).attr("name")]);
-                        }else {
-                            $(this).val(data[$(this).attr("name")]);
-                        }
-                    }
-                }
-            });
-            $newRow.children("td:first").append($contentDiv);
-            _$table.children(".hflist-data").append($newRow);
-            if($(this).hasClass("tree-folder")) {
-                var $subTreeItems = $(this).children(".tree-folder-content").children("div:visible");
-                recursionNestTable(_$tree, _$table, $subTreeItems, _$templateTable, _$templateTableRow, deepIndex + 1)
-                $(this).remove(".tree-folder-content");
-            }
-        });
-    }
 
     ///**
     // * 循环递归 嵌套table
@@ -337,6 +289,70 @@ function componentinit(){
 
 
 
+}
+
+function initRelatComponent() {
+    var $firstForm = $(".hfform:first");
+    if(!$firstForm || $firstForm.length == 0) return;
+    var firstFormId = $firstForm.attr("id");
+    var mainEntityCode = firstFormId.substring(0, firstFormId.length - "QueryForm".length);
+    var $allLikeRelatField = $("select[data-code*='" + mainEntityCode   + ".']");
+    $allLikeRelatField.each(function(){
+        var $this = $(this);
+        var dateCode = $this.attr("data-code");
+        if(dateCode.split(".").length == 3 && $this.parents(".hfform:first") != $firstForm){
+            if($this.parent().is("td")){
+                var index = $this.parent().prevAll("td").size();
+                $this.parents("table:first").find("thead tr th").eq(index).hide();
+                $this.parent().hide();
+            }else {
+                $this.parents(".control-group:first").hide();
+            }
+        }
+        $this.removeAttr("not-null");
+    });
+}
+
+
+/**
+ * 循环递归 嵌套table
+ * @param $table
+ * @param $treeItems
+ * @param $templateTable
+ * @param $templateTableRow
+ */
+function recursionNestTable(_$tree, _$table, _$treeItems, _$templateTable, _$templateTableRow, deepIndex){
+    _$treeItems.each(function(){
+        var $newRow = _$templateTableRow.clone();
+        var $contentDiv = $("<div class='tree-folder-content' style='position:relative;margin-left: " + deepIndex * 23 + "px;'></div>");
+        var data = $(this).data()["additionalParameters"];
+        if($(this).hasClass("tree-folder")) {
+            data = $(this).children().data()["additionalParameters"];
+        }
+        //var data = _$tree.tree('getAdditionalParameters', $(this));
+        $contentDiv.append($(this));
+        //$newRow.children("td:first").empty();
+        $newRow.find("select,input").each(function(){
+            if(data[$(this).attr("name")]) {
+                if($(this).is("select")){
+                    $(this).attr("data-value", data[$(this).attr("name")]);
+                }else {
+                    if($(this).is("[type=checkbox]") || $(this).is("[type=radio]")) {
+                        $(this).parents("label.hfcheckbox").attr("data-value", data[$(this).attr("name")]);
+                    }else {
+                        $(this).val(data[$(this).attr("name")]);
+                    }
+                }
+            }
+        });
+        $newRow.children("td:first").append($contentDiv);
+        _$table.children(".hflist-data").append($newRow);
+        if($(this).hasClass("tree-folder")) {
+            var $subTreeItems = $(this).children(".tree-folder-content").children("div:visible");
+            recursionNestTable(_$tree, _$table, $subTreeItems, _$templateTable, _$templateTableRow, deepIndex + 1)
+            $(this).remove(".tree-folder-content");
+        }
+    });
 }
 
 $.datepicker.regional['ru'] = {

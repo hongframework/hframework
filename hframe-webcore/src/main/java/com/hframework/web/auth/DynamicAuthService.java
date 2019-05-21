@@ -65,6 +65,26 @@ public class DynamicAuthService implements AuthService {
     //管理员默认权限字段值
     private  String adminDefaultAuthFiledValue = null;//PropertyConfigurerUtils.getProperty("hframe.admin.default.auth.filed.value");
 
+    /**
+     * 获取系统菜单类
+     * @return
+     * @throws Exception
+     */
+    public List<Class> getFunctionClasses() throws Exception {
+        List<Class> authFunctionClass = new ArrayList<Class>();
+        Program program = WebContext.get().getProgram();
+        String[] authFuncImpls = RegexUtils.split(program.getAuthInstance().getFunction(), "[ ]*[;,]+[ ]*");
+
+        for (String authFuncImpl : authFuncImpls) {
+            String moduleCode = authFuncImpl.substring(0, authFuncImpl.indexOf("."));
+            String dataSetCode = authFuncImpl.substring(authFuncImpl.indexOf(".") + 1);
+            Class<?> defPoClass = Class.forName(CreatorUtil.getDefPoClass(WebContext.get().getProgram().getCompany(),
+                    WebContext.get().getProgram().getCode(), moduleCode, dataSetCode).getClassPath());
+            authFunctionClass.add(defPoClass);
+        }
+        return authFunctionClass;
+    }
+
     public AuthContext initAuthContext(HttpServletRequest request) throws Exception {
         AuthContext context = new AuthContext();
 
@@ -349,7 +369,7 @@ public class DynamicAuthService implements AuthService {
         return true;
     }
 
-    private void addFunctions(AuthContext context) throws Exception {
+    public void addFunctions(AuthContext context) throws Exception {
         String[] authFuncImpls = RegexUtils.split(authFuncImpl, "[ ]*[;,]+[ ]*");
         for (String authFuncImpl : authFuncImpls) {
             String moduleCode = authFuncImpl.substring(0, authFuncImpl.indexOf("."));

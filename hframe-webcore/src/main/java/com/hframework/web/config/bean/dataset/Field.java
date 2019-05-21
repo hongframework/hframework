@@ -62,6 +62,17 @@ public class Field {
     @XStreamAlias("def-val")
     private String defaultValue;
 
+    //目前主要用于动态获取枚举值，用在了feditor中
+    @XStreamAsAttribute
+    @XStreamAlias("embed-class")
+    private String embedClass;
+    @XStreamAsAttribute
+    @XStreamAlias("embed-method")
+    private String embedMethod;
+    @XStreamAsAttribute
+    @XStreamAlias("embed-type")
+    private String embedType;
+
  public Field() {
     }
    
@@ -208,5 +219,29 @@ public class Field {
 
     public void setDefaultValue(String defaultValue) {
         this.defaultValue = defaultValue;
+    }
+
+    public String getEmbedClass() {
+        return embedClass;
+    }
+
+    public void setEmbedClass(String embedClass) {
+        this.embedClass = embedClass;
+    }
+
+    public String getEmbedMethod() {
+        return embedMethod;
+    }
+
+    public void setEmbedMethod(String embedMethod) {
+        this.embedMethod = embedMethod;
+    }
+
+    public String getEmbedType() {
+        return embedType;
+    }
+
+    public void setEmbedType(String embedType) {
+        this.embedType = embedType;
     }
 }

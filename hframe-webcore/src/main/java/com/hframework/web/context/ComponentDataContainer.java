@@ -955,6 +955,7 @@ public class ComponentDataContainer {
         private Map<String, String> initMap= new LinkedHashMap<String, String>();
 
         private List<Map<String, String>> resultList= new ArrayList<Map<String, String>>();
+        private List<Object[]> runtimeResultList = new ArrayList<Object[]>(); //存放动态Field解析的index, map_key, may_val
 
         public ObjectsJsonSegmentParser(Element element, String type) {
             super(element, type);
@@ -971,6 +972,14 @@ public class ComponentDataContainer {
         }
 
         public JSONArray getJsonObject() {
+            //动态解析，目前用于feditor中获取columns的枚举，极少复杂情况用到
+            for (Object[] runtimeResult : runtimeResultList) {
+                Integer resultIndex = (Integer) runtimeResult[0];
+                String initCode = (String) runtimeResult[1];
+                Field field = (Field) runtimeResult[2];
+                Map<String, String> map = resultList.get(resultIndex);
+                map.put(initCode, getValueFromField(field, initMap.get(initCode), dataSetDescriptor));
+            }
             JSONArray jsonArray = new JSONArray();
             for (Map<String, String> stringStringMap : resultList) {
                 jsonArray.add(JSONArray.toJSON(stringStringMap));
@@ -980,6 +989,7 @@ public class ComponentDataContainer {
 
         public void clear() {
             resultList = new ArrayList<Map<String, String>>();
+            runtimeResultList.clear();
         }
 
         @Override
@@ -1004,7 +1014,11 @@ public class ComponentDataContainer {
                         for (Field field : fields) {
                             Map<String, String> tempMap= new LinkedHashMap<String, String>();
                             for (String key : initMap.keySet()) {
-                                tempMap.put(key, getValueFromField(field, initMap.get(key), dataSetDescriptor));
+                                String value = getValueFromField(field, initMap.get(key), dataSetDescriptor);
+                                if("RUNTIME!".equals(value)) {
+                                    runtimeResultList.add(new Object[]{resultList.size(), key, field});
+                                }
+                                tempMap.put(key, value);
                             }
                             resultList.add(tempMap);
                         }
@@ -1152,6 +1166,9 @@ public class ComponentDataContainer {
                 if(field.getRel() != null && StringUtils.isNotBlank(field.getRel().getUrl())) {
                     return "URL:" + field.getRel().getUrl();
                 }
+                if(StringUtils.isNotBlank(field.getEmbedClass()) && StringUtils.isNotBlank(field.getEmbedMethod())) {
+                    return "RUNTIME!";
+                }
             }
             return null;
         }
@@ -1252,18 +1269,21 @@ public class ComponentDataContainer {
 
         public void setData(Map<String, Object> map) {
             resultTree= new ArrayList<Map<String, Object>>();
-            String rootId = map.keySet().iterator().hasNext() ? map.keySet().iterator().next() : null;
-            if( !rootId.equals("-1") && (map.containsKey(-1L) || map.containsKey(-1)|| map.containsKey("-1"))) {
-                rootId = "-1";
-            }
+            if(!map.isEmpty()) {
+                String rootId = map.keySet().iterator().hasNext() ? map.keySet().iterator().next() : null;
+                if( !rootId.equals("-1") && (map.containsKey(-1L) || map.containsKey(-1)|| map.containsKey("-1"))) {
+                    rootId = "-1";
+                }
 
-            List<Object> list = (List<Object>) map.get(rootId);
-            if(list != null && list.size() > 0) {
-                for (Object o : list) {
-                    resultTree.add(getNodeInfo(o, map));
+                List<Object> list = (List<Object>) map.get(rootId);
+                if(list != null && list.size() > 0) {
+                    for (Object o : list) {
+                        resultTree.add(getNodeInfo(o, map));
+                    }
                 }
             }
-            System.out.println("==============");
+
+//            System.out.println("==============");
         }
 
         private Map<String, Object> getNodeInfo(Object object, Map<String, Object> dataMap) {

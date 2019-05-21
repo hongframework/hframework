@@ -22,7 +22,9 @@ import org.dom4j.DocumentHelper;
 import org.dom4j.dom.DOMElement;
 import org.w3c.dom.NodeList;
 
+import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.*;
 
 /**
@@ -83,6 +85,8 @@ public class DataSetDescriptor {
 
     private Map<String, Field> fields = null;
     private Set<String> virtualContainerSubNodePath;
+
+    private List<Field> runtimeFields;
 
     public void addRelDataSet(String fieldName, String key, DataSetDescriptor descriptor) {
         relDataSetMap.put(key,descriptor);
@@ -480,7 +484,7 @@ public class DataSetDescriptor {
         this.helperRuntime = helperRuntime;
     }
 
-    public void resetHelperInfo(boolean containHelpDataAnyWay) throws DocumentException, ClassNotFoundException, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+    public void resetHelperInfo(boolean containHelpDataAnyWay, HttpServletRequest request) throws DocumentException, ClassNotFoundException, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
         if(dataSet == null || dataSet.getDescriptor() == null || dataSet.getDescriptor().getHelperDatas() == null){
             return;
         }
@@ -493,7 +497,14 @@ public class DataSetDescriptor {
                 String embedMethod = helpData.getEmbedMethod();
                 boolean isAjaxRequest = "ajax".equals(helpData.getEmbedType());
                 if(StringUtils.isNotBlank(embedClass) && StringUtils.isNotBlank(embedMethod)){
-                    String replaceString = String.valueOf(java.lang.Class.forName(embedClass).getMethod(embedMethod, new java.lang.Class[0]).invoke(null, null));
+                    String replaceString = null;
+                    try{
+                        Method method = Class.forName(embedClass).getMethod(embedMethod, new Class[0]);
+                        replaceString = String.valueOf(method.invoke(null, null));
+                    }catch (NoSuchMethodException e) {
+                        Method method = Class.forName(embedClass).getMethod(embedMethod, new Class[]{HttpServletRequest.class});
+                        replaceString = String.valueOf(method.invoke(null, request));
+                    }
                     helpData.setHelpLabels(XmlUtils.readValue("<helper-data>" + replaceString + "</helper-data>", HelperData.class).getHelpLabels());
                 }
                 String targetId = helpData.getTargetId();
@@ -512,13 +523,18 @@ public class DataSetDescriptor {
                 JSONObject helpTag = new JSONObject(true);
                 helpTags.put(dataSet.getCode() + "#" + targetId, helpTag);
                 int count = 0;
-                for (HelperLabel helperLabel : helpData.getHelpLabels()) {
-                    JSONObject helpLabel = new JSONObject(true);
-                    helpTag.put(helperLabel.getName(), helpLabel);
-                    for (int i = 0; i < helperLabel.getHelpItems().size(); i++) {
-                        helpLabel.put(helperLabel.getHelpItems().get(i).getName(), count ++);
+                if(helpData.getHelpLabels() != null) {
+                    for (HelperLabel helperLabel : helpData.getHelpLabels()) {
+                        JSONObject helpLabel = new JSONObject(true);
+                        helpTag.put(helperLabel.getName(), helpLabel);
+                        if(helperLabel.getHelpItems() != null) {
+                            for (int i = 0; i < helperLabel.getHelpItems().size(); i++) {
+                                helpLabel.put(helperLabel.getHelpItems().get(i).getName(), count ++);
+                            }
+                        }
                     }
                 }
+
             }
             if(root != null) {
                 String xml = root.asXML();
@@ -528,18 +544,37 @@ public class DataSetDescriptor {
         }
     }
 
-    private void addElementToDomElement(DOMElement root, String[] nodes, List<HelperLabel> helpLabels, boolean isAjaxRequest) throws DocumentException {
+    public boolean hasRuntimeField(){
+        return runtimeFields != null && runtimeFields.size() > 0;
+    }
 
-        DOMElement parentElement = getCurrentElement(root, nodes);
-        for (HelperLabel helpLabel : helpLabels) {
-            List<HelperItem> helpItems = helpLabel.getHelpItems();
-            for (HelperItem helpItem : helpItems) {
-                if(StringUtils.isNotBlank(helpItem.getText()) && !isAjaxRequest) {
-                    parentElement.add(DocumentHelper.parseText(helpItem.getText()).getRootElement());
+    public void resetRuntimeFields() throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+        if(runtimeFields != null) {
+            for (Field runtimeField : runtimeFields) {
+                String embedClass = runtimeField.getEmbedClass();
+                String embedMethod = runtimeField.getEmbedMethod();
+                if(StringUtils.isNotBlank(embedClass) && StringUtils.isNotBlank(embedMethod)){
+                    String replaceString = String.valueOf(java.lang.Class.forName(embedClass).getMethod(embedMethod, new java.lang.Class[0]).invoke(null, null));
+                    runtimeField.setEnumList(XmlUtils.readValue(replaceString, Field.class).getEnumList());
                 }
             }
         }
-        ;
+
+    }
+
+    private void addElementToDomElement(DOMElement root, String[] nodes, List<HelperLabel> helpLabels, boolean isAjaxRequest) throws DocumentException {
+
+        DOMElement parentElement = getCurrentElement(root, nodes);
+        if(helpLabels != null) {
+            for (HelperLabel helpLabel : helpLabels) {
+                List<HelperItem> helpItems = helpLabel.getHelpItems();
+                for (HelperItem helpItem : helpItems) {
+                    if(StringUtils.isNotBlank(helpItem.getText()) && !isAjaxRequest) {
+                        parentElement.add(DocumentHelper.parseText(helpItem.getText()).getRootElement());
+                    }
+                }
+            }
+        }
     }
 
     private DOMElement getCurrentElement(DOMElement root, String[] nodes) {
@@ -582,5 +617,12 @@ public class DataSetDescriptor {
 
     public void setColumnTableKeyAndValue(String[] columnTableKeyAndValue) {
         this.columnTableKeyAndValue = columnTableKeyAndValue;
+    }
+
+    public void addRuntimeField(Field field) {
+        if(runtimeFields == null) {
+            runtimeFields = new ArrayList<Field>();
+        }
+        runtimeFields.add(field);
     }
 }

@@ -108,7 +108,12 @@ public class FileComponentInvoker {
         JSONObject jsonObject;
         if("container".equals(type) || "container".equals(componentDescriptor.getComponent().getId())) {
             String xmlContent = getXmlContent(componentDescriptor, request);
-            jsonObject = invokerXmlContainer(xmlContent, module, componentDescriptor, mav, request, response);
+            try {
+                jsonObject = invokerXmlContainer(xmlContent, module, componentDescriptor, mav, request, response);
+            }catch (Exception e) {
+                logger.error("file parse error: " ,e);
+                throw e;
+            }
         }else if(StringUtils.isNotBlank(componentDescriptor.getDataId())) {
             ResultData resultData = invokerFileCategory(componentDescriptor);
             jsonObject = componentDescriptor.getJson(resultData);
@@ -319,14 +324,14 @@ public class FileComponentInvoker {
             if(descriptor.getDataSetDescriptor() != null) {
                 String tempDataSetCode = descriptor.getDataSetDescriptor().getDataSet().getCode();
                 tempDataSetCode = tempDataSetCode.contains("#") ? tempDataSetCode.substring(tempDataSetCode.indexOf("#") + 1) : tempDataSetCode;
-                if(tempDataSetCode.equals( dataSet.getNode().getPath())) {
+                if("SYSTEM_EMPTY_DATASET".equals(tempDataSetCode) || tempDataSetCode.equals( dataSet.getNode().getPath())) {
                     if(dataSet.isOne() || dataSet.getOne() != null) {
                         dataSet.setComponentData(descriptor.getJson(ResultData.success(dataSet.getOne())));
                     }else {
                         dataSet.setComponentData(descriptor.getJson(ResultData.success(new HashMap() {{
                             put("list", dataSet.getList());
                         }})));
-                        dataSet.getComponentData().put("dataIsEmpty", dataSet.getList().size()==1 &&  dataSet.getList().get(0).isEmpty());
+                        dataSet.getComponentData().put("dataIsEmpty", dataSet.getList() == null || (dataSet.getList().size()==1 &&  dataSet.getList().get(0).isEmpty()));
                     }
                 }
             }

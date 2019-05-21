@@ -27,6 +27,10 @@ public class Node {
 	@XStreamAlias("events")
 	private String events;
 
+	@XStreamAsAttribute
+	@XStreamAlias("event-extend")
+	private String eventExtend;
+
 	private String path;
     public Node() {}
    
@@ -98,5 +102,13 @@ public class Node {
 
 	public void setEvents(String events) {
 		this.events = events;
+	}
+
+	public String getEventExtend() {
+		return eventExtend;
+	}
+
+	public void setEventExtend(String eventExtend) {
+		this.eventExtend = eventExtend;
 	}
 }

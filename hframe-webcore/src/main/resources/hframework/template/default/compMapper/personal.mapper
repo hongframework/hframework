@@ -8,5 +8,6 @@
         <mapping id="settingUrl" value="/hframe/setting.html"></mapping>
         <mapping id="messageUrl" value="/hframe/message.html"></mapping>
         <mapping id="logoutUrl" value="/logout.html"></mapping>
+        <mapping id="loginUrl" value="/login.html"></mapping>
     </baseMapper>
 </mapper>

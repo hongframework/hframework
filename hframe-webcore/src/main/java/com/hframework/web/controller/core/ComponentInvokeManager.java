@@ -52,7 +52,8 @@ public class ComponentInvokeManager {
     private FileComponentInvoker fileComponentInvoker;
 
 
-    public  JSONObject invoke(boolean isRefresh, ComponentDescriptor componentDescriptor, Object componentExtendData, Map<String, Object> extendData,
+    public  JSONObject invoke(boolean loginRequired, boolean isRefresh, ComponentDescriptor componentDescriptor,
+                              Object componentExtendData, Map<String, Object> extendData,
                               Pagination pagination, String module, String pageCode, PageDescriptor pageInfo,
                               ModelAndView mav, HttpServletRequest request, HttpServletResponse response) throws Throwable {
 
@@ -61,8 +62,12 @@ public class ComponentInvokeManager {
             return null;
         }
         if(componentDescriptor.getDataSetDescriptor().isHelperRuntime()){
-            componentDescriptor.getDataSetDescriptor().resetHelperInfo(false);
+            componentDescriptor.getDataSetDescriptor().resetHelperInfo(false, request);
         }
+        if(componentDescriptor.getDataSetDescriptor().hasRuntimeField()){
+            componentDescriptor.getDataSetDescriptor().resetRuntimeFields();
+        }
+
 
         String moduleCode = componentDescriptor.getDataSetDescriptor().getDataSet().getModule();
         String eventObjectCode = componentDescriptor.getDataSetDescriptor().getDataSet().getEventObjectCode();
@@ -107,8 +112,10 @@ public class ComponentInvokeManager {
                     WebContext.get().getProgram().getCode(), moduleCode, eventObjectCode);
             Object data = request.getSession().getAttribute(java.lang.Class.forName(defPoClass.getClassPath()).getName());
             System.out.println("session data " + data);
-            if (data == null) {
+            if (data == null && loginRequired) {
                 throw new SessionExpiredException();
+            }else if(data == null) {
+                data = java.lang.Class.forName(defPoClass.getClassPath()).newInstance();
             }
             jsonObject = getJsonObjectByResultData(componentDescriptor, ResultData.success(data), moduleCode, dataSetCode, action);
         }else if("file".equals(componentDescriptor.getDataSetDescriptor().getDataSet().getSource())) {
@@ -495,7 +502,13 @@ public class ComponentInvokeManager {
         }
 
         AuthContext authContext = authServiceProxy.getAuthContext(request);
-        if(authContext != null && authContext.getAuthManager().getAuthFunctionClass().contains(java.lang.Class.forName(defPoClass.getClassPath()))) {
+        if(authContext == null && authServiceProxy.getFunctionClasses().contains(java.lang.Class.forName(defPoClass.getClassPath()))) {
+            com.hframework.web.config.bean.dataset.Field keyField = componentDescriptor.getDataSetDescriptor().getKeyField();
+            Object criteria = ReflectUtils.invokeMethod(poExample, "createCriteria", new java.lang.Class[]{}, new Object[]{});
+            ReflectUtils.invokeMethod(criteria,
+                    "and" + JavaUtil.getJavaClassName(keyField.getCode()) + "In",
+                    new java.lang.Class[]{List.class}, new Object[]{Lists.newArrayList(-999L)});
+        }else if(authContext.getAuthManager().getAuthFunctionClass().contains(java.lang.Class.forName(defPoClass.getClassPath()))) {
             List<Long> functionIds = authServiceProxy.getFunctionIds(request);
             if(functionIds == null || functionIds.size() == 0) {
                 functionIds = new ArrayList<Long>(){{add(-999L);}};
@@ -505,7 +518,7 @@ public class ComponentInvokeManager {
             ReflectUtils.invokeMethod(criteria,
                     "and" + JavaUtil.getJavaClassName(keyField.getCode()) + "In",
                     new java.lang.Class[]{List.class}, new Object[]{functionIds});
-        }else if(authContext != null && authContext.getAuthManager().getAuthDataClass().contains(java.lang.Class.forName(defPoClass.getClassPath()))) {
+        }else if(authContext.getAuthManager().getAuthDataClass().contains(java.lang.Class.forName(defPoClass.getClassPath()))) {
             Long funcId = authContext.getAuthFunctionManager().get("/" + module + "/" + pageCode + ".html");
             List<Long> dataUnitIds = authContext.getAuthManager().getDataUnitIds(funcId);
 
@@ -514,7 +527,7 @@ public class ComponentInvokeManager {
             ReflectUtils.invokeMethod(criteria,
                     "and" + JavaUtil.getJavaClassName(keyField.getCode()) + "In",
                     new java.lang.Class[]{List.class}, new Object[]{dataUnitIds});
-        }else if(authContext != null){
+        }else{
             List<String> relFieldNames = componentDescriptor.getDataSetDescriptor().getRelFieldCodes(authContext.getAuthManager().getAuthDataClass());
             if(relFieldNames.size() > 0) {
                 Object criteria = ReflectUtils.invokeMethod(poExample, "createCriteria", new java.lang.Class[]{}, new Object[]{});

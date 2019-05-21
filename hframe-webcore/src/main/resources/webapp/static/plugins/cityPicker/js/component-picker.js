@@ -62,8 +62,8 @@
             $("[dc='" + relComponentDC + "'] .box-header .box-icon").remove();
             $("[dc='" + relComponentDC + "'] .box-content .pagination").remove();
             $("[dc='" + relComponentDC + "'] ").find("input[name=EOFR_EDIT_FLAG]").parent().each(function(){
-               $(this).find("a").not(":first").remove();
-               $(this).find("a:first").append($('<a class="btn btn-danger hfhref" href="javascript:void(0)" params="" action=\'{"component.row.delete":{"param":"{}"}}\'><i class="icon-trash"></i></a>'));
+                $(this).find("a").not(":first").remove();
+                $(this).find("a:first").append($('<a class="btn btn-danger hfhref" href="javascript:void(0)" params="" action=\'{"component.row.delete":{"param":"{}"}}\'><i class="icon-trash"></i></a>'));
 
             });
             $("[dc='" + relComponentDC + "']").hide();
@@ -367,9 +367,9 @@
             var $emptyTr = $("[dc='" + relComponentDC + "']").find(" .hflist .table tbody tr:first");
             var subData = JSON.parse(values);
             var text = "";
-            for(var index in subData){
-                for(var key in subData[index]){
-                    var value = subData[index][key];
+            if(subData.length > 0) {
+                for(var key in subData[0]){
+                    var value = subData[0][key];
                     if(value) {
                         var $childElement = $emptyTr.find("[name='" + key + "']")
                         if($childElement.is('select')) {
@@ -378,25 +378,54 @@
                                 text = text + JSON.parse(jsonCode.replace(/'/g,'"'))[value] + "|";
                             }else if($childElement.find("option[value='" + value + "']").size() > 0){
                                 var  html = $childElement.find("option[value='" + value + "']").html();
-                                text = text + html + "|";
+                                text = text + html + "-";
                             }else {
-                                text = text + "无" + "|";
+                                text = text + "无" + "-";
                             }
 
                         }else if($childElement.hasClass("hfcheckbox") || $childElement.hasClass("hfradio") ) {
-                            text = text + value + "|";
+                            text = text + value + "-";
                         }else {
-                            text = text + value + "|";
+                            text = text + value + "-";
                         }
                     }
                 }
                 if(text && text.length > 0) {
-                    text = text.substring(0, text.length -1) + ", "
+                    text = text.substring(0, text.length -1)
                 }
-
             }
+            // for(var index in subData){
+            //     for(var key in subData[index]){
+            //         var value = subData[index][key];
+            //         if(value) {
+            //             var $childElement = $emptyTr.find("[name='" + key + "']")
+            //             if($childElement.is('select')) {
+            //                 if($childElement.find("option").size()== 0 ){
+            //                     var jsonCode = $childElement.attr("data-code").substring("JSON:".length);
+            //                     text = text + JSON.parse(jsonCode.replace(/'/g,'"'))[value] + "|";
+            //                 }else if($childElement.find("option[value='" + value + "']").size() > 0){
+            //                     var  html = $childElement.find("option[value='" + value + "']").html();
+            //                     text = text + html + "|";
+            //                 }else {
+            //                     text = text + "无" + "|";
+            //                 }
+            //
+            //             }else if($childElement.hasClass("hfcheckbox") || $childElement.hasClass("hfradio") ) {
+            //                 text = text + value + "|";
+            //             }else {
+            //                 text = text + value + "|";
+            //             }
+            //         }
+            //     }
+            //     if(text && text.length > 0) {
+            //         text = text.substring(0, text.length -1) + ", "
+            //     }
+            //
+            // }
             if(!text){
                 text = "无"
+            }else if(subData.length > 1){
+                text = text + "[" + subData.length + "条]";
             }
             return text;
             //return this.$dropdown.children().html();

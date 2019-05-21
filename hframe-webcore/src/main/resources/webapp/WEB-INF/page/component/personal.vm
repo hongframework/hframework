@@ -1,20 +1,39 @@
 <!-- start: User Dropdown -->
 <li class="dropdown">
     <a class="btn account dropdown-toggle" data-toggle="dropdown" href="#">
-        <div class="avatar"><img src="$!{personal.user.avatar}" alt="头像" /></div>
+        <div class="avatar" style="border-left:2px solid white">
+            #if($!{personal.user.avatar} == '')
+                <img src="$staticResourcePath/img/default_avatar.jpg" alt="头像" />
+            #else
+                <img src="$!{personal.user.avatar}" alt="头像" />
+            #end
+
+        </div>
         <div class="user">
-            <span class="hello">欢迎!</span>
-            <span class="name">$!{personal.user.name}</span>
+##            <span class="hello"></span>
+            #if($!{personal.user.name} == '')
+                <span class="name" style="font-size: 16px;">欢迎, 游客!</span>
+            #else
+                <span class="name" style="font-size: 16px;">欢迎, $!{personal.user.name}!</span>
+            #end
+
         </div>
     </a>
+    #if($!{personal.user.name} != '')
+    #end
     <ul class="dropdown-menu">
-        <li class="dropdown-menu-title">
+##        <li class="dropdown-menu-title">
+##            更多
+##        </li>
+        #if($!{personal.user.name} == '')
+            <li><a href="$!{personal.loginUrl}"><i class="icon-user"></i> 登录</a></li>
+        #else
+            <li><a href="$!{personal.centerUrl}"><i class="icon-user"></i> 个人中心</a></li>
+            <li><a href="$!{personal.settingUrl}"><i class="icon-cog"></i> 系统设置</a></li>
+            <li><a href="$!{personal.messageUrl}"><i class="icon-envelope"></i>我的消息</a></li>
+            <li><a href="$!{personal.logoutUrl}"><i class="icon-off"></i>退出</a></li>
+        #end
 
-        </li>
-        <li><a href="$!{personal.centerUrl}"><i class="icon-user"></i> 个人中心</a></li>
-        <li><a href="$!{personal.settingUrl}"><i class="icon-cog"></i> 系统设置</a></li>
-        <li><a href="$!{personal.messageUrl}"><i class="icon-envelope"></i>我的消息</a></li>
-        <li><a href="$!{personal.logoutUrl}"><i class="icon-off"></i>退出</a></li>
     </ul>
 </li>
 <!-- end: User Dropdown -->

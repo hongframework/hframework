@@ -819,8 +819,13 @@ require(['layer','ajax','js/hframework/errormsg'], function () {
             while(result.indexOf("{") > -1 && result.indexOf("}") > -1){
                 var value;
                 var position = result.substring(result.indexOf("{") + 1, result.indexOf("}"));
-                if($this.parents("tr").find("span[code="+ position +"]").size() > 0 ) {
-                    value = $this.parents("tr").find("span[code="+ position +"]").text();
+                var $span = $this.parents("tr").find("span[code="+ position +"]");
+                if($span.size() > 0 ) {
+                    if($span.attr("value")){
+                        value = $span.attr("value");
+                    }else {
+                        value = $span.text();
+                    }
                 }else if($this.parents("tr").find("[name="+ position +"]").size() > 0 ) {
                     value = $this.parents("tr").find("[name="+ position +"]").val();
                 }else if($this.parents("form").size() > 0 )  {

@@ -8,6 +8,7 @@
     <element id="settingUrl" type="characters"  default-value=""></element>
     <element id="messageUrl" type="characters"  default-value=""></element>
     <element id="logoutUrl" type="characters"  default-value=""></element>
+    <element id="loginUrl" type="characters"  default-value=""></element>
     <events>
     </events>
     <example>
