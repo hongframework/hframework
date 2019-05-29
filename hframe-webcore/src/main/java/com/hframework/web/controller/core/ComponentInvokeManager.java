@@ -65,7 +65,7 @@ public class ComponentInvokeManager {
             componentDescriptor.getDataSetDescriptor().resetHelperInfo(false, request);
         }
         if(componentDescriptor.getDataSetDescriptor().hasRuntimeField()){
-            componentDescriptor.getDataSetDescriptor().resetRuntimeFields();
+            componentDescriptor.getDataSetDescriptor().resetRuntimeFields(request);
         }
 
 

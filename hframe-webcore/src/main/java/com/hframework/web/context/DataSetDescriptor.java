@@ -548,13 +548,22 @@ public class DataSetDescriptor {
         return runtimeFields != null && runtimeFields.size() > 0;
     }
 
-    public void resetRuntimeFields() throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+    public void resetRuntimeFields(HttpServletRequest request) throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
         if(runtimeFields != null) {
             for (Field runtimeField : runtimeFields) {
                 String embedClass = runtimeField.getEmbedClass();
                 String embedMethod = runtimeField.getEmbedMethod();
                 if(StringUtils.isNotBlank(embedClass) && StringUtils.isNotBlank(embedMethod)){
-                    String replaceString = String.valueOf(java.lang.Class.forName(embedClass).getMethod(embedMethod, new java.lang.Class[0]).invoke(null, null));
+                    String replaceString = null;
+                    try{
+                        replaceString = String.valueOf(java.lang.Class.forName(embedClass).getMethod(
+                                embedMethod, new java.lang.Class[0]).invoke(null, null));
+                    }catch (NoSuchMethodException e) {
+                        replaceString = String.valueOf(java.lang.Class.forName(embedClass).getMethod(
+                                embedMethod, new Class[]{HttpServletRequest.class}).invoke(null, request));
+                                                        Class.forName(embedClass).getMethod(embedMethod, new Class[]{HttpServletRequest.class});
+                    }
+
                     runtimeField.setEnumList(XmlUtils.readValue(replaceString, Field.class).getEnumList());
                 }
             }
