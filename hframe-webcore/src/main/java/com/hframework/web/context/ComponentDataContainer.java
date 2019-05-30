@@ -1150,14 +1150,20 @@ public class ComponentDataContainer {
                 }
 
                 if(field.getEnumList() != null && field.getEnumList().size() > 0) {
-                    JSONObject enums = new JSONObject();
-                    for (Enum anEnum : field.getEnumList()) {
-                        if(StringUtils.isNotBlank(anEnum.getParent())) {
-                            enums.put(anEnum.getValue(),new String[]{anEnum.getName(), anEnum.getParent()});
-                        }else {
-                            enums.put(anEnum.getValue(),new String[]{anEnum.getName()});
-                        }
 
+//                    JSONObject enums = new JSONObject();
+//                    for (Enum anEnum : field.getEnumList()) {
+//                        if(StringUtils.isNotBlank(anEnum.getParent())) {
+//                            enums.put(anEnum.getValue(),new String[]{anEnum.getName(), anEnum.getParent()});
+//                        }else {
+//                            enums.put(anEnum.getValue(),new String[]{anEnum.getName()});
+//                        }
+//
+//                    }
+
+                    JSONArray enums = new JSONArray();
+                    for (Enum anEnum : field.getEnumList()) {
+                        enums.add(new String[]{anEnum.getValue(), anEnum.getName(), anEnum.getParent()});
                     }
 
                     return "JSON:" + enums.toJSONString().replaceAll("\"","'");

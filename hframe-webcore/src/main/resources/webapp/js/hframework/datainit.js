@@ -57,13 +57,21 @@ require(['layer','ajax','js/hframework/errormsg'], function () {
             if(dataCode.startsWith("JSON:")) {
                 var enums  =JSON.parse(dataCode.substr(5).replace(new RegExp(/(')/g),'"'));
                 var data = [];
-                for(var key in enums) {
-                    if(enums[key][1]) {
-                        data.push({"value":key,"text":enums[key][0],"extInfo": null, "parent": enums[key][1]});
+                for(var i in enums) {
+                    if(enums[i][2]) {
+                        data.push({"value":enums[i][0],"text":enums[i][1],"extInfo": null, "parent": enums[i][2]});
                     }else {
-                        data.push({"value":key,"text":enums[key][0],"extInfo": null});
+                        data.push({"value":enums[i][0],"text":enums[i][1],"extInfo": null});
                     }
                 }
+                // enums 由 {} 变为 []
+                // for(var key in enums) {
+                //     if(enums[key][1]) {
+                //         data.push({"value":key,"text":enums[key][0],"extInfo": null, "parent": enums[key][1]});
+                //     }else {
+                //         data.push({"value":key,"text":enums[key][0],"extInfo": null});
+                //     }
+                // }
                 if(_showEleFunc) {
                     _showEleFunc({"data": data});
                 }

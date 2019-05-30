@@ -375,7 +375,16 @@
                         if($childElement.is('select')) {
                             if($childElement.find("option").size()== 0 ){
                                 var jsonCode = $childElement.attr("data-code").substring("JSON:".length);
-                                text = text + JSON.parse(jsonCode.replace(/'/g,'"'))[value] + "|";
+                                var enums = JSON.parse(jsonCode.replace(/'/g,'"'))
+                                var text  = value;
+                                for(var i in enums) {
+                                    if(enums[i][0] == value) {
+                                        text = enums[i][1]
+                                        break;
+                                    }
+                                }
+                                text = text + text + "|";
+                                // text = text + JSON.parse(jsonCode.replace(/'/g,'"'))[value] + "|";
                             }else if($childElement.find("option[value='" + value + "']").size() > 0){
                                 var  html = $childElement.find("option[value='" + value + "']").html();
                                 text = text + html + "-";
