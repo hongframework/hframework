@@ -31,7 +31,7 @@ public abstract class ConfigMonitor<T> extends AbstractMonitor<T> implements Mon
     }
 
 
-    public void reload() {
+    public synchronized void reload() {
         try {
             T newObject = fetch();
             if(isDiff(objectString, newObject)) {

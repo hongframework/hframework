@@ -278,13 +278,16 @@ public class BusinessHandlerInterceptor {
     }
 
     private Object getOriginObject(Object targetObject, Class curServiceClass) throws IllegalAccessException, NoSuchMethodException, InvocationTargetException {
-
         Object service = ServiceFactory.getService(curServiceClass);
-        String keyPropertyGetMethod = "get" + targetObject.getClass().getSimpleName() + "Id";
-        String keyPropertyValue = String.valueOf(ReflectUtils.invokeMethod(targetObject, keyPropertyGetMethod, new Class[0], new Object[0]));
+//        String keyPropertyGetMethod = "get" + targetObject.getClass().getSimpleName() + "Id";
+//        String keyPropertyValue = String.valueOf(ReflectUtils.invokeMethod(targetObject, keyPropertyGetMethod, new Class[0], new Object[0]));
 
+        DataSetDescriptor dataSet = WebContext.get().getDataSet(targetObject.getClass());
+        Field keyField = dataSet.getKeyField();
+        Object keyPropertyValue = ReflectUtils.getFieldValue(targetObject, JavaUtil.getJavaVarName(keyField.getCode()));
         String methodName = "get" + targetObject.getClass().getSimpleName() + "ByPK";
 
-        return ReflectUtils.invokeMethod(service, methodName, new Class[]{long.class}, new Object[]{Long.valueOf(keyPropertyValue)});
+        return ReflectUtils.invokeMethod(service, methodName, new Class[]{long.class},
+                new Object[]{Long.valueOf(String.valueOf(keyPropertyValue))});
     }
 }

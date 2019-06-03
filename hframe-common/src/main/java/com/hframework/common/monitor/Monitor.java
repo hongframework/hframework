@@ -11,7 +11,7 @@ public interface Monitor<T> {
     /**启动*/
     public void start() throws Exception;
     /**重新加载*/
-    public void reload();
+    public  void reload();
     /**销毁*/
     public void destroy();
     public  T getObject() ;

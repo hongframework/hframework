@@ -184,7 +184,7 @@ public class ComponentInvokeManager {
                 resultData = controllerMethodInvoker.invokeTreeByRelDataSet(poExample, pagination, defPoClass, defPoExampleClass, controller, action, componentDescriptor, request);
             }else if("list".equals(action)){
                 if (pagination.getPageNo() == 0) pagination.setPageNo(1);
-                if (pagination.getPageSize() == 0) pagination.setPageSize(10);
+                if (pagination.getPageSize() == 0) pagination.setPageSize(20);
                 if ("eList".equals(type)) pagination.setPageSize(50);
                 if(columnTableInfo != null) pagination.setPageSize(10000);
                 if(componentDescriptor.getSetValueList() != null && componentDescriptor.getSetValueList().size() > 0) {

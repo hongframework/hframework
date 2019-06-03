@@ -58,7 +58,7 @@ public abstract class ConfigMapMonitor<T> extends AbstractMonitor<T> implements 
 
     protected abstract String keyProperty(T t);
 
-    public void reload() {
+    public synchronized void reload() {
         reload(true);
     }
     public boolean reload(boolean whetherNotifyListener) {

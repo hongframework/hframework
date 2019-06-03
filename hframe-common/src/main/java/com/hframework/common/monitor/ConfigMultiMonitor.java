@@ -37,7 +37,7 @@ public abstract class ConfigMultiMonitor<T> extends AbstractMonitor<T> implement
         subMonitors.add(configMapMonitor);
     }
 
-    public void reload() {
+    public synchronized void reload() {
         if(subMonitors != null) {
             buildNetworkRedirectMap();
             List<ConfigMapMonitor> changedMonitor = new ArrayList<ConfigMapMonitor>();
