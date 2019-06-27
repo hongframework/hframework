@@ -36,8 +36,6 @@ import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import java.io.*;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.*;
 
 /**
@@ -187,6 +185,7 @@ public class WebContext {
 
         WebContextMonitor webContextMonitor = new WebContextMonitor(this);
         webContextMonitor.addRootConfMap(DataSet.class, XmlUtils.class.getResource("/" + contextHelper.programConfigDataSetDir).getPath());
+        webContextMonitor.addRootConfMap(Module.class, XmlUtils.class.getResource("/" + contextHelper.programConfigModuleDir).getPath());
         webContextMonitor.start();
 
     }
@@ -677,91 +676,101 @@ public class WebContext {
 
     private void pageSettingInitial() throws Exception {
         for (String moduleCode : modules.keySet()) {
-            pageSetting.put(moduleCode, new HashMap<String, PageDescriptor>());
             Module module = modules.get(moduleCode);
             List<Page> pageList = module.getPageList();
-            if(pageList == null) {
-                continue;
-            }
+            reloadPage(moduleCode, pageList);
+        }
+    }
 
-            boolean useDescriptorSubPages = false;
-            for (Page page : pageList) {
-                for (com.hframework.web.config.bean.module.Component component : page.getComponentList()) {
-                    if(descriptorSubPages.containsKey(component.getDataSet())) {
-                        useDescriptorSubPages = true;
-                        break;
-                    }
+    public void reloadPage(String moduleCode, List<Page> pageList) throws Exception {
+
+        if(pageList == null) {
+            return;
+        }
+
+        if(!pageSetting.containsKey(moduleCode)) {
+            pageSetting.put(moduleCode, new HashMap<String, PageDescriptor>());
+        }
+
+
+        boolean useDescriptorSubPages = false;
+        for (Page page : pageList) {
+            for (com.hframework.web.config.bean.module.Component component : page.getComponentList()) {
+                if(descriptorSubPages.containsKey(component.getDataSet())) {
+                    useDescriptorSubPages = true;
+                    break;
                 }
             }
-            if(useDescriptorSubPages) {
-                for (List<Page> pages : descriptorSubPages.values()) {
-                    pageList.addAll(0, pages);
-                }
-
-            }
-
-            for (Page page : pageList) {
-                if(StringUtils.isNotBlank(page.getDataSet()) && page.getDataSet().startsWith("#")  && page.getDataSet().endsWith("#")) {
-                    page.setDataSet(getValueByVar(page.getDataSet()));
-                }
-                if(StringUtils.isBlank(page.getId()) && StringUtils.isBlank(moduleCode)) {
-                    List<com.hframework.web.config.bean.module.Component> pubComponentList = page.getComponentList();
-                    for (com.hframework.web.config.bean.module.Component component : pubComponentList) {
-                        if(StringUtils.isNotBlank(component.getDataSet()) && component.getDataSet().startsWith("#")  && component.getDataSet().endsWith("#")) {
-                            component.setDataSet(getValueByVar(component.getDataSet()));
-                        }
-                        defaultComponentMap.put(component.getId(), component);
-                    }
-                    List<com.hframework.web.config.bean.module.Element> elementList = page.getElementList();
-                    for (com.hframework.web.config.bean.module.Element element : elementList) {
-                        if(StringUtils.isNotBlank(element.getValue()) && element.getValue().startsWith("#")  && element.getValue().endsWith("#")) {
-                            element.setValue(getValueByVar(element.getValue()));
-                        }
-                        defaultElementMap.put(element.getId(),element);
-                    }
-
-                    continue;
-                }
-
-                com.hframework.web.config.bean.module.Component targetComponent = null;
-                if(page.getDataSet() != null && page.getPageTemplate().equals("qlist")) {
-                    String dataSet = page.getDataSet().substring(page.getDataSet().indexOf("/") + 1);
-                    if(processsCache.containsKey(dataSet) ) {
-                        List<com.hframework.web.config.bean.module.Component> componentList = page.getComponentList();
-                        for (com.hframework.web.config.bean.module.Component component : componentList) {
-                            if (component.getId().equals("qList") && component.getDataSet().equals(page.getDataSet())) {
-                                targetComponent = component;
-                            }
-                        }
-
-                        if (targetComponent == null) {
-                            targetComponent = new com.hframework.web.config.bean.module.Component();
-                            targetComponent.setId("qList");
-                            targetComponent.setDataSet(page.getDataSet());
-                            page.getComponentList().add(targetComponent);
-                        }
-                    }
-                }else {
-                    List<com.hframework.web.config.bean.module.Component> componentList = page.getComponentList();
-                    for (com.hframework.web.config.bean.module.Component component : componentList) {
-                        if (component.getId().equals("qList") && processsCache.containsKey(component.getDataSet().substring(component.getDataSet().indexOf("/") + 1)) ) {
-                            targetComponent = component;
-                        }
-                    }
-                }
-
-                if(targetComponent != null) {
-                    Object[] objects = processsCache.get(targetComponent.getDataSet().substring(targetComponent.getDataSet().indexOf("/") + 1));
-                    if(targetComponent.getEventList() == null) targetComponent.setEventList(new ArrayList<Event>());
-                    targetComponent.getEventList().addAll((List<Event>)objects[4]);
-                }
-
-                PageDescriptor pageDescriptor = parsePageDescriptor(page, moduleCode);
-                pageSetting.get(moduleCode).put(page.getId(), pageDescriptor);
+        }
+        if(useDescriptorSubPages) {
+            for (List<Page> pages : descriptorSubPages.values()) {
+                pageList.addAll(0, pages);
             }
 
         }
+
+        for (Page page : pageList) {
+            if(StringUtils.isNotBlank(page.getDataSet()) && page.getDataSet().startsWith("#")  && page.getDataSet().endsWith("#")) {
+                page.setDataSet(getValueByVar(page.getDataSet()));
+            }
+            if(StringUtils.isBlank(page.getId()) && StringUtils.isBlank(moduleCode)) {
+                List<com.hframework.web.config.bean.module.Component> pubComponentList = page.getComponentList();
+                for (com.hframework.web.config.bean.module.Component component : pubComponentList) {
+                    if(StringUtils.isNotBlank(component.getDataSet()) && component.getDataSet().startsWith("#")  && component.getDataSet().endsWith("#")) {
+                        component.setDataSet(getValueByVar(component.getDataSet()));
+                    }
+                    defaultComponentMap.put(component.getId(), component);
+                }
+                List<com.hframework.web.config.bean.module.Element> elementList = page.getElementList();
+                for (com.hframework.web.config.bean.module.Element element : elementList) {
+                    if(StringUtils.isNotBlank(element.getValue()) && element.getValue().startsWith("#")  && element.getValue().endsWith("#")) {
+                        element.setValue(getValueByVar(element.getValue()));
+                    }
+                    defaultElementMap.put(element.getId(),element);
+                }
+
+                continue;
+            }
+
+            com.hframework.web.config.bean.module.Component targetComponent = null;
+            if(page.getDataSet() != null && page.getPageTemplate().equals("qlist")) {
+                String dataSet = page.getDataSet().substring(page.getDataSet().indexOf("/") + 1);
+                if(processsCache.containsKey(dataSet) ) {
+                    List<com.hframework.web.config.bean.module.Component> componentList = page.getComponentList();
+                    for (com.hframework.web.config.bean.module.Component component : componentList) {
+                        if (component.getId().equals("qList") && component.getDataSet().equals(page.getDataSet())) {
+                            targetComponent = component;
+                        }
+                    }
+
+                    if (targetComponent == null) {
+                        targetComponent = new com.hframework.web.config.bean.module.Component();
+                        targetComponent.setId("qList");
+                        targetComponent.setDataSet(page.getDataSet());
+                        page.getComponentList().add(targetComponent);
+                    }
+                }
+            }else {
+                List<com.hframework.web.config.bean.module.Component> componentList = page.getComponentList();
+                for (com.hframework.web.config.bean.module.Component component : componentList) {
+                    if (component.getId().equals("qList") && processsCache.containsKey(component.getDataSet().substring(component.getDataSet().indexOf("/") + 1)) ) {
+                        targetComponent = component;
+                    }
+                }
+            }
+
+            if(targetComponent != null) {
+                Object[] objects = processsCache.get(targetComponent.getDataSet().substring(targetComponent.getDataSet().indexOf("/") + 1));
+                if(targetComponent.getEventList() == null) targetComponent.setEventList(new ArrayList<Event>());
+                targetComponent.getEventList().addAll((List<Event>)objects[4]);
+            }
+
+            PageDescriptor pageDescriptor = parsePageDescriptor(page, moduleCode);
+            pageSetting.get(moduleCode).put(page.getId(), pageDescriptor);
+        }
     }
+
+
 
     private String getValueByVar(String var) {
         var = var.substring(1, var.length() - 1);
@@ -1221,50 +1230,61 @@ public class WebContext {
         return false;
     }
 
+    public void overrideDataSet(DataSet dataSet) throws Exception {
+        DataSetDescriptor dataSetDescriptor = dataSets.get(dataSet.getModule() + "/" + dataSet.getCode());
+        if(dataSetDescriptor == null) {
+            dataSets.put(dataSet.getModule() + "/" + dataSet.getCode(), new DataSetDescriptor((dataSet)));
+            dataSetDescriptor =  dataSets.get(dataSet.getModule() + "/" + dataSet.getCode());
+            com.hframework.beans.class0.Class defPoClass = CreatorUtil.getDefPoClass(program.getCompany(),
+                    program.getCode(), dataSet.getModule(), dataSet.getCode());
+            if(dataSet.getCode().equals(dataSet.getEventObjectCode())) {
+                try{
+                    Class<?> aClass = Class.forName(defPoClass.getClassPath());
+                    dataSetCache.put(aClass, dataSetDescriptor);
+                }catch (Exception e) {}
+            }
+        }else {
+            BeanUtils.copyProperties(dataSetDescriptor.getDataSet(), dataSet);
+        }
+
+        List<Field> fieldList = dataSetDescriptor.getDataSet().getFields().getFieldList();
+        for (Field field : fieldList) {
+            if(field.getRel() != null && field.getRel().getEntityCode() != null) {
+                String entityCode = field.getRel().getEntityCode();
+                String dataSetCode = entityCode.substring(0, entityCode.indexOf("/"));
+                String relFieldCode = entityCode.substring(entityCode.indexOf("/") + 1, entityCode.lastIndexOf("/"));
+                DataSetDescriptor relDataSet = this.getOnlyDataSetDescriptor(dataSetCode);
+                com.hframework.beans.class0.Class relPoClass =
+                        CreatorUtil.getDefPoClass(program.getCompany(),
+                                program.getCode(), relDataSet.getDataSet().getModule(), dataSetCode);
+                DataSetDescriptor relDataSetDescriptor = dataSetCache.get(Class.forName(relPoClass.getClassPath()));
+                dataSetDescriptor.addRelDataSet(field.getCode(), dataSetCode + "/" + relFieldCode, relDataSetDescriptor);
+            }
+        }
+
+        List<ComponentDescriptor> componentDescriptors = dataSetComponentApplyCache.get(dataSetDescriptor);
+        if(componentDescriptors != null) {
+            for (ComponentDescriptor componentDescriptor : componentDescriptors) {
+                //重新初始化组件内容
+                componentDescriptor.initComponentDataContainer(events);
+            }
+        }
+
+
+    }
+
     public void overrideContext(List<File> diffFile, Class config) throws Exception {
         if(config == DataSet.class) {
             for (File file : diffFile) {
                 DataSet dataSet = XmlUtils.readValueFromAbsoluteFilePath(file.getAbsolutePath(), DataSet.class);
-
-                DataSetDescriptor dataSetDescriptor = dataSets.get(dataSet.getModule() + "/" + dataSet.getCode());
-                if(dataSetDescriptor == null) {
-                    dataSets.put(dataSet.getModule() + "/" + dataSet.getCode(), new DataSetDescriptor((dataSet)));
-                    dataSetDescriptor =  dataSets.get(dataSet.getModule() + "/" + dataSet.getCode());
-                    com.hframework.beans.class0.Class defPoClass = CreatorUtil.getDefPoClass(program.getCompany(),
-                            program.getCode(), dataSet.getModule(), dataSet.getCode());
-                    if(dataSet.getCode().equals(dataSet.getEventObjectCode())) {
-                        try{
-                            Class<?> aClass = Class.forName(defPoClass.getClassPath());
-                            dataSetCache.put(aClass, dataSetDescriptor);
-                        }catch (Exception e) {}
-                    }
-                }else {
-                    BeanUtils.copyProperties(dataSetDescriptor.getDataSet(), dataSet);
-                }
-
-                List<Field> fieldList = dataSetDescriptor.getDataSet().getFields().getFieldList();
-                for (Field field : fieldList) {
-                    if(field.getRel() != null && field.getRel().getEntityCode() != null) {
-                        String entityCode = field.getRel().getEntityCode();
-                        String dataSetCode = entityCode.substring(0, entityCode.indexOf("/"));
-                        String relFieldCode = entityCode.substring(entityCode.indexOf("/") + 1, entityCode.lastIndexOf("/"));
-                        DataSetDescriptor relDataSet = this.getOnlyDataSetDescriptor(dataSetCode);
-                        com.hframework.beans.class0.Class relPoClass =
-                                CreatorUtil.getDefPoClass(program.getCompany(),
-                                        program.getCode(), relDataSet.getDataSet().getModule(), dataSetCode);
-                        DataSetDescriptor relDataSetDescriptor = dataSetCache.get(Class.forName(relPoClass.getClassPath()));
-                        dataSetDescriptor.addRelDataSet(field.getCode(), dataSetCode + "/" + relFieldCode, relDataSetDescriptor);
-                    }
-                }
-
-                List<ComponentDescriptor> componentDescriptors = dataSetComponentApplyCache.get(dataSetDescriptor);
-                for (ComponentDescriptor componentDescriptor : componentDescriptors) {
-                    //重新初始化组件内容
-                    componentDescriptor.initComponentDataContainer(events);
-                }
-
+                overrideDataSet(dataSet);
             }
 
+        }else if(config == Module.class) {
+            for (File file : diffFile) {
+                Module module = XmlUtils.readValueFromAbsoluteFilePath(file.getAbsolutePath(), Module.class);
+                reloadPage(module.getCode(), module.getPageList());
+            }
         }
     }
 

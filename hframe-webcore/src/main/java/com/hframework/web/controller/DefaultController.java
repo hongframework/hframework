@@ -477,6 +477,7 @@ public class DefaultController {
                     getXml(root, jsonObject, descriptor.getVirtualContainerSubNodePath());
 //                    String xml = document.asXML();
                     OutputFormat formater = OutputFormat.createPrettyPrint();
+                    formater.setTrimText(false);//这里不能trimText,当前台textarea的提交带回车符号sql语句，如果trimText，\r\n都被去掉，导致与实际不符。
                     StringWriter out = new StringWriter();
                     // 注释：创建输出流
                     XMLWriter writer = new XMLWriter(out, formater);

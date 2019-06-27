@@ -65,6 +65,7 @@ public class HttpClient {
                     .returnContent().asString(Charset.forName("utf-8"));
         } catch (IOException e) {
             logger.warn("request failed.|{}", e);
+            throw e;
         }
         return ret;
     }
@@ -88,6 +89,7 @@ public class HttpClient {
                     .returnContent().asString(Charset.forName("utf-8"));
         } catch (IOException e) {
             logger.warn("request failed.|{}", e);
+            throw e;
         }
         logger.info("HTTP 响应报文: " + ret);
         System.out.println(ret);
@@ -115,6 +117,7 @@ public class HttpClient {
                     .returnContent().asString(Charset.forName("utf-8"));
         } catch (IOException e) {
             logger.warn("request failed.|{}", e);
+            throw e;
         }
         logger.info("HTTP 响应报文: " + ret);
         return ret;
@@ -141,6 +144,7 @@ public class HttpClient {
                     .returnContent().asString(Charset.forName("utf-8"));
         } catch (IOException e) {
             logger.warn("request failed.|{}", e);
+            throw e;
         }
         logger.info("HTTP 响应报文: " + ret);
         return ret;
@@ -168,6 +172,7 @@ public class HttpClient {
                     .returnContent().asString(Charset.forName("utf-8"));
         } catch (IOException e) {
             logger.warn("request failed.|{}", e);
+            throw e;
         }
         logger.info("HTTP 响应报文: " + ret);
         return ret;

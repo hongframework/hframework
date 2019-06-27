@@ -8,6 +8,34 @@ require(['layer','ajax','js/hframework/errormsg'], function () {
     //    return false;
     //});
 
+    $(".btn-setting").click(function(){
+        try{
+            var component = $(this).parents("div[component]:first").attr("component");
+            if(!component){
+                var id = $(this).parents("div.box-header").parent().attr("id");
+                if(id.endsWith("QueryForm")){
+                    component = "qForm";
+                }
+            }
+            $.ajax({
+                url: "/component_setting.json",
+                data: {component: component},
+                type: 'post',
+                success: function(data){
+                    hideProcessBar();
+                    if(data.resultCode != '0') {
+                        alert(data.resultMessage);
+                        return;
+                    }
+
+                    var url = data.data.url;
+                    window.location.href = url;
+                }
+            });
+
+        }catch (e){}
+    });
+
     //动态刷新的form注解需要捆绑改submit属性，否则就直接提交走了
     $('form').live("submit", function(){
         if(!$(this).attr("action")) {
@@ -201,6 +229,58 @@ require(['layer','ajax','js/hframework/errormsg'], function () {
                 }
 
             }
+        }else if($type == "parentPageFwd") {
+            var isStack =$action[$type].isStack;
+            var $componentParam  = formatContent($($this).attr("params"), $($this));
+            if($componentParam != null && $componentParam.endsWith("thisForm")) {
+                $thisForm = $this.parents("form")[0];
+                if(!$thisForm) {
+                    $thisForm = $("body form:last");
+                }
+                //参数检查
+                if(!$.checkSubmit($thisForm)) {
+                    //alert("字段不能为空！");
+                    return;
+                }
+
+                showProcessBar();
+                if($param && $param != "thisForm") {
+                    parent.location.href = url + "?" + $param;
+                }else {
+                    parent.location.href = url;
+                }
+
+
+                //由于submit提交，刷新网页时会提示是否重复提交（比如登录后页面），所以暂时没有必要带上thisForm的内容
+                //$($thisForm).attr("action", url + "?" + $param);
+                //$($thisForm).attr("method", "post");
+                //$($thisForm).submit();
+            }else {
+                if($($this).attr("params") == "checkIds") {
+                    var checkIds = new Array();
+                    var $thisList = $this.parents(".hflist")[0];
+                    var $allChecked = $($thisList).find("tbody input[type=checkbox][name=checkIds]:checked");
+                    $allChecked.each(function(){
+                        var columnName = $(this).attr("value-key");
+                        var columnValue  = formatContent("{" + columnName + "}", $(this));
+                        checkIds.push(columnValue);
+                    });
+                    showProcessBar();
+                    parent.location.href = url + "?" + $param + "=" + checkIds.join();
+                }else{
+                    showProcessBar();
+                    if($param) {
+                        parent.location.href = url + "?" + $param;
+                    }else{
+                        parent.location.href = url;
+                    }
+                }
+
+            }
+        }else if($type == "graphDbDiv") {
+            var pageCode = window.location.href.substring(window.location.href.lastIndexOf("/") + 1, window.location.href.indexOf(".html"));
+            var dbId = pageCode.substring(0, pageCode.indexOf("_"));
+            parent.location.href="/cfg/data_graph_init.html?dbId=" + dbId;
         }else if($type == "pageFwdWithData") {
             var isStack =$action[$type].isStack;
             var $componentParam  = formatContent($($this).attr("params"), $($this));
@@ -299,7 +379,7 @@ require(['layer','ajax','js/hframework/errormsg'], function () {
             }else if($param.endsWith("thisForm")) {
                 if($this.parents("form").length == 0 && $this.parents(".hflist").find("form").length == 0) {//由于hflist按钮并在form内，这里特殊处理一下
                     //var $rootNodes = $this.parents("div .hfspan").children(".hfcontainer").children("div").children("div .box");
-                    var $rootNodes = $this.parents("div.hfspan").find(".hfcontainer:first > div > div > div.box:first, .hfcontainer:first > div > div.box")
+                    var $rootNodes = $this.parents("div.hfspan").find(".hfcontainer:first > div > div > div.box, .hfcontainer:first > div > div.box")
                     var filePath = $this.parents("div .hfspan").find("div[path]").attr("path");
                     $param = $param + "&path=" + filePath;
                     //alert(filePath);

@@ -26,6 +26,8 @@
 		#parse("component/element/tipinput_FORGRID.vm")
 #elseif($column.editType=='checkbox')
 	#parse("component/element/_checkbox.vm")
+#elseif($column.editType=='password')
+	#parse("component/element/_password.vm")
 #elseif($column.editType=='radio')
 	#parse("component/element/_radio.vm")
 #elseif($column.editType=='openwin')

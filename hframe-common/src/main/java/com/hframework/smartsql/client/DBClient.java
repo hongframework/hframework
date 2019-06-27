@@ -22,6 +22,8 @@ import java.util.*;
  */
 public class DBClient {
 
+    public static Object[] emptyObjectArray = new Object[0];
+
     private static final Logger logger = LoggerFactory.getLogger(DBClient.class);
 
     private static final Boolean REGISTER_DATABASE_IGNORE_KEY_REPEAT = true;

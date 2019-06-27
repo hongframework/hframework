@@ -77,7 +77,11 @@
                                             <span class="hflist-data-item" code="$!{list.columns.get($count).code}">$item</span>
                                         </a>
                                     #else
-                                        <span code="$!{list.columns.get($count).code}">$item</span>
+                                        #if("$!{list.columns.get($count).showType}" == "password")
+                                            <span code="$!{list.columns.get($count).code}">*</span>
+                                        #else
+                                            <span code="$!{list.columns.get($count).code}">$item</span>
+                                        #end
                                     #end
                                     #set($count=$count+1)
                                 </td>

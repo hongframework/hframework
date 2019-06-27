@@ -155,6 +155,35 @@ public class ComponentInvokeManager {
                     jsonObject.put("data",JSONObject.toJSON(WebContext.getDefault()));
                 }
             }
+        }else if(StringUtils.isNotBlank(action) &&
+                "runtime".equals(componentDescriptor.getDataSetDescriptor().getDataSet().getModule())){
+            ResultData resultData = null;
+            IRuntimeDataService runtimeDataService = ServiceFactory.getService(IRuntimeDataService.class);
+            if ("detail".equals(action)) {
+                resultData = runtimeDataService.invokeDetail(request, componentDescriptor);
+            }else if("list".equals(action)){
+                if (pagination.getPageNo() == 0) pagination.setPageNo(1);
+                if (pagination.getPageSize() == 0) pagination.setPageSize(20);
+                if ("eList".equals(type)) pagination.setPageSize(50);
+                if(columnTableInfo != null) pagination.setPageSize(10000);
+
+                resultData = runtimeDataService.invokeList(request, componentDescriptor, pagination);
+            }else {
+                throw new BusinessException("runtime mode, action [ " + action + " ] not supported! ");
+            }
+
+            if(columnTableInfo != null) {
+                convertResultDataColToRow(resultData, componentDescriptor, columnTableInfo, sourceAction);
+            }
+
+            jsonObject = getJsonObjectByResultData(componentDescriptor, resultData, moduleCode, dataSetCode, action);
+            if(resultData.getData() == null) {
+                jsonObject.put("dataIsEmpty","true");
+            }
+            if("detail".equals(action) && "eForm".equals(type) && resultData.getData() == null) {
+                jsonObject.put("data",JSONObject.toJSON(WebContext.getDefault()));
+            }
+
         }else if(StringUtils.isNotBlank(action)) {
 
             ResultData resultData = null;
