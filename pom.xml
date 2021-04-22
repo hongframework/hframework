@@ -29,7 +29,7 @@
         <spring_version>4.2.5.RELEASE</spring_version>
         <jackson_version>2.2.3</jackson_version>
         <jsoup_version>1.8.3</jsoup_version>
-        <mybatis_version>3.3.0</mybatis_version>
+        <mybatis_version>3.5.6</mybatis_version>
         <mybatis_spring>1.1.1</mybatis_spring>
     </properties>
 
