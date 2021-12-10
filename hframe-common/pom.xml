@@ -12,7 +12,7 @@
     <properties>
         <slf4j_version>1.7.10</slf4j_version>
         <jetty_verion>8.1.7.v20120910</jetty_verion>
-        <log4j_version>2.2</log4j_version>
+        <log4j_version>2.14.1</log4j_version>
     </properties>
 
     <artifactId>hframe-common</artifactId>
