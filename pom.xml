@@ -211,7 +211,7 @@
         <dependency>
             <groupId>com.alibaba</groupId>
             <artifactId>fastjson</artifactId>
-            <version>1.2.29</version><!-- 解决fastjson安全性问题 同时需要解决canal不兼容问题 -->
+            <version>1.2.83</version><!-- 解决fastjson安全性问题 同时需要解决canal不兼容问题 -->
         </dependency>
         <dependency>
             <groupId>com.google.zxing</groupId>
