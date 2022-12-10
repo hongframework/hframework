@@ -26,7 +26,7 @@
     <properties>
         <encoding>UTF-8</encoding>
         <jdk_version>1.7</jdk_version>
-        <spring_version>4.2.5.RELEASE</spring_version>
+        <spring_version>6.0.0</spring_version>
         <jackson_version>2.2.3</jackson_version>
         <jsoup_version>1.8.3</jsoup_version>
         <mybatis_version>3.3.0</mybatis_version>
